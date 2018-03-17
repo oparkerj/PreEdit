@@ -34,16 +34,18 @@ public abstract class Input<N extends Node, O> {
 		return node;
 	}
 	
-	public final O getValue() throws InvalidInputException {
-		return getNodeValue(node);
+	public final Optional<O> getValue() {
+		try {
+			O o = getNodeValue(node);
+			if (isValid(o)) return Optional.ofNullable(o);
+			return Optional.empty();
+		} catch (InvalidInputException e) {
+			return Optional.empty();
+		}
 	}
 	
 	public final boolean isValid() {
-		try {
-			return isValid(getValue());
-		} catch (InvalidInputException e) {
-			return false;
-		}
+		return getValue().isPresent();
 	}
 
 }
