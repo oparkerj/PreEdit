@@ -1,6 +1,7 @@
 package com.ssplugins.meme.input;
 
 import com.ssplugins.meme.exceptions.InvalidInputException;
+import com.ssplugins.meme.exceptions.SilentFailException;
 import javafx.scene.Node;
 
 import java.util.Optional;

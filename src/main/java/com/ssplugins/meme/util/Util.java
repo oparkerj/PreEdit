@@ -1,6 +1,7 @@
 package com.ssplugins.meme.util;
 
 import com.ssplugins.meme.exceptions.InvalidInputException;
+import com.ssplugins.meme.exceptions.SilentFailException;
 import javafx.application.Platform;
 
 import java.io.PrintWriter;
@@ -47,6 +48,10 @@ public final class Util {
 	
 	public static Supplier<InvalidInputException> invalidInput() {
 		return InvalidInputException::new;
+	}
+	
+	public static Supplier<SilentFailException> silentFail() {
+		return SilentFailException::new;
 	}
 	
 }

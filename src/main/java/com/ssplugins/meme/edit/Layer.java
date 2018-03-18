@@ -1,5 +1,6 @@
 package com.ssplugins.meme.edit;
 
+import com.ssplugins.meme.exceptions.SilentFailException;
 import com.ssplugins.meme.input.InputMap;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -13,7 +14,7 @@ public abstract class Layer {
 	
 	public abstract String getName();
 	
-	public abstract void draw(GraphicsContext context);
+	public abstract void draw(GraphicsContext context) throws SilentFailException;
 	
 	protected abstract void defineInputs(InputMap map);
 	

@@ -1,5 +1,8 @@
 package com.ssplugins.meme.input;
 
+import com.ssplugins.meme.exceptions.SilentFailException;
+import com.ssplugins.meme.util.Util;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +27,10 @@ public class InputMap {
 	
 	public <T extends Input> Optional<T> getInput(String name, Class<T> type) {
 		return getInput(name).filter(input -> type.isAssignableFrom(input.getClass())).map(type::cast);
+	}
+	
+	public final <T> T getValue(String name, Class<? extends Input<?, T>> type) throws SilentFailException {
+		return getInput(name, type).flatMap(Input::getValue).orElseThrow(Util.silentFail());
 	}
 	
 }
