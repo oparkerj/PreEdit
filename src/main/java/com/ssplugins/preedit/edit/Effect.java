@@ -1,4 +1,4 @@
-package com.ssplugins.meme.edit;
+package com.ssplugins.preedit.edit;
 
 public abstract class Effect extends Layer {
 

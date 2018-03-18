@@ -1,4 +1,4 @@
-package com.ssplugins.meme.exceptions;
+package com.ssplugins.preedit.exceptions;
 
 public class SilentFailException extends Exception {
 	

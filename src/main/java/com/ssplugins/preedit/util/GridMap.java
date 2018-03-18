@@ -1,4 +1,4 @@
-package com.ssplugins.meme.util;
+package com.ssplugins.preedit.util;
 
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;

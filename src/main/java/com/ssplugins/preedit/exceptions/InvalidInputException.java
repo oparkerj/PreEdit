@@ -1,4 +1,4 @@
-package com.ssplugins.meme.exceptions;
+package com.ssplugins.preedit.exceptions;
 
 public class InvalidInputException extends Exception {
 	

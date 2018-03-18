@@ -1,7 +1,7 @@
-package com.ssplugins.meme.input;
+package com.ssplugins.preedit.input;
 
-import com.ssplugins.meme.exceptions.SilentFailException;
-import com.ssplugins.meme.util.Util;
+import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.util.Util;
 
 import java.util.Collections;
 import java.util.HashMap;

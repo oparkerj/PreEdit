@@ -1,4 +1,4 @@
-package com.ssplugins.meme.input;
+package com.ssplugins.preedit.input;
 
 import javafx.scene.control.TextArea;
 

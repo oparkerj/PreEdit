@@ -1,34 +1,34 @@
-package com.ssplugins.meme;
+package com.ssplugins.preedit;
 
-import com.ssplugins.meme.gui.Scenes;
-import com.ssplugins.meme.util.GUI;
-import com.ssplugins.meme.util.Util;
+import com.ssplugins.preedit.gui.Scenes;
+import com.ssplugins.preedit.util.GUI;
+import com.ssplugins.preedit.util.Util;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.javacord.DiscordApi;
 
-public class MemeBot extends Application {
+public class PreEdit extends Application {
 	
 	public static void main(String[] args) {
-		Application.launch(MemeBot.class);
+		Application.launch(PreEdit.class);
 	}
 	
-	public MemeBot() {
+	public PreEdit() {
 		instance = this;
 	}
 	
-	public static final String NAME = "MemeBot";
-	private static MemeBot instance;
+	public static final String NAME = "PreEdit";
+	private static PreEdit instance;
 	
 	private Stage stage;
 	private DiscordApi api;
 	
-	public static MemeBot getInstance() {
+	public static PreEdit getInstance() {
 		return instance;
 	}
 	
 	@Override
-	public void start(Stage stage) throws Exception {
+	public void start(Stage stage) {
 		this.stage = stage;
 		stage.setOnCloseRequest(event -> {
 			if (api != null) api.disconnect();

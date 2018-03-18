@@ -1,6 +1,6 @@
-package com.ssplugins.meme.gui;
+package com.ssplugins.preedit.gui;
 
-import com.ssplugins.meme.util.GUI;
+import com.ssplugins.preedit.util.GUI;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.PixelWriter;
@@ -38,7 +38,7 @@ public final class Tabs {
 		
 		ComboBox<String> selector = new ComboBox<>();
 		selector.setMinWidth(100);
-		selector.setPromptText("<select meme>");
+		selector.setPromptText("<select preedit>");
 		controls.add("selector", 0, 0, selector);
 		
 		Button btnNew = new Button("New");

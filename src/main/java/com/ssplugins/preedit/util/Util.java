@@ -1,7 +1,7 @@
-package com.ssplugins.meme.util;
+package com.ssplugins.preedit.util;
 
-import com.ssplugins.meme.exceptions.InvalidInputException;
-import com.ssplugins.meme.exceptions.SilentFailException;
+import com.ssplugins.preedit.exceptions.InvalidInputException;
+import com.ssplugins.preedit.exceptions.SilentFailException;
 import javafx.application.Platform;
 
 import java.io.PrintWriter;

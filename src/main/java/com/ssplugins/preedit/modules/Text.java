@@ -1,10 +1,10 @@
-package com.ssplugins.meme.modules;
+package com.ssplugins.preedit.modules;
 
-import com.ssplugins.meme.edit.Module;
-import com.ssplugins.meme.exceptions.SilentFailException;
-import com.ssplugins.meme.input.InputMap;
-import com.ssplugins.meme.input.LocationInput;
-import com.ssplugins.meme.input.TextInput;
+import com.ssplugins.preedit.edit.Module;
+import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.input.InputMap;
+import com.ssplugins.preedit.input.LocationInput;
+import com.ssplugins.preedit.input.TextInput;
 import javafx.scene.canvas.GraphicsContext;
 
 public class Text extends Module {

@@ -1,9 +1,9 @@
-package com.ssplugins.meme.gui;
+package com.ssplugins.preedit.gui;
 
-import com.ssplugins.meme.util.Dialog;
-import com.ssplugins.meme.util.GUI;
-import com.ssplugins.meme.MemeBot;
-import com.ssplugins.meme.util.Util;
+import com.ssplugins.preedit.util.Dialog;
+import com.ssplugins.preedit.util.GUI;
+import com.ssplugins.preedit.PreEdit;
+import com.ssplugins.preedit.util.Util;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -51,8 +51,8 @@ public final class Scenes {
 			}
 			new DiscordApiBuilder().setToken(op.get().getText()).login().thenAccept(api -> {
 				Util.log("Logged in.");
-				MemeBot.getInstance().setApi(api);
-				MemeBot.getInstance().setGUI(MENU);
+				PreEdit.getInstance().setApi(api);
+				PreEdit.getInstance().setGUI(MENU);
 				working.set(false);
 				gui.hide("labelLogin");
 			}).exceptionally(throwable -> {
@@ -73,7 +73,7 @@ public final class Scenes {
 	}
 	
 	public static GUI menu() {
-		GUI gui = new GUI(MemeBot.NAME);
+		GUI gui = new GUI(PreEdit.NAME);
 		gui.setPadding(10);
 		
 		Tab tabGenerate = new Tab("Generate");

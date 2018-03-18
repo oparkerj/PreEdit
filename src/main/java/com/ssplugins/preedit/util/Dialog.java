@@ -1,6 +1,6 @@
-package com.ssplugins.meme.util;
+package com.ssplugins.preedit.util;
 
-import com.ssplugins.meme.MemeBot;
+import com.ssplugins.preedit.PreEdit;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -16,7 +16,7 @@ public final class Dialog {
 			return Util.runFXSafeFlat(() -> show(msg, title, type));
 		}
 		Alert alert = new Alert(type);
-		alert.setTitle(title == null ? MemeBot.NAME : title);
+		alert.setTitle(title == null ? PreEdit.NAME : title);
 		alert.setContentText(msg);
 		return alert.showAndWait();
 	}
@@ -26,7 +26,7 @@ public final class Dialog {
 			return Util.runFXSafeFlat(() -> exception(msg, title, t));
 		}
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle(title == null ? MemeBot.NAME : title);
+		alert.setTitle(title == null ? PreEdit.NAME : title);
 		alert.setContentText(msg);
 		
 		TextArea textArea = new TextArea(Util.exceptionMessage(t));
@@ -42,7 +42,7 @@ public final class Dialog {
 			return Util.runFXSafeFlat(() -> input(msg, title));
 		}
 		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle(title == null ? MemeBot.NAME : title);
+		dialog.setTitle(title == null ? PreEdit.NAME : title);
 		dialog.setContentText(msg);
 		dialog.initModality(Modality.APPLICATION_MODAL);
 		return dialog.showAndWait();
@@ -54,7 +54,7 @@ public final class Dialog {
 			return Util.runFXSafeFlat(() -> choose(msg, title, choices));
 		}
 		ChoiceDialog<T> dialog = new ChoiceDialog<>(choices.get(0), choices);
-		dialog.setTitle(title == null ? MemeBot.NAME : title);
+		dialog.setTitle(title == null ? PreEdit.NAME : title);
 		dialog.setContentText(msg);
 		dialog.initModality(Modality.APPLICATION_MODAL);
 		return dialog.showAndWait();

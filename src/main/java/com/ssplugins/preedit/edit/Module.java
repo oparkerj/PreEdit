@@ -1,4 +1,4 @@
-package com.ssplugins.meme.edit;
+package com.ssplugins.preedit.edit;
 
 import java.util.ArrayList;
 import java.util.List;

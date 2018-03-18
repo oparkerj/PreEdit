@@ -1,8 +1,8 @@
-package com.ssplugins.meme.input;
+package com.ssplugins.preedit.input;
 
-import com.ssplugins.meme.exceptions.InvalidInputException;
-import com.ssplugins.meme.util.GridMap;
-import com.ssplugins.meme.util.Util;
+import com.ssplugins.preedit.exceptions.InvalidInputException;
+import com.ssplugins.preedit.util.GridMap;
+import com.ssplugins.preedit.util.Util;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;

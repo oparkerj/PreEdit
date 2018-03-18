@@ -1,7 +1,7 @@
-package com.ssplugins.meme.edit;
+package com.ssplugins.preedit.edit;
 
-import com.ssplugins.meme.exceptions.SilentFailException;
-import com.ssplugins.meme.input.InputMap;
+import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.input.InputMap;
 import javafx.scene.canvas.GraphicsContext;
 
 public abstract class Layer {
