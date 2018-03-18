@@ -1,4 +1,4 @@
-package com.ssplugins.meme.common;
+package com.ssplugins.meme.gui;
 
 import com.ssplugins.meme.util.GUI;
 import javafx.scene.canvas.Canvas;

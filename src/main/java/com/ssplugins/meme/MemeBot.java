@@ -1,11 +1,9 @@
 package com.ssplugins.meme;
 
-import com.ssplugins.meme.common.Scenes;
-import com.ssplugins.meme.util.Dialog;
+import com.ssplugins.meme.gui.Scenes;
 import com.ssplugins.meme.util.GUI;
 import com.ssplugins.meme.util.Util;
 import javafx.application.Application;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.javacord.DiscordApi;
 
