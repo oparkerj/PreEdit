@@ -1,7 +1,10 @@
 package com.ssplugins.preedit.input;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.util.GridMap;
+import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Util;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,6 +24,38 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 		this.width = width;
 		this.height = height;
 		this.ready();
+	}
+	
+	@Override
+	protected void setNodeValue(GridMap node, Region value) {
+		node.get("x", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getX())));
+		node.get("y", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getY())));
+		node.get("width", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getWidth())));
+		node.get("height", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getHeight())));
+	}
+	
+	@Override
+	protected JsonConverter<Region> getJsonConverter() {
+		return new JsonConverter<Region>() {
+			@Override
+			public JsonElement toJson(Region region) {
+				JsonObject out = new JsonObject();
+				out.addProperty("x", region.getX());
+				out.addProperty("y", region.getY());
+				out.addProperty("width", region.getWidth());
+				out.addProperty("height", region.getHeight());
+				return out;
+			}
+			
+			@Override
+			public Region fromJson(JsonElement element) {
+				JsonObject json = element.getAsJsonObject();
+				return new Region(json.get("x").getAsInt(),
+								  json.get("y").getAsInt(),
+								  json.get("width").getAsInt(),
+								  json.get("height").getAsInt());
+			}
+		};
 	}
 	
 	@Override
@@ -51,7 +86,8 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 		return true;
 	}
 	
-	public class Region {
+	public static class Region {
+		
 		private int x, y, width, height;
 		
 		public Region(int x, int y, int width, int height) {

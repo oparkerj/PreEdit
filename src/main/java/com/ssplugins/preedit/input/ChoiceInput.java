@@ -1,5 +1,6 @@
 package com.ssplugins.preedit.input;
 
+import com.ssplugins.preedit.util.JsonConverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
@@ -10,11 +11,23 @@ public class ChoiceInput<T> extends Input<ComboBox<T>, T> {
 	
 	private ObservableList<T> options;
 	private T def;
+	private JsonConverter<T> converter;
 	
-	public ChoiceInput(List<T> options, T selected) {
+	public ChoiceInput(List<T> options, T selected, JsonConverter<T> converter) {
 		this.options = FXCollections.observableArrayList(options);
 		this.def = selected;
+		this.converter = converter;
 		this.ready();
+	}
+	
+	@Override
+	protected void setNodeValue(ComboBox<T> node, T value) {
+		node.setValue(value);
+	}
+	
+	@Override
+	protected JsonConverter<T> getJsonConverter() {
+		return converter;
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package com.ssplugins.preedit.input;
 
+import com.ssplugins.preedit.util.JsonConverter;
 import javafx.scene.control.TextArea;
 
 public class TextAreaInput extends Input<TextArea, String> {
@@ -9,6 +10,16 @@ public class TextAreaInput extends Input<TextArea, String> {
 	public TextAreaInput(boolean emptyAllowed) {
 		this.emptyAllowed = emptyAllowed;
 		this.ready();
+	}
+	
+	@Override
+	protected void setNodeValue(TextArea node, String value) {
+		node.setText(value);
+	}
+	
+	@Override
+	protected JsonConverter<String> getJsonConverter() {
+		return TextInput.stringConverter();
 	}
 	
 	@Override

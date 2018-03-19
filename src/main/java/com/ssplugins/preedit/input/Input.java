@@ -1,15 +1,17 @@
 package com.ssplugins.preedit.input;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
+import com.ssplugins.preedit.util.JsonConverter;
 import javafx.scene.Node;
-import javafx.util.StringConverter;
 
 import java.util.Optional;
 
 public abstract class Input<N extends Node, O> {
 	
 	private N node;
-	private StringConverter<O> converter;
+	private JsonConverter<O> converter;
 	private boolean ready;
 	private boolean userProvided;
 
@@ -21,14 +23,12 @@ public abstract class Input<N extends Node, O> {
 	
 	protected abstract boolean isValid(O value);
 	
-	protected abstract StringConverter<O> getStringConverter();
-	
-	public abstract O getDefaultValue();
+	protected abstract JsonConverter<O> getJsonConverter();
 	
 	protected final void ready() {
 		this.ready = true;
 		this.node = createInputNode();
-		this.converter = getStringConverter();
+		this.converter = getJsonConverter();
 	}
 	
 	public final boolean isReady() {
@@ -62,12 +62,12 @@ public abstract class Input<N extends Node, O> {
 		}
 	}
 	
-	public final String serialize() {
-		return getValue().map(converter::toString).orElse(null);
+	public final JsonElement serialize() {
+		return getValue().map(converter::toJson).orElse(JsonNull.INSTANCE);
 	}
 	
-	public final void deserialize(String value) {
-		setNodeValue(node, converter.fromString(value));
+	public final void deserialize(JsonElement value) {
+		setNodeValue(node, converter.fromJson(value));
 	}
 	
 	public final boolean isValid() {

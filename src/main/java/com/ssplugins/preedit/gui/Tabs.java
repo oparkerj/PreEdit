@@ -47,11 +47,11 @@ public final class Tabs {
 		controls.add("line1", 1, 0, 1, 2, new Separator());
 		
 		Label labelLayers = new Label("Layers:");
-		controls.add("labelLayers", 2, 0, labelLayers);
+		controls.add("labelLayers", 0, 0, labelLayers);
 		
 		// TODO layer stuff
 		
-		gui.add("controls", 0, 1, controls.getPane());
+		gui.add("controls", 1, 1, controls.getPane());
 		return gui.getPane();
 	}
 	
