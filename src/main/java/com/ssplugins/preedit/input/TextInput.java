@@ -34,6 +34,11 @@ public class TextInput extends Input<TextField, String> {
 	}
 	
 	@Override
+	protected void setUpdateTrigger(TextField node, Runnable update) {
+		node.textProperty().addListener(observable -> update.run());
+	}
+	
+	@Override
 	protected JsonConverter<String> getJsonConverter() {
 		return stringConverter();
 	}

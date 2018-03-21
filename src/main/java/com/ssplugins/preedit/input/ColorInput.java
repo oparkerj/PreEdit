@@ -2,7 +2,6 @@ package com.ssplugins.preedit.input;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.util.JsonConverter;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
@@ -57,4 +56,8 @@ public class ColorInput extends Input<ColorPicker, Color> {
 		};
 	}
 	
+	@Override
+	protected void setUpdateTrigger(ColorPicker node, Runnable update) {
+		node.valueProperty().addListener(observable -> update.run());
+	}
 }

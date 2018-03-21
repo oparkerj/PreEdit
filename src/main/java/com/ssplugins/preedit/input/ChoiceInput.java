@@ -31,6 +31,11 @@ public class ChoiceInput<T> extends Input<ComboBox<T>, T> {
 	}
 	
 	@Override
+	protected void setUpdateTrigger(ComboBox<T> node, Runnable update) {
+		node.valueProperty().addListener(observable -> update.run());
+	}
+	
+	@Override
 	protected ComboBox<T> createInputNode() {
 		ComboBox<T> box = new ComboBox<>();
 		box.setItems(options);

@@ -23,6 +23,11 @@ public class TextAreaInput extends Input<TextArea, String> {
 	}
 	
 	@Override
+	protected void setUpdateTrigger(TextArea node, Runnable update) {
+		node.textProperty().addListener(observable -> update.run());
+	}
+	
+	@Override
 	protected TextArea createInputNode() {
 		return new TextArea();
 	}

@@ -28,7 +28,7 @@ public class ModuleAdapter implements JsonSerializer<Module>, JsonDeserializer<M
 		List<Effect> effects = context.deserialize(json.getAsJsonArray("effects"), effectType);
 		effects.forEach(module::addEffect);
 		JsonObject inputs = json.getAsJsonObject("inputs");
-		inputs.keySet().forEach(s -> module.getInputs().getInput(s).ifPresent(input -> input.deserialize(inputs.get(s))));
+		InputMapAdapter.deserialize(inputs, module.getInputs());
 		return module;
 	}
 	

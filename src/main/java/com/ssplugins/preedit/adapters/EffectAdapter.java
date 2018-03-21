@@ -20,7 +20,7 @@ public class EffectAdapter implements JsonSerializer<Effect>, JsonDeserializer<E
 		String name = json.get("name").getAsString();
 		Effect effect = catalog.createEffect(name).orElseThrow(() -> new JsonParseException("Could not create effect \"" + name + "\""));
 		JsonObject inputs = json.getAsJsonObject("inputs");
-		inputs.keySet().forEach(s -> effect.getInputs().getInput(s).ifPresent(input -> input.deserialize(inputs.get(s))));
+		InputMapAdapter.deserialize(inputs, effect.getInputs());
 		return null;
 	}
 	

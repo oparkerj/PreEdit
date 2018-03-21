@@ -3,7 +3,10 @@ package com.ssplugins.preedit.input;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
+import com.ssplugins.preedit.nodes.UserInput;
 import com.ssplugins.preedit.util.JsonConverter;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 
 import java.util.Optional;
@@ -11,10 +14,11 @@ import java.util.Optional;
 public abstract class Input<N extends Node, O> {
 	
 	private N node;
+	private UserInput displayNode;
 	private JsonConverter<O> converter;
 	private boolean ready;
-	private boolean userProvided;
-
+	private BooleanProperty userProvided = new SimpleBooleanProperty(false);
+	
 	protected abstract N createInputNode();
 	
 	protected abstract O getNodeValue(N node) throws InvalidInputException;
@@ -25,9 +29,13 @@ public abstract class Input<N extends Node, O> {
 	
 	protected abstract JsonConverter<O> getJsonConverter();
 	
+	protected abstract void setUpdateTrigger(N node, Runnable update);
+	
 	protected final void ready() {
 		this.ready = true;
 		this.node = createInputNode();
+		displayNode = new UserInput(node);
+		displayNode.getCheckBox().selectedProperty().bindBidirectional(userProvided);
 		this.converter = getJsonConverter();
 	}
 	
@@ -36,11 +44,15 @@ public abstract class Input<N extends Node, O> {
 	}
 	
 	public final void setUserProvided(boolean userProvided) {
-		this.userProvided = userProvided;
+		this.userProvided.set(userProvided);
 	}
 	
 	public final boolean isUserProvided() {
-		return userProvided;
+		return userProvided.get();
+	}
+	
+	public final void setUpdateTrigger(Runnable update) {
+		setUpdateTrigger(node, update);
 	}
 	
 	public final <T extends Input> Optional<T> as(Class<T> type) {
@@ -50,6 +62,10 @@ public abstract class Input<N extends Node, O> {
 	
 	public final N getNode() {
 		return node;
+	}
+	
+	public final UserInput getDisplayNode() {
+		return displayNode;
 	}
 	
 	public final Optional<O> getValue() {

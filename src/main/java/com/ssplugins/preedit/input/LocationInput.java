@@ -35,6 +35,14 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	}
 	
 	@Override
+	protected void setUpdateTrigger(GridMap node, Runnable update) {
+		node.get("x", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
+		node.get("y", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
+		node.get("width", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
+		node.get("height", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
+	}
+	
+	@Override
 	protected JsonConverter<Region> getJsonConverter() {
 		return new JsonConverter<Region>() {
 			@Override

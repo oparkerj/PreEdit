@@ -1,6 +1,9 @@
 package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.util.ShiftList;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.util.Callback;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +26,18 @@ public abstract class Module extends Layer {
 	
 	public final void shiftEffect(int i, boolean up) {
 		effects.shiftElement(i, !up);
+	}
+	
+	public static Callback<ListView<Module>, ListCell<Module>> getCellFactory() {
+		return param -> new ModuleCell();
+	}
+	
+	private static class ModuleCell extends ListCell<Module> {
+		@Override
+		protected void updateItem(Module item, boolean empty) {
+			super.updateItem(item, empty);
+			setText(item.getName());
+		}
 	}
 	
 }
