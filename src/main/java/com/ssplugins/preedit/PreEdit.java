@@ -2,11 +2,15 @@ package com.ssplugins.preedit;
 
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.gui.Scenes;
+import com.ssplugins.preedit.util.Dialog;
 import com.ssplugins.preedit.util.GUI;
 import com.ssplugins.preedit.util.Util;
 import javafx.application.Application;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
+
+import java.util.Optional;
 
 public class PreEdit extends Application {
 	
@@ -41,7 +45,6 @@ public class PreEdit extends Application {
 		GUI menu = Scenes.menu(stage);
 		setGUI(menu, () -> {
 			stage.show();
-//			stage.sizeToScene();
 			stage.setMinWidth(stage.getWidth());
 			stage.setMinHeight(stage.getHeight());
 			// Make content scale with window.

@@ -60,4 +60,16 @@ public final class Dialog {
 		return dialog.showAndWait();
 	}
 	
+	public static Optional<ButtonType> saveDialog(String msg, String title) {
+		if (!Platform.isFxApplicationThread()) {
+			return Util.runFXSafeFlat(() -> saveDialog(msg, title));
+		}
+		ButtonType dontSave = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
+		ButtonType save = new ButtonType("Save", ButtonBar.ButtonData.YES);
+		Alert alert = new Alert(AlertType.CONFIRMATION, msg, dontSave, save);
+		alert.setTitle(title == null ? PreEdit.NAME : title);
+		alert.setContentText(msg);
+		return alert.showAndWait();
+	}
+	
 }

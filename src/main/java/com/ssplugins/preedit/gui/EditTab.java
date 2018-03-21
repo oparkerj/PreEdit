@@ -78,11 +78,11 @@ public class EditTab extends BorderPane {
 			gc.setStroke(Color.MAGENTA);
 			gc.rect(canvas.getWidth() / 4, canvas.getHeight() / 4, canvas.getWidth() / 2, canvas.getHeight() / 2);
 			gc.stroke();
-			BorderPane.setMargin(canvas, new Insets(10, 0, 10, 10));
-			this.setLeft(canvas);
 		};
 		canvas.setOnResize(onResize);
 		onResize.run();
+		BorderPane.setMargin(canvas, new Insets(10, 0, 10, 10));
+		this.setCenter(canvas.getScrollPane());
 		//
 		controls = new GridPane();
 		controls.setPadding(PADDING);
@@ -102,6 +102,7 @@ public class EditTab extends BorderPane {
 		controls.add(layerButtons, 1, 1);
 		//
 		addLayer = smallButton("+");
+		addLayer.setDisable(true);
 		layerButtons.getChildren().add(addLayer);
 		//
 		removeLayer = smallButton("-");
@@ -128,6 +129,7 @@ public class EditTab extends BorderPane {
 		controls.add(effectButtons, 3, 1);
 		//
 		addEffect = smallButton("+");
+		addEffect.setDisable(true);
 		effectButtons.getChildren().add(addEffect);
 		//
 		removeEffect = smallButton("-");
@@ -145,7 +147,8 @@ public class EditTab extends BorderPane {
 		paramContainer = new ScrollPane();
 		paramContainer.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 		paramContainer.setPrefViewportHeight(150);
-		paramContainer.setFitToWidth(true);
+		paramContainer.setFitToHeight(true);
+		paramContainer.setMaxWidth(350);
 		controls.add(paramContainer, 0, 2, 4, 1);
 //		//
 		paramArea = new FlowPane(10, 10);
