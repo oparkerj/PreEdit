@@ -71,9 +71,14 @@ public abstract class Input<N extends Node, O> {
 	public final Optional<O> getValue() {
 		try {
 			O o = getNodeValue(node);
-			if (isValid(o)) return Optional.ofNullable(o);
+			if (isValid(o)) {
+				displayNode.setValid(false);
+				return Optional.ofNullable(o);
+			}
+			displayNode.setValid(true);
 			return Optional.empty();
 		} catch (InvalidInputException e) {
+			displayNode.setValid(false);
 			return Optional.empty();
 		}
 	}

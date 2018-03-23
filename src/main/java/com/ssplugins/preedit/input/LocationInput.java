@@ -57,6 +57,7 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 			
 			@Override
 			public Region fromJson(JsonElement element) {
+				if (element.isJsonNull()) return Region.DEFAULT;
 				JsonObject json = element.getAsJsonObject();
 				return new Region(json.get("x").getAsInt(),
 								  json.get("y").getAsInt(),
@@ -97,6 +98,8 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	public static class Region {
 		
 		private int x, y, width, height;
+		
+		private static Region DEFAULT = new Region(0, 0, 100, 100);
 		
 		public Region(int x, int y, int width, int height) {
 			this.x = x;

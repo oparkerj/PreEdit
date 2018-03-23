@@ -16,7 +16,7 @@ public class TemplateAdapter implements JsonSerializer<Template>, JsonDeserializ
 	@Override
 	public Template deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject json = element.getAsJsonObject();
-		Template template = new Template(json.get("name").getAsString());
+		Template template = new Template(json.get("name").getAsString(), json.get("width").getAsInt(), json.get("height").getAsInt());
 		List<Module> modules = context.deserialize(json.getAsJsonArray("modules"), moduleType);
 		modules.forEach(template::addModule);
 		return template;
@@ -26,6 +26,8 @@ public class TemplateAdapter implements JsonSerializer<Template>, JsonDeserializ
 	public JsonElement serialize(Template template, Type type, JsonSerializationContext context) {
 		JsonObject out = new JsonObject();
 		out.addProperty("name", template.getName());
+		out.addProperty("width", template.getWidth());
+		out.addProperty("height", template.getHeight());
 		out.add("modules", context.serialize(template.getModules(), moduleType));
 		return out;
 	}

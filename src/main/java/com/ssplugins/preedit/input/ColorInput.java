@@ -47,6 +47,7 @@ public class ColorInput extends Input<ColorPicker, Color> {
 			
 			@Override
 			public Color fromJson(JsonElement element) {
+				if (element.isJsonNull()) return Color.WHITE;
 				JsonArray json = element.getAsJsonArray();
 				return Color.color(json.get(0).getAsDouble(),
 								   json.get(1).getAsDouble(),

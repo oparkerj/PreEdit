@@ -50,7 +50,7 @@ public class ChoiceInput<T> extends Input<ComboBox<T>, T> {
 	
 	@Override
 	protected boolean isValid(T value) {
-		return true;
+		return value != null;
 	}
 	
 }

@@ -23,6 +23,7 @@ public class TextInput extends Input<TextField, String> {
 			
 			@Override
 			public String fromJson(JsonElement element) {
+				if (element.isJsonNull()) return "";
 				return element.getAsString();
 			}
 		};

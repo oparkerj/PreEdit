@@ -2,15 +2,12 @@ package com.ssplugins.preedit;
 
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.gui.Scenes;
-import com.ssplugins.preedit.util.Dialog;
+import com.ssplugins.preedit.modules.Text;
 import com.ssplugins.preedit.util.GUI;
 import com.ssplugins.preedit.util.Util;
 import javafx.application.Application;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
-
-import java.util.Optional;
 
 public class PreEdit extends Application {
 	
@@ -21,6 +18,12 @@ public class PreEdit extends Application {
 	public PreEdit() {
 		instance = this;
 		catalog = new Catalog();
+		// register modules/effects
+		registerModulesEffects();
+	}
+	
+	private void registerModulesEffects() {
+		catalog.registerModule("Text", Text.class);
 	}
 	
 	public static final String NAME = "PreEdit";
@@ -35,6 +38,10 @@ public class PreEdit extends Application {
 	
 	public static Catalog getCatalog() {
 		return getInstance().catalog;
+	}
+	
+	public static Stage stage() {
+		return getInstance().stage;
 	}
 	
 	@Override
