@@ -72,15 +72,19 @@ public abstract class Input<N extends Node, O> {
 		try {
 			O o = getNodeValue(node);
 			if (isValid(o)) {
-				displayNode.setValid(false);
+				displayNode.setValid(true);
 				return Optional.ofNullable(o);
 			}
-			displayNode.setValid(true);
+			displayNode.setValid(false);
 			return Optional.empty();
 		} catch (InvalidInputException e) {
 			displayNode.setValid(false);
 			return Optional.empty();
 		}
+	}
+	
+	public final void setValue(O o) {
+		setNodeValue(node, o);
 	}
 	
 	public final JsonElement serialize() {

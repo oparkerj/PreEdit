@@ -111,7 +111,7 @@ public class Catalog {
 	public Optional<Module> createModule(String name) {
 		return findModule(name).flatMap(aClass -> {
 			try {
-				return Optional.of(aClass.newInstance());
+				return Optional.ofNullable(aClass.newInstance());
 			} catch (InstantiationException | IllegalAccessException e) {
 				return Optional.empty();
 			}

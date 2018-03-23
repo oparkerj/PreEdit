@@ -2,20 +2,18 @@ package com.ssplugins.preedit.util;
 
 import com.ssplugins.preedit.PreEdit;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public final class Dialogs {

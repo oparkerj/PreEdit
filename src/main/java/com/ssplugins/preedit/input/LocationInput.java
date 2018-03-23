@@ -13,16 +13,18 @@ import javafx.scene.control.TextInputControl;
 public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	
 	private int x, y, width, height;
+	private boolean size;
 	
-	public LocationInput() {
-		this(0, 0, 100, 100);
+	public LocationInput(boolean size) {
+		this(size, 0, 0, 100, 100);
 	}
 	
-	public LocationInput(int x, int y, int width, int height) {
+	public LocationInput(boolean size, int x, int y, int width, int height) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.size = size;
 		this.ready();
 	}
 	
@@ -70,24 +72,39 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	@Override
 	protected GridMap createInputNode() {
 		GridMap map = new GridMap();
+		map.setHgap(5);
+		map.setVgap(5);
 		map.add(null, 0, 0, new Label("x:"));
-		map.add("x", 0, 1, new TextField(String.valueOf(x)));
+		TextField fieldX = new TextField(String.valueOf(x));
+		fieldX.setPrefWidth(50);
+		map.add("x", 0, 1, fieldX);
 		map.add(null, 0, 2, new Label("y:"));
-		map.add("y", 0, 3, new TextField(String.valueOf(y)));
+		TextField fieldY = new TextField(String.valueOf(y));
+		fieldY.setPrefWidth(50);
+		map.add("y", 0, 3, fieldY);
+		if (!size) return map;
 		map.add(null, 1, 0, new Label("width:"));
-		map.add("width", 1, 1, new TextField(String.valueOf(width)));
+		TextField fieldW = new TextField(String.valueOf(width));
+		fieldW.setPrefWidth(50);
+		map.add("width", 1, 1, fieldW);
 		map.add(null, 1, 2, new Label("height:"));
-		map.add("height", 1, 3, new TextField(String.valueOf(height)));
+		TextField fieldH = new TextField(String.valueOf(height));
+		fieldH.setPrefWidth(50);
+		map.add("height", 1, 3, fieldH);
 		return map;
 	}
 	
 	@Override
 	protected Region getNodeValue(GridMap node) throws InvalidInputException {
-		int x = node.get("x", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-		int y = node.get("y", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-		int width = node.get("width", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-		int height = node.get("height", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-		return new Region(x, y, width, height);
+		try {
+			int x = node.get("x", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
+			int y = node.get("y", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
+			int width = node.get("width", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
+			int height = node.get("height", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
+			return new Region(x, y, width, height);
+		} catch (NumberFormatException e) {
+			throw new InvalidInputException();
+		}
 	}
 	
 	@Override

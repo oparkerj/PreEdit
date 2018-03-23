@@ -31,6 +31,10 @@ public class State {
 		});
 	}
 	
+	public void render() {
+		upToDate.set(false);
+	}
+	
 	public void setRenderCall(Runnable renderCall) {
 		this.renderCall = renderCall;
 	}

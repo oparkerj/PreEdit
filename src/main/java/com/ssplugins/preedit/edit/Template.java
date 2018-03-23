@@ -2,9 +2,6 @@ package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.util.ShiftList;
 
-import java.util.Collections;
-import java.util.List;
-
 public class Template {
 	
 	private String name;
@@ -31,12 +28,16 @@ public class Template {
 		return height;
 	}
 	
-	public List<Module> getModules() {
-		return Collections.unmodifiableList(modules);
+	public ShiftList<Module> getModules() {
+		return modules;
 	}
 	
 	public void addModule(Module module) {
 		modules.add(module);
+	}
+	
+	public void removeModule(Module module) {
+		modules.remove(module);
 	}
 	
 	public void removeModule(int i) {
