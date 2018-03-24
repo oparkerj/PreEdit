@@ -6,11 +6,13 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Util;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 
-public class LocationInput extends Input<GridMap, LocationInput.Region> {
+public class LocationInput extends Input<GridMap, Bounds> {
 	
 	private int x, y, width, height;
 	private boolean size;
@@ -29,9 +31,9 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	}
 	
 	@Override
-	protected void setNodeValue(GridMap node, Region value) {
-		node.get("x", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getX())));
-		node.get("y", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getY())));
+	protected void setNodeValue(GridMap node, Bounds value) {
+		node.get("x", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getMinX())));
+		node.get("y", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getMinY())));
 		node.get("width", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getWidth())));
 		node.get("height", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getHeight())));
 	}
@@ -45,23 +47,23 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	}
 	
 	@Override
-	protected JsonConverter<Region> getJsonConverter() {
-		return new JsonConverter<Region>() {
+	protected JsonConverter<Bounds> getJsonConverter() {
+		return new JsonConverter<Bounds>() {
 			@Override
-			public JsonElement toJson(Region region) {
+			public JsonElement toJson(Bounds bounds) {
 				JsonObject out = new JsonObject();
-				out.addProperty("x", region.getX());
-				out.addProperty("y", region.getY());
-				out.addProperty("width", region.getWidth());
-				out.addProperty("height", region.getHeight());
+				out.addProperty("x", bounds.getMinX());
+				out.addProperty("y", bounds.getMinY());
+				out.addProperty("width", bounds.getWidth());
+				out.addProperty("height", bounds.getHeight());
 				return out;
 			}
 			
 			@Override
-			public Region fromJson(JsonElement element) {
-				if (element.isJsonNull()) return Region.DEFAULT;
+			public Bounds fromJson(JsonElement element) {
+				if (element.isJsonNull()) return new BoundingBox(0, 0, 100, 100);
 				JsonObject json = element.getAsJsonObject();
-				return new Region(json.get("x").getAsInt(),
+				return new BoundingBox(json.get("x").getAsInt(),
 								  json.get("y").getAsInt(),
 								  json.get("width").getAsInt(),
 								  json.get("height").getAsInt());
@@ -95,51 +97,21 @@ public class LocationInput extends Input<GridMap, LocationInput.Region> {
 	}
 	
 	@Override
-	protected Region getNodeValue(GridMap node) throws InvalidInputException {
+	protected Bounds getNodeValue(GridMap node) throws InvalidInputException {
 		try {
 			int x = node.get("x", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
 			int y = node.get("y", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
 			int width = node.get("width", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
 			int height = node.get("height", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-			return new Region(x, y, width, height);
+			return new BoundingBox(x, y, width, height);
 		} catch (NumberFormatException e) {
 			throw new InvalidInputException();
 		}
 	}
 	
 	@Override
-	protected boolean isValid(Region value) {
+	protected boolean isValid(Bounds value) {
 		return true;
-	}
-	
-	public static class Region {
-		
-		private int x, y, width, height;
-		
-		private static Region DEFAULT = new Region(0, 0, 100, 100);
-		
-		public Region(int x, int y, int width, int height) {
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-		}
-		
-		public int getX() {
-			return x;
-		}
-		
-		public int getY() {
-			return y;
-		}
-		
-		public int getWidth() {
-			return width;
-		}
-		
-		public int getHeight() {
-			return height;
-		}
 	}
 	
 }

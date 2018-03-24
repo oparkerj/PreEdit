@@ -5,7 +5,7 @@ import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.ColorInput;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
-import com.ssplugins.preedit.input.LocationInput.Region;
+import javafx.geometry.Bounds;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -18,10 +18,10 @@ public class Solid extends Module {
 	
 	@Override
 	public void draw(GraphicsContext context) throws SilentFailException {
-		Region region = getInputs().getValue("Location", LocationInput.class);
+		Bounds region = getInputs().getValue("Location", LocationInput.class);
 		Color color = getInputs().getValue("Color", ColorInput.class);
 		context.setFill(color);
-		context.fillRect(region.getX(), region.getY(), region.getWidth(), region.getHeight());
+		context.fillRect(region.getMinX(), region.getMinY(), region.getWidth(), region.getHeight());
 	}
 	
 	@Override
