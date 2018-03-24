@@ -3,6 +3,7 @@ package com.ssplugins.preedit.input;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
+import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Util;
@@ -30,20 +31,24 @@ public class LocationInput extends Input<GridMap, Bounds> {
 		this.ready();
 	}
 	
+	public boolean isSizeable() {
+		return size;
+	}
+	
 	@Override
 	protected void setNodeValue(GridMap node, Bounds value) {
-		node.get("x", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getMinX())));
-		node.get("y", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getMinY())));
-		node.get("width", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getWidth())));
-		node.get("height", TextField.class).ifPresent(field -> field.setText(String.valueOf(value.getHeight())));
+		node.get("x", NumberField.class).ifPresent(field -> field.setNumber(value.getMinX()));
+		node.get("y", NumberField.class).ifPresent(field -> field.setNumber(value.getMinY()));
+		node.get("width", NumberField.class).ifPresent(field -> field.setNumber(value.getWidth()));
+		node.get("height", NumberField.class).ifPresent(field -> field.setNumber(value.getHeight()));
 	}
 	
 	@Override
 	protected void setUpdateTrigger(GridMap node, Runnable update) {
-		node.get("x", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
-		node.get("y", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
-		node.get("width", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
-		node.get("height", TextField.class).ifPresent(textField -> textField.textProperty().addListener(observable -> update.run()));
+		node.get("x", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
+		node.get("y", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
+		node.get("width", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
+		node.get("height", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
 	}
 	
 	@Override
@@ -77,20 +82,20 @@ public class LocationInput extends Input<GridMap, Bounds> {
 		map.setHgap(5);
 		map.setVgap(5);
 		map.add(null, 0, 0, new Label("x:"));
-		TextField fieldX = new TextField(String.valueOf(x));
+		NumberField fieldX = new NumberField(x);
 		fieldX.setPrefWidth(50);
 		map.add("x", 0, 1, fieldX);
 		map.add(null, 0, 2, new Label("y:"));
-		TextField fieldY = new TextField(String.valueOf(y));
+		NumberField fieldY = new NumberField(y);
 		fieldY.setPrefWidth(50);
 		map.add("y", 0, 3, fieldY);
 		if (!size) return map;
 		map.add(null, 1, 0, new Label("width:"));
-		TextField fieldW = new TextField(String.valueOf(width));
+		NumberField fieldW = new NumberField(width);
 		fieldW.setPrefWidth(50);
 		map.add("width", 1, 1, fieldW);
 		map.add(null, 1, 2, new Label("height:"));
-		TextField fieldH = new TextField(String.valueOf(height));
+		NumberField fieldH = new NumberField(height);
 		fieldH.setPrefWidth(50);
 		map.add("height", 1, 3, fieldH);
 		return map;
@@ -99,10 +104,10 @@ public class LocationInput extends Input<GridMap, Bounds> {
 	@Override
 	protected Bounds getNodeValue(GridMap node) throws InvalidInputException {
 		try {
-			int x = node.get("x", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-			int y = node.get("y", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-			int width = node.get("width", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
-			int height = node.get("height", TextField.class).map(TextInputControl::getText).map(Integer::parseInt).orElseThrow(Util.invalidInput());
+			int x = node.get("x", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
+			int y = node.get("y", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
+			int width = node.get("width", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
+			int height = node.get("height", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
 			return new BoundingBox(x, y, width, height);
 		} catch (NumberFormatException e) {
 			throw new InvalidInputException();
