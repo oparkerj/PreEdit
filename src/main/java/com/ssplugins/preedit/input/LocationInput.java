@@ -116,7 +116,7 @@ public class LocationInput extends Input<GridMap, Bounds> {
 	
 	@Override
 	protected boolean isValid(Bounds value) {
-		return true;
+		return value.getWidth() > 0 && value.getHeight() > 0;
 	}
 	
 }

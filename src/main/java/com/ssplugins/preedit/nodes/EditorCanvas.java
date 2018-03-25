@@ -3,13 +3,9 @@ package com.ssplugins.preedit.nodes;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.SilentFailException;
-import javafx.beans.InvalidationListener;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -17,32 +13,33 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
-public class EditorCanvas extends ScrollPane {
+public class EditorCanvas extends StackPane {
 	
-	private StackPane canvasStack;
+	private Pane posPane;
+	private ResizeHandle handle;
 	
 	public EditorCanvas(double width, double height) {
-		canvasStack = new StackPane();
+		this.prefWidthProperty().bind(this.minWidthProperty());
+		this.prefHeightProperty().bind(this.minHeightProperty());
 		setCanvasSize(width, height);
-		GridPane alignment = new GridPane();
-		alignment.add(canvasStack, 0, 0);
-		alignment.setAlignment(Pos.CENTER);
-		this.setContent(alignment);
-		this.setMinWidth(width);
-		this.setMinHeight(height);
-		this.setMinViewportWidth(width);
-		this.setMinViewportHeight(height);
-		this.setFitToWidth(true);
-		this.setFitToHeight(true);
-		alignment.prefWidthProperty().bind(this.prefViewportWidthProperty());
-		alignment.prefHeightProperty().bind(this.prefViewportHeightProperty());
+		posPane = new Pane();
+		this.getChildren().add(posPane);
+		handle = new ResizeHandle();
+		posPane.getChildren().add(handle);
+//		handle.update(100, 100, 100, 100);
+	}
+	
+	public ResizeHandle getHandle() {
+		return handle;
 	}
 	
 	public void setCanvasSize(double width, double height) {
-		canvasStack.setMinWidth(width);
-		canvasStack.setMinHeight(height);
-		canvasStack.setPrefWidth(width);
-		canvasStack.setPrefHeight(height);
+		this.setMinWidth(width);
+		this.setMinHeight(height);
+	}
+	
+	public void clearAll() {
+		this.getChildren().removeIf(node -> node instanceof Canvas);
 	}
 	
 	public void transparentLayer() {
@@ -66,31 +63,27 @@ public class EditorCanvas extends ScrollPane {
 			Module m = it.previous();
 			Canvas c = newLayer();
 			GraphicsContext gc = c.getGraphicsContext2D();
-			m.draw(gc);
-			renderEffects(m.getEffects(), gc);
+			m.draw(c, gc);
+			renderEffects(m.getEffects(), c, gc);
 		}
 	}
 	
-	private void renderEffects(List<Effect> list, GraphicsContext context) throws SilentFailException {
+	private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context) throws SilentFailException {
 		ListIterator<Effect> it = list.listIterator(list.size());
 		while (it.hasPrevious()) {
 			Effect e = it.previous();
-			e.draw(context);
+			e.draw(c, context);
 		}
 	}
 	
-	public void clearAll() {
-		canvasStack.getChildren().clear();
-	}
-	
 	private Canvas newLayer() {
-		Canvas c = new Canvas(canvasStack.getWidth(), canvasStack.getHeight());
-		canvasStack.getChildren().add(c);
+		Canvas c = new Canvas(this.getMinWidth(), this.getMinHeight());
+		this.getChildren().add(this.getChildren().size() - 1, c);
 		return c;
 	}
 	
 	private List<Canvas> getLayers() {
-		return canvasStack.getChildren().stream().map(Canvas.class::cast).collect(Collectors.toList());
+		return this.getChildren().stream().map(Canvas.class::cast).collect(Collectors.toList());
 	}
 	
 }

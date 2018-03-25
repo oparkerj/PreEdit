@@ -5,7 +5,9 @@ import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.ColorInput;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
+import com.ssplugins.preedit.nodes.ResizeHandle;
 import javafx.geometry.Bounds;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -17,7 +19,7 @@ public class Solid extends Module {
 	}
 	
 	@Override
-	public void draw(GraphicsContext context) throws SilentFailException {
+	public void draw(Canvas canvas, GraphicsContext context) throws SilentFailException {
 		Bounds region = getInputs().getValue("Location", LocationInput.class);
 		Color color = getInputs().getValue("Color", ColorInput.class);
 		context.setFill(color);
@@ -28,6 +30,11 @@ public class Solid extends Module {
 	protected void defineInputs(InputMap map) {
 		map.addInput("Color", new ColorInput());
 		map.addInput("Location", new LocationInput(true));
+	}
+	
+	@Override
+	public void linkResizeHandle(ResizeHandle handle) {
+		getInputs().getInput("Location", LocationInput.class).ifPresent(handle::linkTo);
 	}
 	
 }

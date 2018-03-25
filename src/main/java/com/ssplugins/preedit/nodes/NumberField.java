@@ -25,6 +25,7 @@ public class NumberField extends TextField {
 		super(number.toString());
 		this.format = format;
 		registerEvents();
+		setNumber(number);
 	}
 	
 	private void registerEvents() {
