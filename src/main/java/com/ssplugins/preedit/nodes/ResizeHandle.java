@@ -5,7 +5,6 @@ import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.SizeHandler;
 import javafx.beans.property.Property;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
@@ -28,25 +27,21 @@ public class ResizeHandle extends AnchorPane {
 		Border border = new Border(new BorderStroke(Color.MAGENTA, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
 		this.setBorder(border);
 		topLeft = new Pane();
-		setup(topLeft, border);
-		setTopLeft(topLeft);
+		setupAnchor(topLeft, Pos.TOP_LEFT, Cursor.NW_RESIZE, border);
 		topRight = new Pane();
-		setup(topRight, border);
-		setTopRight(topRight);
+		setupAnchor(topRight, Pos.TOP_RIGHT, Cursor.NE_RESIZE, border);
 		bottomLeft = new Pane();
-		setup(bottomLeft, border);
-		setBottomLeft(bottomLeft);
+		setupAnchor(bottomLeft, Pos.BOTTOM_LEFT, Cursor.SW_RESIZE, border);
 		bottomRight = new Pane();
-		setup(bottomRight, border);
-		setBottomRight(bottomRight);
+		setupAnchor(bottomRight, Pos.BOTTOM_RIGHT, Cursor.SE_RESIZE, border);
 		top = new Pane();
-		setTop(top);
+		setupAnchor(top, Pos.TOP_CENTER, Cursor.N_RESIZE, null);
 		right = new Pane();
-		setRight(right);
+		setupAnchor(right, Pos.CENTER_RIGHT, Cursor.E_RESIZE, null);
 		bottom = new Pane();
-		setBottom(bottom);
+		setupAnchor(bottom, Pos.BOTTOM_CENTER, Cursor.S_RESIZE, null);
 		left = new Pane();
-		setLeft(left);
+		setupAnchor(left, Pos.CENTER_LEFT, Cursor.W_RESIZE, null);
 		this.getChildren().addAll(topLeft, topRight, bottomLeft, bottomRight, top, right, bottom, left);
 		this.prefWidthProperty().bind(this.minWidthProperty());
 		this.prefHeightProperty().bind(this.minHeightProperty());
@@ -60,66 +55,51 @@ public class ResizeHandle extends AnchorPane {
 		hide();
 	}
 	
-	private void setup(Pane pane, Border border) {
+	private void setupAnchor(Pane pane, Pos anchor, Cursor cursor, Border border) {
 		pane.setMinWidth(HANDLE_SIZE);
 		pane.setMinHeight(HANDLE_SIZE);
-		pane.setBorder(border);
-	}
-	
-	private void setTopLeft(Pane pane) {
-		AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setLeftAnchor(pane, -HALF_HANDLE);
-		pane.setCursor(Cursor.NW_RESIZE);
-	}
-	
-	private void setTopRight(Pane pane) {
-		AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setRightAnchor(pane, -HALF_HANDLE);
-		pane.setCursor(Cursor.NE_RESIZE);
-	}
-	
-	private void setBottomLeft(Pane pane) {
-		AnchorPane.setBottomAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setLeftAnchor(pane, -HALF_HANDLE);
-		pane.setCursor(Cursor.SW_RESIZE);
-	}
-	
-	private void setBottomRight(Pane pane) {
-		AnchorPane.setBottomAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setRightAnchor(pane, -HALF_HANDLE);
-		pane.setCursor(Cursor.SE_RESIZE);
-	}
-	
-	private void setTop(Pane pane) {
-		pane.setMinHeight(HANDLE_SIZE);
-		pane.setCursor(Cursor.N_RESIZE);
-		AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setLeftAnchor(pane, HALF_HANDLE);
-		AnchorPane.setRightAnchor(pane, HALF_HANDLE);
-	}
-	
-	private void setRight(Pane pane) {
-		pane.setMinWidth(HANDLE_SIZE);
-		pane.setCursor(Cursor.E_RESIZE);
-		AnchorPane.setRightAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setTopAnchor(pane, HALF_HANDLE);
-		AnchorPane.setBottomAnchor(pane, HALF_HANDLE);
-	}
-	
-	private void setBottom(Pane pane) {
-		pane.setMinHeight(HANDLE_SIZE);
-		pane.setCursor(Cursor.S_RESIZE);
-		AnchorPane.setBottomAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setLeftAnchor(pane, HALF_HANDLE);
-		AnchorPane.setRightAnchor(pane, HALF_HANDLE);
-	}
-	
-	private void setLeft(Pane pane) {
-		pane.setMinWidth(HANDLE_SIZE);
-		pane.setCursor(Cursor.W_RESIZE);
-		AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
-		AnchorPane.setTopAnchor(pane, HALF_HANDLE);
-		AnchorPane.setBottomAnchor(pane, HALF_HANDLE);
+		if (border != null) pane.setBorder(border);
+		if (cursor != null) pane.setCursor(cursor);
+		switch (anchor) {
+			case TOP_CENTER:
+				AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setLeftAnchor(pane, HALF_HANDLE);
+				AnchorPane.setRightAnchor(pane, HALF_HANDLE);
+				break;
+			case TOP_LEFT:
+				AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setLeftAnchor(pane, -HALF_HANDLE);
+				break;
+			case TOP_RIGHT:
+				AnchorPane.setTopAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setRightAnchor(pane, -HALF_HANDLE);
+				break;
+			case CENTER_LEFT:
+				AnchorPane.setLeftAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setTopAnchor(pane, HALF_HANDLE);
+				AnchorPane.setBottomAnchor(pane, HALF_HANDLE);
+				break;
+			case CENTER_RIGHT:
+				AnchorPane.setRightAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setTopAnchor(pane, HALF_HANDLE);
+				AnchorPane.setBottomAnchor(pane, HALF_HANDLE);
+				break;
+			case BOTTOM_LEFT:
+				AnchorPane.setBottomAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setLeftAnchor(pane, -HALF_HANDLE);
+				break;
+			case BOTTOM_CENTER:
+				AnchorPane.setBottomAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setLeftAnchor(pane, HALF_HANDLE);
+				AnchorPane.setRightAnchor(pane, HALF_HANDLE);
+				break;
+			case BOTTOM_RIGHT:
+				AnchorPane.setBottomAnchor(pane, -HALF_HANDLE);
+				AnchorPane.setRightAnchor(pane, -HALF_HANDLE);
+				break;
+			default:
+				break;
+		}
 	}
 	
 	private void setSizeable(boolean sizeable) {
