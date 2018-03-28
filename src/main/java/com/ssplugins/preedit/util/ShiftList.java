@@ -10,19 +10,21 @@ public class ShiftList<T> extends ObservableListWrapper<T> {
 		super(new ArrayList<>());
 	}
 	
-	public void shiftElement(int i, boolean forward) {
-		if (forward && i == size() - 1) return; //throw new IllegalArgumentException("Cannot shift last element forward.");
-		if (!forward && i == 0) return; //throw new IllegalArgumentException("Cannot shift last element backwards.");
+	public int shiftElement(int i, boolean forward) {
+		if (forward && i == size() - 1) return -1; //throw new IllegalArgumentException("Cannot shift last element forward.");
+		if (!forward && i == 0) return -1; //throw new IllegalArgumentException("Cannot shift last element backwards.");
 		T t = this.remove(i);
-		this.add(i + (forward ? 1 : -1), t);
+		int n = i + (forward ? 1 : -1);
+		this.add(n, t);
+		return n;
 	}
 	
-	public void shiftForward(int i) {
-		shiftElement(i, true);
+	public int shiftForward(int i) {
+		return shiftElement(i, true);
 	}
 	
-	public void shiftBackward(int i) {
-		shiftElement(i, false);
+	public int shiftBackward(int i) {
+		return shiftElement(i, false);
 	}
 	
 }

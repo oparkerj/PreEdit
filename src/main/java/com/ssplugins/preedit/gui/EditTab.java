@@ -166,7 +166,18 @@ public class EditTab extends BorderPane {
 		layers.setPrefHeight(200);
 		layers.setCellFactory(Module.getCellFactory());
 		layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue == null) return; // TODO disable anything when no item
+			if (newValue == null) {
+				canvas.getHandle().hide();
+				removeLayer.setDisable(true);
+				layerUp.setDisable(true);
+				layerDown.setDisable(true);
+				effects.setItems(null);
+				addEffect.setDisable(true);
+				return;
+			}
+			removeLayer.setDisable(false);
+			layerUp.setDisable(false);
+			layerDown.setDisable(false);
 			newValue.linkResizeHandle(canvas.getHandle());
 			effects.setItems(newValue.getEffects());
 			addEffect.setDisable(false);
@@ -190,14 +201,26 @@ public class EditTab extends BorderPane {
 		//
 		removeLayer = smallButton("-");
 		removeLayer.setDisable(true);
+		removeLayer.setOnAction(event -> {
+			getSelectedModule().ifPresent(module -> {
+				layers.getItems().remove(module);
+				state.render();
+			});
+		});
 		layerButtons.getChildren().add(removeLayer);
 		//
 		layerUp = smallButton("^");
 		layerUp.setDisable(true);
+		layerUp.setOnAction(event -> {
+			shiftUp(layers);
+		});
 		layerButtons.getChildren().add(layerUp);
 		//
 		layerDown = smallButton("v");
 		layerDown.setDisable(true);
+		layerDown.setOnAction(event -> {
+			shiftDown(layers);
+		});
 		layerButtons.getChildren().add(layerDown);
 		//
 		labelEffects = new Label("Effects:");
@@ -208,7 +231,15 @@ public class EditTab extends BorderPane {
 		effects.setPrefHeight(200);
 		effects.setCellFactory(Effect.getCellFactory());
 		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue == null) return;
+			if (newValue == null) {
+				removeEffect.setDisable(true);
+				effectUp.setDisable(true);
+				effectDown.setDisable(true);
+				return;
+			}
+			removeEffect.setDisable(false);
+			effectUp.setDisable(false);
+			effectDown.setDisable(false);
 			canvas.getHandle().hide();
 			setInputs(newValue.getInputs());
 		});
@@ -230,14 +261,26 @@ public class EditTab extends BorderPane {
 		//
 		removeEffect = smallButton("-");
 		removeEffect.setDisable(true);
+		removeEffect.setOnAction(event -> {
+			Effect effect = effects.getSelectionModel().getSelectedItem();
+			if (effect == null) return;
+			effects.getItems().remove(effect);
+			state.render();
+		});
 		effectButtons.getChildren().add(removeEffect);
 		//
 		effectUp = smallButton("^");
 		effectUp.setDisable(true);
+		effectUp.setOnAction(event -> {
+			shiftUp(effects);
+		});
 		effectButtons.getChildren().add(effectUp);
 		//
 		effectDown = smallButton("v");
 		effectDown.setDisable(true);
+		effectDown.setOnAction(event -> {
+			shiftDown(effects);
+		});
 		effectButtons.getChildren().add(effectDown);
 		//
 		paramContainer = new ScrollPane();
@@ -290,6 +333,46 @@ public class EditTab extends BorderPane {
 			displayNode.update(s);
 			paramArea.getChildren().add(displayNode);
 		});
+	}
+	
+	private Optional<Module> getSelectedModule() {
+		return Optional.ofNullable(layers.getSelectionModel().getSelectedItem());
+	}
+	
+	private Optional<Effect> getSelectedEffect() {
+		return Optional.ofNullable(effects.getSelectionModel().getSelectedItem());
+	}
+	
+	private MultipleSelectionModel<Module> layerSelection() {
+		return layers.getSelectionModel();
+	}
+	
+	private MultipleSelectionModel<Effect> effectSelection() {
+		return effects.getSelectionModel();
+	}
+	
+	private <T> void shiftUp(ListView<T> list) {
+		MultipleSelectionModel<T> selection = list.getSelectionModel();
+		if (selection.isEmpty()) return;
+		int r = selection.getSelectedIndex();
+		if (r == 0) return;
+		T removed = list.getItems().remove(r);
+		r--;
+		list.getItems().add(r, removed);
+		selection.select(r);
+		list.scrollTo(r);
+	}
+	
+	private <T> void shiftDown(ListView<T> list) {
+		MultipleSelectionModel<T> selection = list.getSelectionModel();
+		if (selection.isEmpty()) return;
+		int r = selection.getSelectedIndex();
+		if (r >= list.getItems().size() - 1) return;
+		T removed = list.getItems().remove(r);
+		r++;
+		list.getItems().add(r, removed);
+		selection.select(r);
+		list.scrollTo(r);
 	}
 	
 }
