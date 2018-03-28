@@ -6,15 +6,18 @@ import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.nodes.EditorCanvas;
+import com.ssplugins.preedit.nodes.UserInput;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.State;
 import com.ssplugins.preedit.util.TemplateInfo;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -23,7 +26,10 @@ import java.util.Optional;
 
 public class EditTab extends BorderPane {
 	
+	//
 	private final Insets PADDING = new Insets(10);
+	private final int CANVAS_MIN = 400;
+	
 	private Stage stage;
 	private State state;
 
@@ -32,6 +38,7 @@ public class EditTab extends BorderPane {
 	private Button btnNew;
 	private Button btnSave;
 	
+	private ScrollPane canvasArea;
 	private EditorCanvas canvas;
 	
 	private GridPane controls;
@@ -61,6 +68,22 @@ public class EditTab extends BorderPane {
 				canvas.renderImage(true, layers.getItems());
 			} catch (SilentFailException ignored) {
 			}
+		});
+		stage.sceneProperty().addListener((observable, oldValue, newValue) -> {
+			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
+				if (newNode == layers) {
+					Module m = layers.getSelectionModel().getSelectedItem();
+					if (m == null) return;
+					m.linkResizeHandle(canvas.getHandle());
+					setInputs(m.getInputs());
+				}
+				else if (newNode == effects) {
+					Effect e = effects.getSelectionModel().getSelectedItem();
+					if (e == null) return;
+					canvas.getHandle().hide();
+					setInputs(e.getInputs());
+				}
+			});
 		});
 		defineNodes();
 		Platform.runLater(() -> {
@@ -102,16 +125,32 @@ public class EditTab extends BorderPane {
 		btnSave.disableProperty().bind(state.savedProperty());
 		toolbar.getItems().add(btnSave);
 		//
-		canvas = new EditorCanvas(400, 400);
+		canvasArea = new ScrollPane();
+		canvasArea.setMinWidth(CANVAS_MIN);
+		canvasArea.setMinHeight(CANVAS_MIN);
+		canvasArea.setMinViewportWidth(CANVAS_MIN);
+		canvasArea.setMinViewportHeight(CANVAS_MIN);
+		canvasArea.setFitToWidth(true);
+		canvasArea.setFitToHeight(true);
+		BorderPane.setMargin(canvasArea, new Insets(10, 0, 10, 10));
+		this.setCenter(canvasArea);
+		//
+		GridPane canvasPane = new GridPane();
+		canvasPane.setAlignment(Pos.CENTER);
+		canvasPane.prefWidthProperty().bind(canvasArea.widthProperty());
+		canvasPane.prefHeightProperty().bind(canvasArea.heightProperty());
+		canvasArea.setContent(canvasPane);
+		//
+		canvas = new EditorCanvas(CANVAS_MIN, CANVAS_MIN);
 		state.templateProperty().addListener((observable, oldValue, newValue) -> {
 			canvas.clearAll();
 			canvas.setCanvasSize(newValue.getWidth(), newValue.getHeight());
-			layers.setItems(FXCollections.observableArrayList(newValue.getModules()));
+			layers.setItems(newValue.getModules());
 			addLayer.setDisable(false);
-			state.upToDateProperty().set(false);
+			state.render();
 		});
-		BorderPane.setMargin(canvas, new Insets(10, 0, 10, 10));
-		this.setCenter(canvas);
+//		canvasArea.setContent(canvas);
+		canvasPane.add(canvas, 0, 0);
 		//
 		controls = new GridPane();
 		controls.setPadding(PADDING);
@@ -125,6 +164,14 @@ public class EditTab extends BorderPane {
 		layers = new ListView<>();
 		layers.setPrefWidth(150);
 		layers.setPrefHeight(200);
+		layers.setCellFactory(Module.getCellFactory());
+		layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue == null) return; // TODO disable anything when no item
+			newValue.linkResizeHandle(canvas.getHandle());
+			effects.setItems(newValue.getEffects());
+			addEffect.setDisable(false);
+			setInputs(newValue.getInputs());
+		});
 		controls.add(layers, 0, 1);
 		//
 		layerButtons = new VBox(3);
@@ -134,7 +181,10 @@ public class EditTab extends BorderPane {
 		addLayer.setDisable(true);
 		addLayer.setOnAction(event -> {
 			Optional<String> op = Dialogs.choose("Choose a module to add:", null, PreEdit.getCatalog().getModules());
-			//
+			op.flatMap(PreEdit.getCatalog()::createModule).ifPresent(module -> {
+				layers.getItems().add(module);
+				state.render();
+			});
 		});
 		layerButtons.getChildren().add(addLayer);
 		//
@@ -156,6 +206,12 @@ public class EditTab extends BorderPane {
 		effects = new ListView<>();
 		effects.setPrefWidth(150);
 		effects.setPrefHeight(200);
+		effects.setCellFactory(Effect.getCellFactory());
+		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue == null) return;
+			canvas.getHandle().hide();
+			setInputs(newValue.getInputs());
+		});
 		controls.add(effects, 2, 1);
 		//
 		effectButtons = new VBox(3);
@@ -163,6 +219,13 @@ public class EditTab extends BorderPane {
 		//
 		addEffect = smallButton("+");
 		addEffect.setDisable(true);
+		addEffect.setOnAction(event -> {
+			Optional<String> op = Dialogs.choose("Choose an effect to add:", null, PreEdit.getCatalog().getEffects());
+			op.flatMap(PreEdit.getCatalog()::createEffect).ifPresent(effect -> {
+				effects.getItems().add(effect);
+				state.render();
+			});
+		});
 		effectButtons.getChildren().add(addEffect);
 		//
 		removeEffect = smallButton("-");
@@ -179,13 +242,19 @@ public class EditTab extends BorderPane {
 		//
 		paramContainer = new ScrollPane();
 		paramContainer.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-		paramContainer.setPrefViewportHeight(150);
+		paramContainer.setMinViewportHeight(150);
+		paramContainer.setFitToWidth(true);
 		paramContainer.setFitToHeight(true);
-		paramContainer.setMaxWidth(350);
+		GridPane.setVgrow(paramContainer, Priority.ALWAYS);
 		controls.add(paramContainer, 0, 2, 4, 1);
-//		//
+		//
 		paramArea = new FlowPane(10, 10);
-		paramArea.prefWrapLengthProperty().bind(paramContainer.widthProperty());
+		paramArea.setMaxWidth(paramContainer.getViewportBounds().getWidth());
+		paramArea.prefWrapLengthProperty().bind(paramArea.maxWidthProperty());
+		paramContainer.viewportBoundsProperty().addListener((observable, oldValue, newValue) -> {
+			paramArea.setMaxWidth(newValue.getWidth());
+		});
+		StackPane.setMargin(paramArea, PADDING);
 		paramContainer.setContent(paramArea);
 		//
 	}
@@ -211,6 +280,16 @@ public class EditTab extends BorderPane {
 		effectUp.setDisable(true);
 		effectDown.setDisable(true);
 		paramArea.getChildren().clear();
+	}
+	
+	private void setInputs(InputMap map) {
+		paramArea.getChildren().clear();
+		map.getInputs().forEach((s, input) -> {
+			input.setUpdateTrigger(state::render);
+			UserInput displayNode = input.getDisplayNode();
+			displayNode.update(s);
+			paramArea.getChildren().add(displayNode);
+		});
 	}
 	
 }

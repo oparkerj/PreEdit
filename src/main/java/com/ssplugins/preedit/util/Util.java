@@ -3,6 +3,8 @@ package com.ssplugins.preedit.util;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import javafx.application.Platform;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -52,6 +54,10 @@ public final class Util {
 	
 	public static Supplier<SilentFailException> silentFail() {
 		return SilentFailException::new;
+	}
+	
+	public static Border border(Color color) {
+		return new Border(new BorderStroke(color, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
 	}
 	
 }

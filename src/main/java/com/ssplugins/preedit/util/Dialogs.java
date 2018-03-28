@@ -1,12 +1,11 @@
 package com.ssplugins.preedit.util;
 
 import com.ssplugins.preedit.PreEdit;
+import com.ssplugins.preedit.nodes.NumberField;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -15,10 +14,14 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public final class Dialogs {
+	
+	private static void removeHeader(Dialog dialog) {
+		dialog.setHeaderText(null);
+		dialog.setGraphic(null);
+	}
 	
 	public static Optional<ButtonType> show(String msg, String title, AlertType type) {
 		if (!Platform.isFxApplicationThread()) {
@@ -63,6 +66,7 @@ public final class Dialogs {
 			return Util.runFXSafeFlat(() -> choose(msg, title, choices));
 		}
 		ChoiceDialog<T> dialog = new ChoiceDialog<>(choices.iterator().next(), choices);
+		removeHeader(dialog);
 		dialog.setTitle(title == null ? PreEdit.NAME : title);
 		dialog.setContentText(msg);
 		dialog.initModality(Modality.APPLICATION_MODAL);
@@ -108,10 +112,10 @@ public final class Dialogs {
 		name.getChildren().addAll(labelName, fieldName);
 		HBox dims = new HBox(5);
 		Label labelWidth = new Label("Dimensions:");
-		TextField fieldWidth = new TextField("400");
+		NumberField fieldWidth = new NumberField(400);
 		fieldWidth.setMaxWidth(75);
 		Label labelHeight = new Label("x");
-		TextField fieldHeight = new TextField("400");
+		NumberField fieldHeight = new NumberField(400);
 		fieldHeight.setMaxWidth(75);
 		dims.getChildren().addAll(labelWidth, fieldWidth, labelHeight, fieldHeight);
 		box.getChildren().addAll(name, dims);
@@ -127,8 +131,8 @@ public final class Dialogs {
 		dialog.setResultConverter(param -> {
 			if (param != createButton) return null;
 			try {
-				int w = Integer.parseInt(fieldWidth.getText());
-				int h = Integer.parseInt(fieldHeight.getText());
+				int w = fieldWidth.getNumber().intValue();
+				int h = fieldHeight.getNumber().intValue();
 				if (w < 1 || h < 1) {
 					Dialogs.show("Dimensions must be greater than 0.", null, AlertType.WARNING);
 					return null;
