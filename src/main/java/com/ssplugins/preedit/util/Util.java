@@ -3,8 +3,6 @@ package com.ssplugins.preedit.util;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import javafx.application.Platform;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Effect;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
