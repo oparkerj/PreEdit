@@ -29,6 +29,13 @@ public class EditorCanvas extends StackPane {
 //		handle.update(100, 100, 100, 100);
 	}
 	
+	public static void rotate(GraphicsContext context, double cx, double cy, double deg) {
+		if (deg == 0) return;
+		context.translate(cx, cy);
+		context.rotate(deg);
+		context.translate(-cx, -cy);
+	}
+	
 	public ResizeHandle getHandle() {
 		return handle;
 	}

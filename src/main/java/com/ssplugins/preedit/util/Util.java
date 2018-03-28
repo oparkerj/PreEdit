@@ -5,6 +5,8 @@ import com.ssplugins.preedit.exceptions.SilentFailException;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Effect;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,6 +56,10 @@ public final class Util {
 	
 	public static Supplier<SilentFailException> silentFail() {
 		return SilentFailException::new;
+	}
+	
+	public static Border border(Color color) {
+		return new Border(new BorderStroke(color, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
 	}
 	
 }

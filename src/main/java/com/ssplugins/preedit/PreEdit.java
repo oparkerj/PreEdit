@@ -29,6 +29,7 @@ public class PreEdit extends Application {
 	private void registerModulesEffects() {
 		catalog.registerModule("Text", Text.class);
 		catalog.registerModule("Solid", Solid.class);
+//		catalog.registerModule("Image", Image.class);
 		catalog.registerEffect("DropShadow", DropShadow.class);
 	}
 	
