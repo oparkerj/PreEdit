@@ -3,6 +3,7 @@ package com.ssplugins.preedit.nodes;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
@@ -16,17 +17,23 @@ import java.util.stream.Collectors;
 public class EditorCanvas extends StackPane {
 	
 	private Pane posPane;
+	private Pane bgPane;
 	private ResizeHandle handle;
+	
+	private Canvas transparentLayer;
 	
 	public EditorCanvas(double width, double height) {
 		this.prefWidthProperty().bind(this.minWidthProperty());
 		this.prefHeightProperty().bind(this.minHeightProperty());
+		transparentLayer = new Canvas(width, height);
 		setCanvasSize(width, height);
+		bgPane = new Pane();
+		this.getChildren().add(bgPane);
 		posPane = new Pane();
 		this.getChildren().add(posPane);
 		handle = new ResizeHandle();
 		posPane.getChildren().add(handle);
-//		handle.update(100, 100, 100, 100);
+		bgPane.getChildren().add(transparentLayer);
 	}
 	
 	public static void rotate(GraphicsContext context, double cx, double cy, double deg) {
@@ -40,21 +47,35 @@ public class EditorCanvas extends StackPane {
 		return handle;
 	}
 	
+	public Canvas getTransparentLayer() {
+		return transparentLayer;
+	}
+	
 	public void setCanvasSize(double width, double height) {
 		this.setMinWidth(width);
 		this.setMinHeight(height);
+		transparentLayer.setWidth(width);
+		transparentLayer.setHeight(height);
+	}
+	
+	public void addLayer() {
+		newLayer();
+	}
+	
+	public void removeLayer() {
+		this.getChildren().stream().filter(node -> node instanceof Canvas).findFirst().ifPresent(node -> this.getChildren().remove(node));
 	}
 	
 	public void clearAll() {
-		this.getChildren().removeIf(node -> node instanceof Canvas);
+		getLayers().forEach(this::clear);
+		clear(getTransparentLayer());
 	}
 	
-	public void transparentLayer() {
-		Canvas canvas = newLayer();
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		for (int x = 0; x < canvas.getWidth(); x += 5) {
-			for (int y = 0; y < canvas.getHeight(); y += 5) {
+	public void fillTransparent() {
+		GraphicsContext gc = transparentLayer.getGraphicsContext2D();
+		gc.clearRect(0, 0, transparentLayer.getWidth(), transparentLayer.getHeight());
+		for (int x = 0; x < transparentLayer.getWidth(); x += 5) {
+			for (int y = 0; y < transparentLayer.getHeight(); y += 5) {
 				Color c = ((x + y) % 2 == 0 ? Color.WHITE : Color.LIGHTGRAY);
 				gc.setFill(c);
 				gc.fillRect(x, y, 5, 5);
@@ -62,16 +83,21 @@ public class EditorCanvas extends StackPane {
 		}
 	}
 	
-	public void renderImage(boolean transparent, List<Module> modules) throws SilentFailException {
+	public void renderImage(boolean display, List<Module> modules) throws SilentFailException {
 		clearAll();
-		if (transparent) transparentLayer();
+		if (display) fillTransparent();
+		else handle.hide();
 		ListIterator<Module> it = modules.listIterator(modules.size());
-		while (it.hasPrevious()) {
+		for (Node node : this.getChildren()) {
+			if (!(node instanceof Canvas)) continue;
+			Canvas canvas = (Canvas) node;
+			if (!it.hasPrevious()) break;
 			Module m = it.previous();
-			Canvas c = newLayer();
-			GraphicsContext gc = c.getGraphicsContext2D();
-			m.draw(c, gc);
-			renderEffects(m.getEffects(), c, gc);
+			GraphicsContext gc = canvas.getGraphicsContext2D();
+			gc.save();
+			m.draw(canvas, gc);
+			renderEffects(m.getEffects(), canvas, gc);
+			gc.restore();
 		}
 	}
 	
@@ -90,7 +116,12 @@ public class EditorCanvas extends StackPane {
 	}
 	
 	private List<Canvas> getLayers() {
-		return this.getChildren().stream().map(Canvas.class::cast).collect(Collectors.toList());
+		return this.getChildren().stream().filter(node -> node instanceof Canvas)
+				   .map(Canvas.class::cast).collect(Collectors.toList());
+	}
+	
+	private void clear(Canvas canvas) {
+		canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 	}
 	
 }

@@ -194,6 +194,7 @@ public class EditTab extends BorderPane {
 			Optional<String> op = Dialogs.choose("Choose a module to add:", null, PreEdit.getCatalog().getModules());
 			op.flatMap(PreEdit.getCatalog()::createModule).ifPresent(module -> {
 				layers.getItems().add(module);
+				canvas.addLayer();
 				state.render();
 			});
 		});
@@ -204,6 +205,7 @@ public class EditTab extends BorderPane {
 		removeLayer.setOnAction(event -> {
 			getSelectedModule().ifPresent(module -> {
 				layers.getItems().remove(module);
+				canvas.removeLayer();
 				state.render();
 			});
 		});

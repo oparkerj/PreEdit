@@ -133,6 +133,10 @@ public class ResizeHandle extends AnchorPane {
 		this.setVisible(false);
 	}
 	
+	public void show() {
+		this.setVisible(true);
+	}
+	
 	private void unbind(NumberField field, Property<Number> property) {
 		if (field == null) return;
 		field.numberProperty().unbindBidirectional(property);
