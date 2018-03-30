@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class EditorCanvas extends StackPane {
 	
@@ -64,6 +65,17 @@ public class EditorCanvas extends StackPane {
 	
 	public void removeLayer() {
 		this.getChildren().stream().filter(node -> node instanceof Canvas).findFirst().ifPresent(node -> this.getChildren().remove(node));
+	}
+	
+	public void setLayerCount(int layers) {
+		long count = this.getChildren().stream().filter(node -> node instanceof Canvas).count();
+		long d = layers - count;
+		if (d > 0) {
+			LongStream.range(0, d).forEach(value -> this.addLayer());
+		}
+		else if (d < 0) {
+			LongStream.range(0, d).forEach(value -> this.removeLayer());
+		}
 	}
 	
 	public void clearAll() {

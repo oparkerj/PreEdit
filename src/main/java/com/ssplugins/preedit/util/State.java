@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class State {
 	
 	private AtomicBoolean rendering = new AtomicBoolean(false);
+	private AtomicBoolean passive = new AtomicBoolean(false);
 	private Runnable renderCall;
 	
 	private BooleanProperty upToDate = new SimpleBooleanProperty(true);
@@ -20,7 +21,7 @@ public class State {
 	public State() {
 		upToDate.addListener((observable, oldValue, newValue) -> {
 			if (!newValue) {
-				saved.set(false);
+				if (!passive.get()) saved.set(false);
 				if (!rendering.get() && renderCall != null) {
 					rendering.set(true);
 					renderCall.run();
@@ -32,11 +33,25 @@ public class State {
 	}
 	
 	public void render() {
+		passive.set(false);
+		upToDate.set(false);
+	}
+	
+	public void renderPassive() {
+		passive.set(true);
 		upToDate.set(false);
 	}
 	
 	public void setRenderCall(Runnable renderCall) {
 		this.renderCall = renderCall;
+	}
+	
+	public boolean isPassive() {
+		return passive.get();
+	}
+	
+	public void setPassive(boolean passive) {
+		this.passive.set(passive);
 	}
 	
 	public boolean isUpToDate() {

@@ -14,6 +14,7 @@ import com.ssplugins.preedit.util.State;
 import com.ssplugins.preedit.util.TemplateInfo;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert.AlertType;
@@ -23,6 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EditTab extends BorderPane {
 	
@@ -32,6 +34,7 @@ public class EditTab extends BorderPane {
 	
 	private Stage stage;
 	private State state;
+	private AtomicBoolean loading = new AtomicBoolean(false);
 
 	private ToolBar toolbar;
 	private ComboBox<String> selector;
@@ -98,7 +101,23 @@ public class EditTab extends BorderPane {
 		selector = new ComboBox<>();
 		selector.setPromptText("<select template>");
 		selector.valueProperty().addListener((observable, oldValue, newValue) -> {
-			// load new template
+			if (loading.get()) {
+				loading.set(false);
+				return;
+			}
+			checkSave();
+			Optional<Template> template = PreEdit.getCatalog().loadTemplate(newValue);
+			if (template.isPresent()) {
+				if (!state.isSaved()) {
+					selector.getItems().remove(oldValue);
+					return;
+				}
+				resetNodes();
+				state.templateProperty().set(template.get());
+			}
+			else {
+				Dialogs.show("Could not find template \"" + newValue + "\".", null, AlertType.WARNING);
+			}
 		});
 		toolbar.getItems().add(selector);
 		//
@@ -106,6 +125,7 @@ public class EditTab extends BorderPane {
 		btnNew.setOnAction(event -> {
 			Optional<TemplateInfo> op = Dialogs.newTemplate(null);
 			op.ifPresent(info -> {
+				checkSave();
 				Catalog catalog = PreEdit.getCatalog();
 				if (catalog.templateExists(info.getName())) {
 					Dialogs.show("Template already exists.", null, AlertType.INFORMATION);
@@ -113,6 +133,7 @@ public class EditTab extends BorderPane {
 				}
 				resetNodes();
 				Template template = catalog.newTemplate(info.getName(), info.getWidth(), info.getHeight());
+				loading.set(true);
 				state.templateProperty().set(template);
 				selector.getItems().add(template.getName());
 				selector.setValue(template.getName());
@@ -123,6 +144,10 @@ public class EditTab extends BorderPane {
 		btnSave = new Button("Save");
 		btnSave.setDisable(true);
 		btnSave.disableProperty().bind(state.savedProperty());
+		btnSave.setOnAction(event -> {
+			PreEdit.getCatalog().saveTemplate(state.getTemplate());
+			state.savedProperty().set(true);
+		});
 		toolbar.getItems().add(btnSave);
 		//
 		canvasArea = new ScrollPane();
@@ -144,10 +169,12 @@ public class EditTab extends BorderPane {
 		canvas = new EditorCanvas(CANVAS_MIN, CANVAS_MIN);
 		state.templateProperty().addListener((observable, oldValue, newValue) -> {
 			canvas.clearAll();
+			canvas.setLayerCount(newValue.getModules().size());
 			canvas.setCanvasSize(newValue.getWidth(), newValue.getHeight());
 			layers.setItems(newValue.getModules());
 			addLayer.setDisable(false);
-			state.render();
+			if (loading.get()) state.render();
+			else state.renderPassive();
 		});
 //		canvasArea.setContent(canvas);
 		canvasPane.add(canvas, 0, 0);
@@ -264,10 +291,10 @@ public class EditTab extends BorderPane {
 		removeEffect = smallButton("-");
 		removeEffect.setDisable(true);
 		removeEffect.setOnAction(event -> {
-			Effect effect = effects.getSelectionModel().getSelectedItem();
-			if (effect == null) return;
-			effects.getItems().remove(effect);
-			state.render();
+			getSelectedEffect().ifPresent(effect -> {
+				effects.getItems().remove(effect);
+				state.render();
+			});
 		});
 		effectButtons.getChildren().add(removeEffect);
 		//
@@ -319,7 +346,8 @@ public class EditTab extends BorderPane {
 		removeLayer.setDisable(true);
 		layerUp.setDisable(true);
 		layerDown.setDisable(true);
-		effects.getItems().clear();
+		ObservableList<Effect> effectItems = effects.getItems();
+		if (effectItems != null) effectItems.clear();
 		addEffect.setDisable(true);
 		removeEffect.setDisable(true);
 		effectUp.setDisable(true);
@@ -345,12 +373,12 @@ public class EditTab extends BorderPane {
 		return Optional.ofNullable(effects.getSelectionModel().getSelectedItem());
 	}
 	
-	private MultipleSelectionModel<Module> layerSelection() {
-		return layers.getSelectionModel();
-	}
-	
-	private MultipleSelectionModel<Effect> effectSelection() {
-		return effects.getSelectionModel();
+	private void checkSave() {
+		if (!state.isSaved()) {
+			Optional<ButtonType> op = Dialogs.saveDialog("Save the current template before loading?", null);
+			op.filter(buttonType -> buttonType.getButtonData() == ButtonBar.ButtonData.YES)
+			  .ifPresent(buttonType -> PreEdit.getCatalog().saveTemplate(state.getTemplate()));
+		}
 	}
 	
 	private <T> void shiftUp(ListView<T> list) {
