@@ -43,6 +43,12 @@ public abstract class Input<N extends Node, O> {
 		return ready;
 	}
 	
+	public final void setGeneratorMode() {
+		if (displayNode != null) {
+			displayNode.getCheckBox().setVisible(false);
+		}
+	}
+	
 	public final void setUserProvided(boolean userProvided) {
 		this.userProvided.set(userProvided);
 	}

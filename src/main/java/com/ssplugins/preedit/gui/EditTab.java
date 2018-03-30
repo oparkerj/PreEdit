@@ -12,6 +12,7 @@ import com.ssplugins.preedit.nodes.UserInput;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.State;
 import com.ssplugins.preedit.util.TemplateInfo;
+import com.ssplugins.preedit.util.Util;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,6 +43,7 @@ public class EditTab extends BorderPane {
 	private Button btnSave;
 	
 	private ScrollPane canvasArea;
+	private GridPane canvasPane;
 	private EditorCanvas canvas;
 	
 	private GridPane controls;
@@ -160,7 +162,7 @@ public class EditTab extends BorderPane {
 		BorderPane.setMargin(canvasArea, new Insets(10, 0, 10, 10));
 		this.setCenter(canvasArea);
 		//
-		GridPane canvasPane = new GridPane();
+		canvasPane = new GridPane();
 		canvasPane.setAlignment(Pos.CENTER);
 		canvasPane.prefWidthProperty().bind(canvasArea.widthProperty());
 		canvasPane.prefHeightProperty().bind(canvasArea.heightProperty());
@@ -313,7 +315,7 @@ public class EditTab extends BorderPane {
 		effectButtons.getChildren().add(effectDown);
 		//
 		paramContainer = new ScrollPane();
-		paramContainer.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		paramContainer.setBorder(Util.border(Color.BLACK));
 		paramContainer.setMinViewportHeight(150);
 		paramContainer.setFitToWidth(true);
 		paramContainer.setFitToHeight(true);

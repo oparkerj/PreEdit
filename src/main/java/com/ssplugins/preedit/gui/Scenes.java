@@ -14,7 +14,8 @@ public final class Scenes {
 		//gui.setPadding(10);
 		
 		Tab tabGenerate = new Tab("Generate");
-		//tabGenerate.setContent(Tabs.GENERATE);
+		GenerateTab generateTab = new GenerateTab(stage);
+		tabGenerate.setContent(generateTab);
 		Tab tabEdit = new Tab("Edit");
 		tabEdit.setContent(new EditTab(stage));
 		Tab tabSettings = new Tab("Settings");
@@ -23,6 +24,9 @@ public final class Scenes {
 		TabPane pane = new TabPane(tabGenerate, tabEdit, tabSettings);
 		pane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 		pane.setTabMinWidth(50);
+		pane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue == tabGenerate) generateTab.updateTemplates();
+		});
 		gui.add("pane", 0, 0, pane);
 		
 		return gui;
