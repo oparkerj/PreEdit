@@ -125,7 +125,7 @@ public class LocationInput extends Input<GridMap, Bounds> {
 			int y = node.get("y", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
 			int width = node.get("width", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
 			int height = node.get("height", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
-			int angle = node.get("angle", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
+			double angle = node.get("angle", NumberField.class).map(NumberField::getNumber).map(Number::doubleValue).orElseThrow(Util.invalidInput());
 			return new BoundingBox(x, y, angle, width, height, 0);
 		} catch (NumberFormatException e) {
 			throw new InvalidInputException();
