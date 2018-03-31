@@ -8,11 +8,10 @@ import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.nodes.EditorCanvas;
-import com.ssplugins.preedit.nodes.UserInput;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.State;
 import com.ssplugins.preedit.util.TemplateInfo;
-import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.UITools;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -77,16 +76,16 @@ public class EditTab extends BorderPane {
 		stage.sceneProperty().addListener((observable, oldValue, newValue) -> {
 			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
 				if (newNode == layers) {
-					Module m = layers.getSelectionModel().getSelectedItem();
-					if (m == null) return;
-					m.linkResizeHandle(canvas.getHandle());
-					setInputs(m.getInputs());
+					getSelectedModule().ifPresent(module -> {
+						module.linkResizeHandle(canvas.getHandle());
+						setInputs(module.getInputs());
+					});
 				}
 				else if (newNode == effects) {
-					Effect e = effects.getSelectionModel().getSelectedItem();
-					if (e == null) return;
-					canvas.getHandle().hide();
-					setInputs(e.getInputs());
+					getSelectedEffect().ifPresent(effect -> {
+						canvas.getHandle().hide();
+						setInputs(effect.getInputs());
+					});
 				}
 			});
 		});
@@ -103,6 +102,7 @@ public class EditTab extends BorderPane {
 		selector = new ComboBox<>();
 		selector.setPromptText("<select template>");
 		selector.valueProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue == null) return;
 			if (loading.get()) {
 				loading.set(false);
 				return;
@@ -202,6 +202,7 @@ public class EditTab extends BorderPane {
 				layerDown.setDisable(true);
 				effects.setItems(null);
 				addEffect.setDisable(true);
+				setInputs(null);
 				return;
 			}
 			removeLayer.setDisable(false);
@@ -266,6 +267,7 @@ public class EditTab extends BorderPane {
 				removeEffect.setDisable(true);
 				effectUp.setDisable(true);
 				effectDown.setDisable(true);
+				setInputs(null);
 				return;
 			}
 			removeEffect.setDisable(false);
@@ -315,7 +317,7 @@ public class EditTab extends BorderPane {
 		effectButtons.getChildren().add(effectDown);
 		//
 		paramContainer = new ScrollPane();
-		paramContainer.setBorder(Util.border(Color.BLACK));
+		paramContainer.setBorder(UITools.border(Color.BLACK));
 		paramContainer.setMinViewportHeight(150);
 		paramContainer.setFitToWidth(true);
 		paramContainer.setFitToHeight(true);
@@ -343,7 +345,8 @@ public class EditTab extends BorderPane {
 	private void resetNodes() {
 		state.savedProperty().set(true);
 		canvas.clearAll();
-		layers.getItems().clear();
+		ObservableList<Module> layerItems = layers.getItems();
+		if (layerItems != null) layerItems.clear();
 		addLayer.setDisable(true);
 		removeLayer.setDisable(true);
 		layerUp.setDisable(true);
@@ -359,12 +362,8 @@ public class EditTab extends BorderPane {
 	
 	private void setInputs(InputMap map) {
 		paramArea.getChildren().clear();
-		map.getInputs().forEach((s, input) -> {
-			input.setUpdateTrigger(state::render);
-			UserInput displayNode = input.getDisplayNode();
-			displayNode.update(s);
-			paramArea.getChildren().add(displayNode);
-		});
+		if (map == null) return;
+		UITools.setInputNodes(map, state, paramArea, false);
 	}
 	
 	private Optional<Module> getSelectedModule() {

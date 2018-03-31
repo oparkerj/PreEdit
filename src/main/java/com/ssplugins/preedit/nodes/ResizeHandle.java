@@ -3,7 +3,7 @@ package com.ssplugins.preedit.nodes;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.SizeHandler;
-import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.UITools;
 import javafx.beans.property.Property;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -26,7 +26,7 @@ public class ResizeHandle extends AnchorPane {
 	private NumberField x, y, width, height, angle;
 	
 	public ResizeHandle() {
-		Border border = Util.border(Color.MAGENTA);
+		Border border = UITools.border(Color.MAGENTA);
 		this.setBorder(border);
 		topLeft = new Pane();
 		setupAnchor(topLeft, Pos.TOP_LEFT, Cursor.NW_RESIZE, border);
@@ -46,7 +46,7 @@ public class ResizeHandle extends AnchorPane {
 		setupAnchor(left, Pos.CENTER_LEFT, Cursor.W_RESIZE, null);
 		rotate = new Pane();
 		rotate.setId("resize_rotate");
-		setupAnchor(rotate, Pos.TOP_RIGHT, Cursor.CROSSHAIR, Util.border(Color.BLUE), 1);
+		setupAnchor(rotate, Pos.TOP_RIGHT, Cursor.CROSSHAIR, UITools.border(Color.BLUE), 1);
 		this.getChildren().addAll(topLeft, topRight, bottomLeft, bottomRight, top, right, bottom, left, rotate);
 		this.prefWidthProperty().bind(this.minWidthProperty());
 		this.prefHeightProperty().bind(this.minHeightProperty());

@@ -3,18 +3,24 @@ package com.ssplugins.preedit.gui;
 import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
+import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.nodes.EditorCanvas;
+import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.State;
-import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.UITools;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.util.Optional;
 
 public class GenerateTab extends BorderPane {
 	
@@ -51,6 +57,22 @@ public class GenerateTab extends BorderPane {
 			} catch (SilentFailException ignored) {
 			}
 		});
+		stage.sceneProperty().addListener((observable, oldValue, newValue) -> {
+			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
+				if (newNode == layers) {
+					getSelectedModule().ifPresent(module -> {
+						module.linkResizeHandle(canvas.getHandle());
+						setInputs(module.getInputs());
+					});
+				}
+				else if (newNode == effects) {
+					getSelectedEffect().ifPresent(effect -> {
+						canvas.getHandle().hide();
+						setInputs(effect.getInputs());
+					});
+				}
+			});
+		});
 		defineNodes();
 		Platform.runLater(this::updateTemplates);
 	}
@@ -66,7 +88,15 @@ public class GenerateTab extends BorderPane {
 		selector = new ComboBox<>();
 		selector.setPromptText("<select template>");
 		selector.valueProperty().addListener((observable, oldValue, newValue) -> {
-			// TODO
+			if (newValue == null) return;
+			Optional<Template> template = PreEdit.getCatalog().loadTemplate(newValue);
+			if (template.isPresent()) {
+				resetNodes();
+				state.templateProperty().set(template.get());
+			}
+			else {
+				Dialogs.show("Could not find template \"" + newValue + "\".", null, Alert.AlertType.WARNING);
+			}
 		});
 		toolbar.getItems().add(selector);
 		//
@@ -80,7 +110,7 @@ public class GenerateTab extends BorderPane {
 		btnQuickSave = new Button("Quick Save");
 		btnQuickSave.setDisable(true);
 		btnQuickSave.setOnAction(event -> {
-			//
+		
 		});
 		toolbar.getItems().add(btnQuickSave);
 		//
@@ -101,6 +131,15 @@ public class GenerateTab extends BorderPane {
 		canvasArea.setContent(canvasPane);
 		//
 		canvas = new EditorCanvas(CANVAS_MIN, CANVAS_MIN);
+		state.templateProperty().addListener((observable, oldValue, newValue) -> {
+			canvas.clearAll();
+			canvas.setLayerCount(newValue.getModules().size());
+			canvas.setCanvasSize(newValue.getWidth(), newValue.getHeight());
+			layers.setItems(newValue.getModules());
+			btnExport.setDisable(false);
+			btnQuickSave.setDisable(false);
+			state.render();
+		});
 		canvasPane.add(canvas, 0, 0);
 		//
 		controls = new GridPane();
@@ -116,6 +155,17 @@ public class GenerateTab extends BorderPane {
 		layers.setPrefWidth(150);
 		layers.setPrefHeight(200);
 		layers.setCellFactory(Module.getCellFactory());
+		layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue == null) {
+				canvas.getHandle().hide();
+				effects.setItems(null);
+				setInputs(null);
+				return;
+			}
+			newValue.linkResizeHandle(canvas.getHandle());
+			effects.setItems(newValue.getEffects());
+			setInputs(newValue.getInputs());
+		});
 		controls.add(layers, 0, 1);
 		//
 		labelEffects = new Label("Effects:");
@@ -125,10 +175,18 @@ public class GenerateTab extends BorderPane {
 		effects.setPrefWidth(150);
 		effects.setPrefHeight(200);
 		effects.setCellFactory(Effect.getCellFactory());
+		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue == null) {
+				setInputs(null);
+				return;
+			}
+			canvas.getHandle().hide();
+			setInputs(newValue.getInputs());
+		});
 		controls.add(effects, 1, 1);
 		//
 		paramContainer = new ScrollPane();
-		paramContainer.setBorder(Util.border(Color.BLACK));
+		paramContainer.setBorder(UITools.border(Color.BLACK));
 		paramContainer.setMinViewportHeight(150);
 		paramContainer.setFitToWidth(true);
 		paramContainer.setFitToHeight(true);
@@ -143,6 +201,29 @@ public class GenerateTab extends BorderPane {
 		});
 		StackPane.setMargin(paramArea, PADDING);
 		paramContainer.setContent(paramArea);
+	}
+	
+	private void resetNodes() {
+		canvas.clearAll();
+		ObservableList<Module> layerItems = layers.getItems();
+		if (layerItems != null) layerItems.clear();
+		ObservableList<Effect> effectItems = effects.getItems();
+		if (effectItems != null) effectItems.clear();
+		paramArea.getChildren().clear();
+	}
+	
+	private void setInputs(InputMap map) {
+		paramArea.getChildren().clear();
+		if (map == null) return;
+		UITools.setInputNodes(map, state, paramArea, true);
+	}
+	
+	private Optional<Module> getSelectedModule() {
+		return Optional.ofNullable(layers.getSelectionModel().getSelectedItem());
+	}
+	
+	private Optional<Effect> getSelectedEffect() {
+		return Optional.ofNullable(effects.getSelectionModel().getSelectedItem());
 	}
 	
 }
