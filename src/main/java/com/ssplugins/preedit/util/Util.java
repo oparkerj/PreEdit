@@ -1,13 +1,19 @@
 package com.ssplugins.preedit.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import javafx.application.Platform;
+import javafx.geometry.Bounds;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -73,6 +79,44 @@ public final class Util {
 		} catch (SilentFailException e) {
 			return Optional.empty();
 		}
+	}
+	
+	public static <T extends Enum<T>> Callback<ListView<T>, ListCell<T>> enumCellFactory() {
+		return param -> new EnumCell<>();
+	}
+	
+	private static class EnumCell<T extends Enum<T>> extends ListCell<T> {
+		@Override
+		protected void updateItem(T item, boolean empty) {
+			super.updateItem(item, empty);
+			if (empty) {
+				setText("");
+				return;
+			}
+			setText(item.name());
+		}
+	}
+	
+	public static <T extends Enum<T>> JsonConverter<T> enumConverter(Class<T> type) {
+		return new JsonConverter<T>() {
+			@Override
+			public JsonElement toJson(T t) {
+				return new JsonPrimitive(t.name());
+			}
+			
+			@Override
+			public T fromJson(JsonElement element) {
+				return T.valueOf(type, element.getAsString());
+			}
+		};
+	}
+	
+	public static double centerX(Bounds bounds) {
+		return bounds.getMinX() + bounds.getWidth() / 2;
+	}
+	
+	public static double centerY(Bounds bounds) {
+		return bounds.getMinY() + bounds.getHeight() / 2;
 	}
 	
 }

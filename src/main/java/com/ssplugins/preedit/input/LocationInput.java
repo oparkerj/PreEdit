@@ -6,7 +6,10 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.JsonConverter;
-import com.ssplugins.preedit.util.Util;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
@@ -15,18 +18,20 @@ import java.text.NumberFormat;
 
 public class LocationInput extends Input<GridMap, Bounds> {
 	
-	private int x, y, width, height, angle;
+	private IntegerProperty x, y, width, height;
+	private DoubleProperty angle;
 	private boolean size, rotate;
 	
 	public LocationInput(boolean size, boolean rotate) {
-		this(size, rotate, 0, 0, 100, 100);
+		this(size, rotate, 0, 0, 100, 100, 0);
 	}
 	
-	public LocationInput(boolean size, boolean rotate, int x, int y, int width, int height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+	public LocationInput(boolean size, boolean rotate, int x, int y, int width, int height, double angle) {
+		this.x = new SimpleIntegerProperty(x);
+		this.y = new SimpleIntegerProperty(y);
+		this.width = new SimpleIntegerProperty(width);
+		this.height = new SimpleIntegerProperty(height);
+		this.angle = new SimpleDoubleProperty(angle);
 		this.size = size;
 		this.rotate = rotate;
 		this.ready();
@@ -40,22 +45,62 @@ public class LocationInput extends Input<GridMap, Bounds> {
 		return rotate;
 	}
 	
+	public int getX() {
+		return x.get();
+	}
+	
+	public IntegerProperty xProperty() {
+		return x;
+	}
+	
+	public int getY() {
+		return y.get();
+	}
+	
+	public IntegerProperty yProperty() {
+		return y;
+	}
+	
+	public int getWidth() {
+		return width.get();
+	}
+	
+	public IntegerProperty widthProperty() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height.get();
+	}
+	
+	public IntegerProperty heightProperty() {
+		return height;
+	}
+	
+	public double getAngle() {
+		return angle.get();
+	}
+	
+	public DoubleProperty angleProperty() {
+		return angle;
+	}
+	
 	@Override
 	protected void setNodeValue(GridMap node, Bounds value) {
-		node.get("x", NumberField.class).ifPresent(field -> field.setNumber(value.getMinX()));
-		node.get("y", NumberField.class).ifPresent(field -> field.setNumber(value.getMinY()));
-		node.get("width", NumberField.class).ifPresent(field -> field.setNumber(value.getWidth()));
-		node.get("height", NumberField.class).ifPresent(field -> field.setNumber(value.getHeight()));
-		node.get("angle", NumberField.class).ifPresent(field -> field.setNumber(value.getMinZ()));
+		x.set((int) value.getMinX());
+		y.set((int) value.getMinY());
+		width.set((int) value.getWidth());
+		height.set((int) value.getHeight());
+		angle.set(value.getMinZ());
 	}
 	
 	@Override
 	protected void setUpdateTrigger(GridMap node, Runnable update) {
-		node.get("x", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
-		node.get("y", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
-		node.get("width", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
-		node.get("height", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
-		node.get("angle", NumberField.class).ifPresent(textField -> textField.numberProperty().addListener(observable -> update.run()));
+		x.addListener(observable -> update.run());
+		y.addListener(observable -> update.run());
+		width.addListener(observable -> update.run());
+		height.addListener(observable -> update.run());
+		angle.addListener(observable -> update.run());
 	}
 	
 	@Override
@@ -92,27 +137,33 @@ public class LocationInput extends Input<GridMap, Bounds> {
 		map.setHgap(5);
 		map.setVgap(5);
 		map.add(null, 0, 0, new Label("x:"));
-		NumberField fieldX = new NumberField(x);
+		NumberField fieldX = new NumberField(x.get());
 		fieldX.setPrefWidth(50);
+		fieldX.numberProperty().bindBidirectional(x);
 		map.add("x", 0, 1, fieldX);
 		map.add(null, 0, 2, new Label("y:"));
-		NumberField fieldY = new NumberField(y);
+		NumberField fieldY = new NumberField(y.get());
 		fieldY.setPrefWidth(50);
+		fieldY.numberProperty().bindBidirectional(y);
 		map.add("y", 0, 3, fieldY);
+		//
 		if (size) {
 			map.add(null, 1, 0, new Label("width:"));
-			NumberField fieldW = new NumberField(width);
+			NumberField fieldW = new NumberField(width.get());
 			fieldW.setPrefWidth(50);
+			fieldW.numberProperty().bindBidirectional(width);
 			map.add("width", 1, 1, fieldW);
 			map.add(null, 1, 2, new Label("height:"));
-			NumberField fieldH = new NumberField(height);
+			NumberField fieldH = new NumberField(height.get());
 			fieldH.setPrefWidth(50);
+			fieldH.numberProperty().bindBidirectional(height);
 			map.add("height", 1, 3, fieldH);
 		}
 		if (rotate) {
 			map.add(null, 2, 0, new Label("angle:"));
-			NumberField fieldR = new NumberField(angle, NumberFormat.getNumberInstance());
+			NumberField fieldR = new NumberField(angle.get(), NumberFormat.getNumberInstance());
 			fieldR.setPrefWidth(50);
+			fieldR.numberProperty().bindBidirectional(angle);
 			map.add("angle", 2, 1, fieldR);
 		}
 		return map;
@@ -121,12 +172,7 @@ public class LocationInput extends Input<GridMap, Bounds> {
 	@Override
 	protected Bounds getNodeValue(GridMap node) throws InvalidInputException {
 		try {
-			int x = node.get("x", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
-			int y = node.get("y", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
-			int width = node.get("width", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
-			int height = node.get("height", NumberField.class).map(NumberField::getNumber).map(Number::intValue).orElseThrow(Util.invalidInput());
-			double angle = node.get("angle", NumberField.class).map(NumberField::getNumber).map(Number::doubleValue).orElseThrow(Util.invalidInput());
-			return new BoundingBox(x, y, angle, width, height, 0);
+			return new BoundingBox(getX(), getY(), getAngle(), getWidth(), getHeight(), 0);
 		} catch (NumberFormatException e) {
 			throw new InvalidInputException();
 		}
@@ -134,7 +180,10 @@ public class LocationInput extends Input<GridMap, Bounds> {
 	
 	@Override
 	protected boolean isValid(Bounds value) {
-		return value.getWidth() > 0 && value.getHeight() > 0;
+		if (size) {
+			return value.getWidth() > 0 && value.getHeight() > 0;
+		}
+		return true;
 	}
 	
 }

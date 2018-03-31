@@ -63,13 +63,14 @@ public class GenerateTab extends BorderPane {
 			try {
 				canvas.renderImage(true, state.getTemplate().getModules());
 			} catch (SilentFailException ignored) {
+//				Dialogs.exception("issue", null, ignored);
 			}
 		});
 		stage.sceneProperty().addListener((observable, oldValue, newValue) -> {
 			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
 				if (newNode == layers) {
 					getSelectedModule().ifPresent(module -> {
-						module.linkResizeHandle(canvas.getHandle());
+						module.linkResizeHandle(canvas.getHandleUnbound());
 						setInputs(module.getInputs());
 					});
 				}
@@ -173,7 +174,7 @@ public class GenerateTab extends BorderPane {
 				setInputs(null);
 				return;
 			}
-			newValue.linkResizeHandle(canvas.getHandle());
+			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
 			setInputs(newValue.getInputs());
 		});

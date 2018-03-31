@@ -48,6 +48,11 @@ public class EditorCanvas extends StackPane {
 		return handle;
 	}
 	
+	public ResizeHandle getHandleUnbound() {
+		handle.unlink();
+		return getHandle();
+	}
+	
 	public Canvas getTransparentLayer() {
 		return transparentLayer;
 	}

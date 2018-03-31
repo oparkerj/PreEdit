@@ -71,13 +71,14 @@ public class EditTab extends BorderPane {
 			try {
 				canvas.renderImage(true, layers.getItems());
 			} catch (SilentFailException ignored) {
+//				Dialogs.exception("debug", null, ignored);
 			}
 		});
 		stage.sceneProperty().addListener((observable, oldValue, newValue) -> {
 			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
 				if (newNode == layers) {
 					getSelectedModule().ifPresent(module -> {
-						module.linkResizeHandle(canvas.getHandle());
+						module.linkResizeHandle(canvas.getHandleUnbound());
 						setInputs(module.getInputs());
 					});
 				}
@@ -208,7 +209,7 @@ public class EditTab extends BorderPane {
 			removeLayer.setDisable(false);
 			layerUp.setDisable(false);
 			layerDown.setDisable(false);
-			newValue.linkResizeHandle(canvas.getHandle());
+			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
 			addEffect.setDisable(false);
 			setInputs(newValue.getInputs());
@@ -245,6 +246,7 @@ public class EditTab extends BorderPane {
 		layerUp.setDisable(true);
 		layerUp.setOnAction(event -> {
 			shiftUp(layers);
+			state.render();
 		});
 		layerButtons.getChildren().add(layerUp);
 		//
@@ -252,6 +254,7 @@ public class EditTab extends BorderPane {
 		layerDown.setDisable(true);
 		layerDown.setOnAction(event -> {
 			shiftDown(layers);
+			state.render();
 		});
 		layerButtons.getChildren().add(layerDown);
 		//
@@ -306,6 +309,7 @@ public class EditTab extends BorderPane {
 		effectUp.setDisable(true);
 		effectUp.setOnAction(event -> {
 			shiftUp(effects);
+			state.render();
 		});
 		effectButtons.getChildren().add(effectUp);
 		//
@@ -313,6 +317,7 @@ public class EditTab extends BorderPane {
 		effectDown.setDisable(true);
 		effectDown.setOnAction(event -> {
 			shiftDown(effects);
+			state.render();
 		});
 		effectButtons.getChildren().add(effectDown);
 		//

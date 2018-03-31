@@ -1,6 +1,5 @@
 package com.ssplugins.preedit.edit;
 
-import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.ShiftList;
 import javafx.scene.control.ListCell;
@@ -23,10 +22,6 @@ public abstract class Module extends Layer {
 	
 	public final void removeEffect(int i) {
 		effects.remove(i);
-	}
-	
-	public final void shiftEffect(int i, boolean up) {
-		effects.shiftElement(i, !up);
 	}
 	
 	public static Callback<ListView<Module>, ListCell<Module>> getCellFactory() {

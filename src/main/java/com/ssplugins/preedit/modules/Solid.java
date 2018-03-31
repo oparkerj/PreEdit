@@ -38,7 +38,7 @@ public class Solid extends Module {
 	
 	@Override
 	public void linkResizeHandle(ResizeHandle handle) {
-		getInputs().getInput("Location", LocationInput.class).ifPresent(handle::linkTo);
+		getInputs().getInput("Location", LocationInput.class).ifPresent(handle::link);
 	}
 	
 }

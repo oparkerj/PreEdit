@@ -5,7 +5,10 @@ import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.SizeHandler;
 import com.ssplugins.preedit.util.UITools;
 import javafx.beans.property.Property;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -24,6 +27,8 @@ public class ResizeHandle extends AnchorPane {
 	private SizeHandler handler;
 	
 	private Property<Number> x, y, width, height, angle;
+	private ObservableValue<Bounds> boundsProperty;
+	private ChangeListener<Bounds> boundsListener = getBoundsListener();
 	
 	public ResizeHandle() {
 		Border border = UITools.border(Color.MAGENTA);
@@ -129,6 +134,13 @@ public class ResizeHandle extends AnchorPane {
 		});
 	}
 	
+	private ChangeListener<Bounds> getBoundsListener() {
+		return (observable, oldValue, newValue) -> {
+			this.minWidthProperty().set(newValue.getWidth());
+			this.minHeightProperty().set(newValue.getHeight());
+		};
+	}
+	
 	public void hide() {
 		this.setVisible(false);
 	}
@@ -182,27 +194,23 @@ public class ResizeHandle extends AnchorPane {
 		return Optional.empty();
 	}
 	
-	public void linkTo(LocationInput input) {
+	public void link(LocationInput input) {
 		GridMap map = input.getNode();
-		unlink();
 		this.setVisible(true);
 		setSizeable(input.isSizeable());
 		setSpinnable(input.canSpin());
-		map.get("x", NumberField.class).ifPresent(field -> {
-			link(HandleProperty.X, field.numberProperty());
-		});
-		map.get("y", NumberField.class).ifPresent(field -> {
-			link(HandleProperty.Y, field.numberProperty());
-		});
-		map.get("width", NumberField.class).ifPresent(field -> {
-			link(HandleProperty.WIDTH, field.numberProperty());
-		});
-		map.get("height", NumberField.class).ifPresent(field -> {
-			link(HandleProperty.HEIGHT, field.numberProperty());
-		});
-		map.get("angle", NumberField.class).ifPresent(field -> {
-			link(HandleProperty.ANGLE, field.numberProperty());
-		});
+		link(HandleProperty.X, input.xProperty());
+		link(HandleProperty.Y, input.yProperty());
+		link(HandleProperty.WIDTH, input.widthProperty());
+		link(HandleProperty.HEIGHT, input.heightProperty());
+		link(HandleProperty.ANGLE, input.angleProperty());
+	}
+	
+	public void link(ObservableValue<Bounds> property) {
+		boundsProperty = property;
+		property.addListener(boundsListener);
+		this.minWidthProperty().set(property.getValue().getWidth());
+		this.minHeightProperty().set(property.getValue().getHeight());
 	}
 	
 	public void link(HandleProperty property, Property<Number> numberProperty) {
@@ -236,6 +244,10 @@ public class ResizeHandle extends AnchorPane {
 		unbind(width, this.minWidthProperty());
 		unbind(height, this.minHeightProperty());
 		unbind(angle, this.rotateProperty());
+		if (boundsProperty != null) {
+			boundsProperty.removeListener(boundsListener);
+			boundsProperty = null;
+		}
 	}
 	
 	public enum HandleProperty {

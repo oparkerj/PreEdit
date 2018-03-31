@@ -3,6 +3,7 @@ package com.ssplugins.preedit.input;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.ssplugins.preedit.util.JsonConverter;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextField;
 
 public class TextInput extends Input<TextField, String> {
@@ -27,6 +28,10 @@ public class TextInput extends Input<TextField, String> {
 				return element.getAsString();
 			}
 		};
+	}
+	
+	public StringProperty textProperty() {
+		return getNode().textProperty();
 	}
 	
 	@Override
