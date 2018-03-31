@@ -23,7 +23,7 @@ public class ResizeHandle extends AnchorPane {
 	private Pane topLeft, topRight, bottomLeft, bottomRight, top, right, bottom, left, rotate;
 	private SizeHandler handler;
 	
-	private NumberField x, y, width, height, angle;
+	private Property<Number> x, y, width, height, angle;
 	
 	public ResizeHandle() {
 		Border border = UITools.border(Color.MAGENTA);
@@ -137,9 +137,9 @@ public class ResizeHandle extends AnchorPane {
 		this.setVisible(true);
 	}
 	
-	private void unbind(NumberField field, Property<Number> property) {
+	private void unbind(Property<Number> field, Property<Number> property) {
 		if (field == null) return;
-		field.numberProperty().unbindBidirectional(property);
+		field.unbindBidirectional(property);
 	}
 	
 	private void makeDraggable() {
@@ -189,25 +189,45 @@ public class ResizeHandle extends AnchorPane {
 		setSizeable(input.isSizeable());
 		setSpinnable(input.canSpin());
 		map.get("x", NumberField.class).ifPresent(field -> {
-			x = field;
-			this.layoutXProperty().bindBidirectional(field.numberProperty());
+			link(HandleProperty.X, field.numberProperty());
 		});
 		map.get("y", NumberField.class).ifPresent(field -> {
-			y = field;
-			this.layoutYProperty().bindBidirectional(field.numberProperty());
+			link(HandleProperty.Y, field.numberProperty());
 		});
 		map.get("width", NumberField.class).ifPresent(field -> {
-			width = field;
-			this.minWidthProperty().bindBidirectional(field.numberProperty());
+			link(HandleProperty.WIDTH, field.numberProperty());
 		});
 		map.get("height", NumberField.class).ifPresent(field -> {
-			height = field;
-			this.minHeightProperty().bindBidirectional(field.numberProperty());
+			link(HandleProperty.HEIGHT, field.numberProperty());
 		});
 		map.get("angle", NumberField.class).ifPresent(field -> {
-			angle = field;
-			this.rotateProperty().bindBidirectional(field.numberProperty());
+			link(HandleProperty.ANGLE, field.numberProperty());
 		});
+	}
+	
+	public void link(HandleProperty property, Property<Number> numberProperty) {
+		switch (property) {
+			case X:
+				x = numberProperty;
+				this.layoutXProperty().bindBidirectional(numberProperty);
+				break;
+			case Y:
+				y = numberProperty;
+				this.layoutYProperty().bindBidirectional(numberProperty);
+				break;
+			case WIDTH:
+				width = numberProperty;
+				this.minWidthProperty().bindBidirectional(numberProperty);
+				break;
+			case HEIGHT:
+				height = numberProperty;
+				this.minHeightProperty().bindBidirectional(numberProperty);
+				break;
+			case ANGLE:
+				angle = numberProperty;
+				this.rotateProperty().bindBidirectional(numberProperty);
+				break;
+		}
 	}
 	
 	public void unlink() {
@@ -216,6 +236,14 @@ public class ResizeHandle extends AnchorPane {
 		unbind(width, this.minWidthProperty());
 		unbind(height, this.minHeightProperty());
 		unbind(angle, this.rotateProperty());
+	}
+	
+	public enum HandleProperty {
+		X,
+		Y,
+		WIDTH,
+		HEIGHT,
+		ANGLE;
 	}
 	
 }
