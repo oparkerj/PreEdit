@@ -18,6 +18,7 @@ public abstract class Input<N extends Node, O> {
 	private JsonConverter<O> converter;
 	private boolean ready;
 	private BooleanProperty userProvided = new SimpleBooleanProperty(false);
+	private Runnable update;
 	
 	protected abstract N createInputNode();
 	
@@ -36,6 +37,9 @@ public abstract class Input<N extends Node, O> {
 		this.node = createInputNode();
 		displayNode = new UserInput(node);
 		displayNode.getCheckBox().selectedProperty().bindBidirectional(userProvided);
+		displayNode.getCheckBox().selectedProperty().addListener((observable, oldValue, newValue) -> {
+			if (update != null) update.run();
+		});
 		this.converter = getJsonConverter();
 	}
 	
@@ -58,6 +62,7 @@ public abstract class Input<N extends Node, O> {
 	}
 	
 	public final void setUpdateTrigger(Runnable update) {
+		this.update = update;
 		setUpdateTrigger(node, update);
 	}
 	
