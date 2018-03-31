@@ -3,6 +3,7 @@ package com.ssplugins.preedit.nodes;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -37,6 +38,14 @@ public class NumberField extends TextField {
 		});
 		this.numberProperty().addListener((observable, oldValue, newValue) -> {
 			NumberField.this.setText(format.format(newValue));
+		});
+		this.setOnKeyPressed(event -> {
+			if (event.getCode() == KeyCode.UP) {
+				setNumber(getNumber().doubleValue() + 1);
+			}
+			else if (event.getCode() == KeyCode.DOWN) {
+				setNumber(getNumber().doubleValue() - 1);
+			}
 		});
 	}
 	
