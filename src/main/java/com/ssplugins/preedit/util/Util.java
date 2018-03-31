@@ -1,11 +1,17 @@
 package com.ssplugins.preedit.util;
 
+import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.nodes.EditorCanvas;
 import javafx.application.Platform;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -54,16 +60,19 @@ public final class Util {
 		return SilentFailException::new;
 	}
 	
-//	public static Optional<WritableImage> renderImage(EditorCanvas canvas, List<Module> modules) {
-//		try {
-//			canvas.renderImage(false, modules);
-//			return runFXSafe(() -> {
-//				WritableImage img = new WritableImage(canvas.getMinWidth(), canvas.getMinHeight());
-//				canvas.snapshot()
-//			});
-//		} catch (SilentFailException e) {
-//			return Optional.empty();
-//		}
-//	}
+	public static Optional<WritableImage> renderImage(EditorCanvas canvas, List<Module> modules) {
+		try {
+			canvas.renderImage(false, modules);
+			return runFXSafe(() -> {
+				WritableImage img = new WritableImage((int) canvas.getMinWidth(), (int) canvas.getMinHeight());
+				SnapshotParameters sp = new SnapshotParameters();
+				sp.setFill(Color.TRANSPARENT);
+				canvas.snapshot(sp, img);
+				return img;
+			});
+		} catch (SilentFailException e) {
+			return Optional.empty();
+		}
+	}
 	
 }

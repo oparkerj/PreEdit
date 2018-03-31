@@ -95,6 +95,20 @@ public final class Dialogs {
 		return Optional.ofNullable(chooser.showOpenDialog(stage));
 	}
 	
+	public static Optional<File> saveFile(Stage stage, String title) {
+		if (!Platform.isFxApplicationThread()) {
+			return Util.runFXSafeFlat(() -> saveFile(stage, title));
+		}
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle(title == null ? PreEdit.NAME : title);
+		chooser.getExtensionFilters().addAll(
+				new FileChooser.ExtensionFilter("PNG Files", "*.png"),
+				new FileChooser.ExtensionFilter("JPEG Files", "*.jpg", "*.jpeg")
+		);
+		File file = chooser.showSaveDialog(stage);
+		return Optional.ofNullable(file);
+	}
+	
 	public static Optional<TemplateInfo> newTemplate(String title) {
 		if (!Platform.isFxApplicationThread()) {
 			return Util.runFXSafeFlat(() -> newTemplate(title));

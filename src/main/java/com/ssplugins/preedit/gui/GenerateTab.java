@@ -10,16 +10,24 @@ import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.State;
 import com.ssplugins.preedit.util.UITools;
+import com.ssplugins.preedit.util.Util;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 public class GenerateTab extends BorderPane {
@@ -88,14 +96,17 @@ public class GenerateTab extends BorderPane {
 		selector = new ComboBox<>();
 		selector.setPromptText("<select template>");
 		selector.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue == null) return;
+			if (newValue == null) {
+				resetNodes();
+				return;
+			}
 			Optional<Template> template = PreEdit.getCatalog().loadTemplate(newValue);
 			if (template.isPresent()) {
 				resetNodes();
 				state.templateProperty().set(template.get());
 			}
 			else {
-				Dialogs.show("Could not find template \"" + newValue + "\".", null, Alert.AlertType.WARNING);
+				Dialogs.show("Could not find template \"" + newValue + "\".", null, AlertType.WARNING);
 			}
 		});
 		toolbar.getItems().add(selector);
@@ -103,14 +114,14 @@ public class GenerateTab extends BorderPane {
 		btnExport = new Button("Export");
 		btnExport.setDisable(true);
 		btnExport.setOnAction(event -> {
-			//
+			Dialogs.saveFile(stage, null).ifPresent(this::exportImage);
 		});
 		toolbar.getItems().add(btnExport);
 		//
 		btnQuickSave = new Button("Quick Save");
 		btnQuickSave.setDisable(true);
 		btnQuickSave.setOnAction(event -> {
-		
+			exportImage(new File("image.png"));
 		});
 		toolbar.getItems().add(btnQuickSave);
 		//
@@ -204,6 +215,8 @@ public class GenerateTab extends BorderPane {
 	}
 	
 	private void resetNodes() {
+		btnExport.setDisable(true);
+		btnQuickSave.setDisable(true);
 		canvas.clearAll();
 		ObservableList<Module> layerItems = layers.getItems();
 		if (layerItems != null) layerItems.clear();
@@ -224,6 +237,35 @@ public class GenerateTab extends BorderPane {
 	
 	private Optional<Effect> getSelectedEffect() {
 		return Optional.ofNullable(effects.getSelectionModel().getSelectedItem());
+	}
+	
+	private void exportImage(File out) {
+		if (state.getTemplate() == null) return;
+		Optional<WritableImage> img = Util.renderImage(canvas, state.getTemplate().getModules());
+		if (!img.isPresent()) {
+			Dialogs.show("There are currently invalid parameters. Unable to export image.", null, AlertType.WARNING);
+			return;
+		}
+		try {
+			BufferedImage bi = SwingFXUtils.fromFXImage(img.get(), null);
+			int i = out.getName().lastIndexOf('.');
+			String format = out.getName().substring(i + 1);
+			if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
+				BufferedImage fix = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_RGB);
+				fix.createGraphics().drawImage(bi, 0, 0, java.awt.Color.WHITE, null);
+				bi = fix;
+			}
+			boolean png = ImageIO.write(bi, format, out);
+			if (!png) {
+				Dialogs.show("Invalid file extension.", null, AlertType.WARNING);
+				return;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			Dialogs.exception("Unable to export image.", null, e);
+		}
+		state.render();
+		Dialogs.show("Exported " + out.getName(), null, AlertType.INFORMATION);
 	}
 	
 }

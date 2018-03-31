@@ -123,6 +123,8 @@ public class EditorCanvas extends StackPane {
 	
 	private Canvas newLayer() {
 		Canvas c = new Canvas(this.getMinWidth(), this.getMinHeight());
+		c.widthProperty().bind(this.minWidthProperty());
+		c.heightProperty().bind(this.minHeightProperty());
 		this.getChildren().add(this.getChildren().size() - 1, c);
 		return c;
 	}
