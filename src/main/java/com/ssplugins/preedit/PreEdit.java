@@ -3,17 +3,16 @@ package com.ssplugins.preedit;
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.effects.DropShadow;
 import com.ssplugins.preedit.gui.Scenes;
+import com.ssplugins.preedit.modules.FileImage;
 import com.ssplugins.preedit.modules.Solid;
 import com.ssplugins.preedit.modules.TextModule;
+import com.ssplugins.preedit.modules.URLImage;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.GUI;
 import com.ssplugins.preedit.util.Util;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.TabPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class PreEdit extends Application {
@@ -32,7 +31,8 @@ public class PreEdit extends Application {
 	private void registerModulesEffects() {
 		catalog.registerModule("Text", TextModule.class);
 		catalog.registerModule("Solid", Solid.class);
-//		catalog.registerModule("Image", Image.class);
+		catalog.registerModule("URLImage", URLImage.class);
+		catalog.registerModule("FileImage", FileImage.class);
 		catalog.registerEffect("DropShadow", DropShadow.class);
 	}
 	

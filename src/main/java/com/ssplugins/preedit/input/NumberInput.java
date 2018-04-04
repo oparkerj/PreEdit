@@ -5,6 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.Range;
 import javafx.beans.property.ObjectProperty;
 
 import java.text.NumberFormat;
@@ -16,6 +17,7 @@ public class NumberInput extends Input<NumberField, Number> {
 	public NumberInput(boolean decimal) {
 		this.decimal = decimal;
 		this.ready();
+		this.setSlideAction((node, initial, dx) -> node.setNumber(initial + dx), field -> field.getNumber().doubleValue());
 	}
 	
 	public static JsonConverter<Number> numberConverter() {
@@ -36,12 +38,16 @@ public class NumberInput extends Input<NumberField, Number> {
 		return getNode().numberProperty();
 	}
 	
+	public void setRange(Range range) {
+		getNode().setRange(range);
+	}
+	
 	@Override
 	protected NumberField createInputNode() {
 		if (decimal) {
 			return new NumberField(0, NumberFormat.getNumberInstance());
 		}
-		return new NumberField();
+		return new NumberField(0);
 	}
 	
 	@Override

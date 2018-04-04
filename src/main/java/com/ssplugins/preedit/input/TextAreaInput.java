@@ -24,7 +24,7 @@ public class TextAreaInput extends Input<TextArea, String> {
 	
 	@Override
 	protected JsonConverter<String> getJsonConverter() {
-		return TextInput.stringConverter();
+		return JsonConverter.forString();
 	}
 	
 	@Override

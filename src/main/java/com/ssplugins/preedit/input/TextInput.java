@@ -1,7 +1,5 @@
 package com.ssplugins.preedit.input;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.ssplugins.preedit.util.JsonConverter;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextField;
@@ -13,21 +11,6 @@ public class TextInput extends Input<TextField, String> {
 	public TextInput(boolean emptyAllowed) {
 		this.emptyAllowed = emptyAllowed;
 		this.ready();
-	}
-	
-	public static JsonConverter<String> stringConverter() {
-		return new JsonConverter<String>() {
-			@Override
-			public JsonElement toJson(String s) {
-				return new JsonPrimitive(s);
-			}
-			
-			@Override
-			public String fromJson(JsonElement element) {
-				if (element.isJsonNull()) return "";
-				return element.getAsString();
-			}
-		};
 	}
 	
 	public StringProperty textProperty() {
@@ -46,7 +29,7 @@ public class TextInput extends Input<TextField, String> {
 	
 	@Override
 	protected JsonConverter<String> getJsonConverter() {
-		return stringConverter();
+		return JsonConverter.forString();
 	}
 	
 	@Override
@@ -61,7 +44,8 @@ public class TextInput extends Input<TextField, String> {
 	
 	@Override
 	protected boolean isValid(String value) {
-		return emptyAllowed || !value.isEmpty();
+		if (emptyAllowed) return true;
+		return !value.isEmpty();
 	}
 	
 }
