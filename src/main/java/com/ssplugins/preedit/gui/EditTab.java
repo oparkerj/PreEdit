@@ -78,8 +78,8 @@ public class EditTab extends BorderPane {
 			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
 				if (newNode == layers) {
 					getSelectedModule().ifPresent(module -> {
-						module.linkResizeHandle(canvas.getHandleUnbound());
 						setInputs(module.getInputs());
+						module.linkResizeHandle(canvas.getHandleUnbound());
 					});
 				}
 				else if (newNode == effects) {
@@ -209,10 +209,10 @@ public class EditTab extends BorderPane {
 			removeLayer.setDisable(false);
 			layerUp.setDisable(false);
 			layerDown.setDisable(false);
+			setInputs(newValue.getInputs());
 			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
 			addEffect.setDisable(false);
-			setInputs(newValue.getInputs());
 		});
 		controls.add(layers, 0, 1);
 		//
@@ -224,7 +224,7 @@ public class EditTab extends BorderPane {
 		addLayer.setOnAction(event -> {
 			Optional<String> op = Dialogs.choose("Choose a module to add:", null, PreEdit.getCatalog().getModules());
 			op.flatMap(PreEdit.getCatalog()::createModule).ifPresent(module -> {
-				layers.getItems().add(module);
+				layers.getItems().add(0, module);
 				canvas.addLayer();
 				state.render();
 			});
@@ -289,7 +289,7 @@ public class EditTab extends BorderPane {
 		addEffect.setOnAction(event -> {
 			Optional<String> op = Dialogs.choose("Choose an effect to add:", null, PreEdit.getCatalog().getEffects());
 			op.flatMap(PreEdit.getCatalog()::createEffect).ifPresent(effect -> {
-				effects.getItems().add(effect);
+				effects.getItems().add(0, effect);
 				state.render();
 			});
 		});

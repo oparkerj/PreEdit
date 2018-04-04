@@ -4,7 +4,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.edit.Template;
-import com.ssplugins.preedit.util.ShiftList;
+import com.ssplugins.preedit.util.wrapper.ShiftList;
 
 import java.lang.reflect.Type;
 import java.util.List;

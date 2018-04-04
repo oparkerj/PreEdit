@@ -5,6 +5,8 @@ import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.*;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.nodes.ResizeHandle;
+import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.Util;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -24,8 +26,8 @@ public class TextModule extends Module {
 	private FontWeight weight;
 	private FontPosture posture;
 	
-	private void update(String family, FontWeight weight, FontPosture posture, double size) {
-		font.set(Font.font(family, weight, posture, size));
+	private void update(String name, FontWeight weight, FontPosture posture, double size) {
+		font.set(Font.font(name, weight, posture, size));
 	}
 	
 	@Override
@@ -62,7 +64,7 @@ public class TextModule extends Module {
 		text.textProperty().bind(content.textProperty());
 		text.fontProperty().bind(font);
 		map.addInput("Content", content);
-		ChoiceInput<String> fontFamily = new ChoiceInput<>(Font.getFamilies(), font.get().getName(), TextInput.stringConverter());
+		ChoiceInput<String> fontFamily = new ChoiceInput<>(Font.getFamilies(), font.get().getName(), JsonConverter.forString());
 		fontFamily.valueProperty().addListener((observable, oldValue, newValue) -> {
 			update(newValue, weight, posture, font.get().getSize());
 		});
@@ -86,7 +88,9 @@ public class TextModule extends Module {
 		fontSize.numberProperty().addListener((observable, oldValue, newValue) -> {
 			update(font.get().getFamily(), weight, posture, newValue.doubleValue());
 		});
+		fontSize.setRange(Range.lowerBound(1));
 		map.addInput("Size", fontSize);
+		// Wrap
 		ColorInput color = new ColorInput();
 		color.setValue(Color.BLACK);
 		map.addInput("Color", color);

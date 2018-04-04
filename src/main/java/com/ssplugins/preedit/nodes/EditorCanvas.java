@@ -50,6 +50,9 @@ public class EditorCanvas extends StackPane {
 	
 	public ResizeHandle getHandleUnbound() {
 		handle.unlink();
+		handle.hide();
+		handle.setDraggable(true);
+		handle.hide();
 		return getHandle();
 	}
 	

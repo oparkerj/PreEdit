@@ -1,21 +1,25 @@
 package com.ssplugins.preedit.nodes;
 
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-public class UserInput extends GridPane {
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+
+public class UserInput<N extends Node> extends GridPane {
 	
 	private static final Border BORDER = new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
 	
 	private Label label;
 	private CheckBox userProvided;
-	private Node inputNode;
+	private N inputNode;
 	
-	public UserInput(Node inputNode) {
+	public UserInput(N inputNode) {
 		this.inputNode = inputNode;
 		label = new Label();
 		userProvided = new CheckBox("Provided");
@@ -29,6 +33,24 @@ public class UserInput extends GridPane {
 		this.add(label, 0, 0);
 		this.add(userProvided, 1, 0);
 		this.add(inputNode, 0, 1, 2, 1);
+	}
+	
+	public interface SlideAction<T> {
+		void onSlide(T node, double initial, double dx);
+	}
+	
+	public void setSlideAction(SlideAction<N> action, Function<N, Double> function) {
+		AtomicReference<Double> sx = new AtomicReference<>((double) 0);
+		AtomicReference<Double> si = new AtomicReference<>((double) 0);
+		label.setOnMousePressed(event -> {
+			sx.set(event.getSceneX());
+			si.set(function.apply(inputNode));
+		});
+		label.setOnMouseDragged(event -> {
+			double dx = event.getSceneX() - sx.get();
+			action.onSlide(inputNode, si.get(), dx);
+		});
+		label.setCursor(Cursor.E_RESIZE);
 	}
 	
 	public void setValid(boolean valid) {

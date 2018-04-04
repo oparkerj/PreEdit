@@ -1,7 +1,6 @@
 package com.ssplugins.preedit.nodes;
 
 import com.ssplugins.preedit.input.LocationInput;
-import com.ssplugins.preedit.util.GridMap;
 import com.ssplugins.preedit.util.SizeHandler;
 import com.ssplugins.preedit.util.UITools;
 import javafx.beans.property.Property;
@@ -17,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ResizeHandle extends AnchorPane {
 	
@@ -26,6 +26,7 @@ public class ResizeHandle extends AnchorPane {
 	private Pane topLeft, topRight, bottomLeft, bottomRight, top, right, bottom, left, rotate;
 	private SizeHandler handler;
 	
+	private AtomicBoolean draggable = new AtomicBoolean(true);
 	private Property<Number> x, y, width, height, angle;
 	private ObservableValue<Bounds> boundsProperty;
 	private ChangeListener<Bounds> boundsListener = getBoundsListener();
@@ -118,7 +119,7 @@ public class ResizeHandle extends AnchorPane {
 		}
 	}
 	
-	private void setSizeable(boolean sizeable) {
+	public void setSizeable(boolean sizeable) {
 		this.getChildren().forEach(node -> {
 			if (node.getId() == null) {
 				node.setVisible(sizeable);
@@ -126,12 +127,18 @@ public class ResizeHandle extends AnchorPane {
 		});
 	}
 	
-	private void setSpinnable(boolean spinnable) {
+	public void setSpinnable(boolean spinnable) {
 		this.getChildren().forEach(node -> {
 			if (node.getId() != null) {
 				node.setVisible(spinnable);
 			}
 		});
+	}
+	
+	public void setDraggable(boolean draggable) {
+		this.draggable.set(draggable);
+		if (draggable) this.setCursor(Cursor.MOVE);
+		else this.setCursor(Cursor.DEFAULT);
 	}
 	
 	private ChangeListener<Bounds> getBoundsListener() {
@@ -158,6 +165,7 @@ public class ResizeHandle extends AnchorPane {
 		EventHandler<MouseEvent> clickEvent = event -> {
 			Optional<Pos> op = findPos(event.getSource());
 			op.ifPresent(pos -> {
+				if (!draggable.get()) return;
 				handler.begin(toCanvas(event.getSceneX(), event.getSceneY()), pos);
 			});
 		};
@@ -168,11 +176,13 @@ public class ResizeHandle extends AnchorPane {
 			}
 			else {
 				node.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+					if (!draggable.get()) return;
 					handler.beginRotate(toCanvas(event.getSceneX(), event.getSceneY()));
 				});
 			}
 		});
 		this.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+			if (!draggable.get()) return;
 			handler.update(toCanvas(event.getSceneX(), event.getSceneY()));
 		});
 	}
@@ -195,8 +205,11 @@ public class ResizeHandle extends AnchorPane {
 	}
 	
 	public void link(LocationInput input) {
-		GridMap map = input.getNode();
-		this.setVisible(true);
+		if (input.isGeneratorMode() && !input.isUserProvided()) {
+			setDraggable(false);
+			return;
+		}
+		show();
 		setSizeable(input.isSizeable());
 		setSpinnable(input.canSpin());
 		link(HandleProperty.X, input.xProperty());
@@ -207,6 +220,7 @@ public class ResizeHandle extends AnchorPane {
 	}
 	
 	public void link(ObservableValue<Bounds> property) {
+		show();
 		boundsProperty = property;
 		property.addListener(boundsListener);
 		this.minWidthProperty().set(property.getValue().getWidth());
@@ -214,6 +228,7 @@ public class ResizeHandle extends AnchorPane {
 	}
 	
 	public void link(HandleProperty property, Property<Number> numberProperty) {
+		show();
 		switch (property) {
 			case X:
 				x = numberProperty;

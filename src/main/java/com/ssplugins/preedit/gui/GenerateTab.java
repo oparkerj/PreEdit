@@ -70,8 +70,8 @@ public class GenerateTab extends BorderPane {
 			newValue.focusOwnerProperty().addListener((observable1, oldNode, newNode) -> {
 				if (newNode == layers) {
 					getSelectedModule().ifPresent(module -> {
-						module.linkResizeHandle(canvas.getHandleUnbound());
 						setInputs(module.getInputs());
+						module.linkResizeHandle(canvas.getHandleUnbound());
 					});
 				}
 				else if (newNode == effects) {
@@ -174,9 +174,9 @@ public class GenerateTab extends BorderPane {
 				setInputs(null);
 				return;
 			}
+			setInputs(newValue.getInputs());
 			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
-			setInputs(newValue.getInputs());
 		});
 		controls.add(layers, 0, 1);
 		//

@@ -1,6 +1,6 @@
 package com.ssplugins.preedit.edit;
 
-import com.ssplugins.preedit.util.ShiftList;
+import com.ssplugins.preedit.util.wrapper.ShiftList;
 
 public class Template {
 	

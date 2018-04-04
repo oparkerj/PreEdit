@@ -11,10 +11,11 @@ public final class UITools {
 		map.getInputs().forEach((s, input) -> {
 			input.setUpdateTrigger(state::render);
 			if (gen) {
-				if (!input.isUserProvided()) return;
 				input.setGeneratorMode();
+				if (!input.isUserProvided()) return;
 			}
 			UserInput displayNode = input.getDisplayNode();
+			if (displayNode == null) return;
 			displayNode.update(s);
 			paramArea.getChildren().add(displayNode);
 		});

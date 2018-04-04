@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
-import com.ssplugins.preedit.util.GridMap;
+import com.ssplugins.preedit.util.wrapper.GridMap;
 import com.ssplugins.preedit.util.JsonConverter;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;

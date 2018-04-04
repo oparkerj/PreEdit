@@ -1,7 +1,7 @@
 package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.nodes.ResizeHandle;
-import com.ssplugins.preedit.util.ShiftList;
+import com.ssplugins.preedit.util.wrapper.ShiftList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;

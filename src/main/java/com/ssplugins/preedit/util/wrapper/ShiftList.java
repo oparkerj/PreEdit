@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.wrapper;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 

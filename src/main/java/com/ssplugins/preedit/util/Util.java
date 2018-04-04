@@ -17,6 +17,9 @@ import javafx.util.Callback;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -49,6 +52,15 @@ public final class Util {
 	
 	public static void log(String msg) {
 		System.out.println(msg);
+	}
+	
+	public static boolean validURL(String url) {
+		try {
+			new URL(url).toURI();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	public static String exceptionMessage(Throwable t) {
