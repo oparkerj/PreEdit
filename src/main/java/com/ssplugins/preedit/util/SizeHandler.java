@@ -60,46 +60,48 @@ public class SizeHandler {
 		double cx = r.getX();
 		double cy = r.getY();
 		if (anchor == Pos.TOP_LEFT) {
-//			move(dx, dy);
 			size(-cx, -cy);
+			cx = Range.clampMax(cx, iw);
+			cy = Range.clampMax(cy, ih);
 		}
 		else if (anchor == Pos.BOTTOM_RIGHT) {
 			size(cx, cy);
+			cx = Range.clampMin(cx, -iw);
+			cy = Range.clampMin(cy, -ih);
 		}
 		else if (anchor == Pos.TOP_RIGHT) {
-//			moveY(dy);
 			size(cx, -cy);
+			cx = Range.clampMin(cx, -iw);
+			cy = Range.clampMax(cy, ih);
 		}
 		else if (anchor == Pos.BOTTOM_LEFT) {
-//			moveX(dx);
 			size(-cx, cy);
+			cx = Range.clampMax(cx, iw);
+			cy = Range.clampMin(cy, -ih);
 		}
 		else if (anchor == Pos.TOP_CENTER) {
-//			moveY(dy);
 			sizeH(-cy);
-			Point2D p = limitDir(dx, dy, 90);
-			dx = p.getX();
-			dy = p.getY();
+			cx = 0;
+			cy = Range.clampMax(cy, ih);
 		}
 		else if (anchor == Pos.CENTER_LEFT) {
-//			moveX(dx);
 			sizeW(-cx);
-			Point2D p = limitDir(dx, dy, 0);
-			dx = p.getX();
-			dy = p.getY();
+			cx = Range.clampMax(cx, iw);
+			cy = 0;
 		}
 		else if (anchor == Pos.CENTER_RIGHT) {
 			sizeW(cx);
-			Point2D p = limitDir(dx, dy, 0);
-			dx = p.getX();
-			dy = p.getY();
+			cx = Range.clampMin(cx, -iw);
+			cy = 0;
 		}
 		else if (anchor == Pos.BOTTOM_CENTER) {
 			sizeH(cy);
-			Point2D p = limitDir(dx, dy, 90);
-			dx = p.getX();
-			dy = p.getY();
+			cx = 0;
+			cy = Range.clampMin(cy, -ih);
 		}
+		Point2D f = rot(cx, cy, outAngle.get());
+		dx = f.getX();
+		dy = f.getY();
 		centerTo(ix + iw / 2 + dx / 2, iy + ih / 2 + dy / 2);
 	}
 	
