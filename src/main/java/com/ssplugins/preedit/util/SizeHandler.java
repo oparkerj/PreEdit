@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.input.MouseEvent;
 
 public class SizeHandler {
 	
@@ -40,11 +41,11 @@ public class SizeHandler {
 		ia = angle(startX, startY);
 	}
 	
-	public void update(Point2D mouse) {
-		update(mouse.getX(), mouse.getY());
+	public void update(Point2D mouse, MouseEvent event) {
+		update(mouse.getX(), mouse.getY(), event);
 	}
 	
-	public void update(double mx, double my) {
+	public void update(double mx, double my, MouseEvent event) {
 		double dx = mx - startX;
 		double dy = my - startY;
 		if (anchor == Pos.CENTER) {
@@ -105,6 +106,25 @@ public class SizeHandler {
 		centerTo(ix + iw / 2 + dx / 2, iy + ih / 2 + dy / 2);
 	}
 	
+	private double getRatioAngle(Pos pos) {
+		switch (pos) {
+			case TOP_LEFT:
+			case BOTTOM_RIGHT:
+				return Math.toDegrees(Math.atan2(ih, iw));
+			case TOP_RIGHT:
+			case BOTTOM_LEFT:
+				return Math.toDegrees(Math.atan2(-iw, ih));
+			case TOP_CENTER:
+			case BOTTOM_CENTER:
+				return 0;
+			case CENTER_LEFT:
+			case CENTER_RIGHT:
+				return 90;
+			default:
+				return 0;
+		}
+	}
+	
 	private void move(double dx, double dy) {
 		moveX(dx);
 		moveY(dy);
@@ -133,11 +153,13 @@ public class SizeHandler {
 	}
 	
 	private void sizeW(double dw) {
-		outWidth.set(clamp(iw + dw));
+		double out = clamp(iw + dw);
+		outWidth.set(out);
 	}
 	
 	private void sizeH(double dh) {
-		outHeight.set(clamp(ih + dh));
+		double out = clamp(ih + dh);
+		outHeight.set(out);
 	}
 	
 	private double clamp(double v) {
@@ -169,6 +191,7 @@ public class SizeHandler {
 	}
 	
 	private Point2D rot(double x, double y, double cx, double cy, double deg) {
+		if (deg == 0) return new Point2D(x, y);
 		deg = Math.toRadians(deg);
 		x -= cx;
 		y -= cy;

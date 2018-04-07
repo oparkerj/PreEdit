@@ -183,7 +183,7 @@ public class ResizeHandle extends AnchorPane {
 		});
 		this.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
 			if (!draggable.get()) return;
-			handler.update(toCanvas(event.getSceneX(), event.getSceneY()));
+			handler.update(toCanvas(event.getSceneX(), event.getSceneY()), event);
 		});
 	}
 	
