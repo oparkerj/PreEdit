@@ -22,11 +22,14 @@ public class EditorCanvas extends StackPane {
 	private ResizeHandle handle;
 	
 	private Canvas transparentLayer;
+	private static Canvas debug;
 	
 	public EditorCanvas(double width, double height) {
 		this.prefWidthProperty().bind(this.minWidthProperty());
 		this.prefHeightProperty().bind(this.minHeightProperty());
 		transparentLayer = new Canvas(width, height);
+		debug = new Canvas(width, height);
+		debug.setMouseTransparent(true);
 		setCanvasSize(width, height);
 		bgPane = new Pane();
 		this.getChildren().add(bgPane);
@@ -34,7 +37,20 @@ public class EditorCanvas extends StackPane {
 		this.getChildren().add(posPane);
 		handle = new ResizeHandle();
 		posPane.getChildren().add(handle);
+		posPane.getChildren().add(debug);
 		bgPane.getChildren().add(transparentLayer);
+	}
+	
+	public static Canvas debugCanvas() {
+		return debug;
+	}
+	
+	public static GraphicsContext debugContext() {
+		return debugCanvas().getGraphicsContext2D();
+	}
+	
+	public static void clearDebug() {
+		debugContext().clearRect(0, 0, debug.getWidth(), debug.getHeight());
 	}
 	
 	public static void rotate(GraphicsContext context, double cx, double cy, double deg) {
@@ -65,6 +81,8 @@ public class EditorCanvas extends StackPane {
 		this.setMinHeight(height);
 		transparentLayer.setWidth(width);
 		transparentLayer.setHeight(height);
+		debug.setWidth(width);
+		debug.setHeight(height);
 	}
 	
 	public void addLayer() {
@@ -103,7 +121,7 @@ public class EditorCanvas extends StackPane {
 		}
 	}
 	
-	public void renderImage(boolean display, List<Module> modules) throws SilentFailException {
+	public void renderImage(boolean display, List<Module> modules, boolean editor) throws SilentFailException {
 		clearAll();
 		if (display) fillTransparent();
 		else handle.hide();
@@ -115,17 +133,17 @@ public class EditorCanvas extends StackPane {
 			Module m = it.previous();
 			GraphicsContext gc = canvas.getGraphicsContext2D();
 			gc.save();
-			m.draw(canvas, gc);
-			renderEffects(m.getEffects(), canvas, gc);
+			m.draw(canvas, gc, editor);
+			renderEffects(m.getEffects(), canvas, gc, editor);
 			gc.restore();
 		}
 	}
 	
-	private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context) throws SilentFailException {
+	private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context, boolean editor) throws SilentFailException {
 		ListIterator<Effect> it = list.listIterator(list.size());
 		while (it.hasPrevious()) {
 			Effect e = it.previous();
-			e.draw(c, context);
+			e.draw(c, context, editor);
 		}
 	}
 	

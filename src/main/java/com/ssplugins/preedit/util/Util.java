@@ -80,7 +80,7 @@ public final class Util {
 	
 	public static Optional<WritableImage> renderImage(EditorCanvas canvas, List<Module> modules) {
 		try {
-			canvas.renderImage(false, modules);
+			canvas.renderImage(false, modules, false);
 			return runFXSafe(() -> {
 				WritableImage img = new WritableImage((int) canvas.getMinWidth(), (int) canvas.getMinHeight());
 				SnapshotParameters sp = new SnapshotParameters();

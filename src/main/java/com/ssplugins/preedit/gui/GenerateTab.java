@@ -20,6 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -61,7 +62,7 @@ public class GenerateTab extends BorderPane {
 		state = new State();
 		state.setRenderCall(() -> {
 			try {
-				canvas.renderImage(true, state.getTemplate().getModules());
+				canvas.renderImage(true, state.getTemplate().getModules(), false);
 			} catch (SilentFailException ignored) {
 //				Dialogs.exception("issue", null, ignored);
 			}
@@ -151,6 +152,9 @@ public class GenerateTab extends BorderPane {
 			btnExport.setDisable(false);
 			btnQuickSave.setDisable(false);
 			state.render();
+		});
+		canvas.addEventFilter(MouseEvent.ANY, event -> {
+			getSelectedModule().ifPresent(module -> module.onMouseEvent(event));
 		});
 		canvasPane.add(canvas, 0, 0);
 		//

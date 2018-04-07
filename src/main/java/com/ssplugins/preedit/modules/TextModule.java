@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -44,7 +45,7 @@ public class TextModule extends Module {
 	}
 	
 	@Override
-	public void draw(Canvas canvas, GraphicsContext context) throws SilentFailException {
+	public void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException {
 		String content = getInputs().getValue("Content", TextAreaInput.class);
 		String family = ChoiceInput.getChoice(getInputs(), "Family", String.class);
 		FontWeight weight = ChoiceInput.getChoice(getInputs(), "Weight", FontWeight.class);

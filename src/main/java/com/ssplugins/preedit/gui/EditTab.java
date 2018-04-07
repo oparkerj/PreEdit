@@ -19,6 +19,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -69,7 +70,7 @@ public class EditTab extends BorderPane {
 		state = new State();
 		state.setRenderCall(() -> {
 			try {
-				canvas.renderImage(true, layers.getItems());
+				canvas.renderImage(true, layers.getItems(), true);
 			} catch (SilentFailException ignored) {
 //				Dialogs.exception("debug", null, ignored);
 			}
@@ -179,7 +180,9 @@ public class EditTab extends BorderPane {
 			if (loading.get()) state.render();
 			else state.renderPassive();
 		});
-//		canvasArea.setContent(canvas);
+		canvas.addEventFilter(MouseEvent.ANY, event -> {
+			getSelectedModule().ifPresent(module -> module.onMouseEvent(event));
+		});
 		canvasPane.add(canvas, 0, 0);
 		//
 		controls = new GridPane();

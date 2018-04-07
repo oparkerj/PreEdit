@@ -4,6 +4,7 @@ import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.wrapper.ShiftList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 public abstract class Module extends Layer {
@@ -11,6 +12,8 @@ public abstract class Module extends Layer {
 	private ShiftList<Effect> effects = new ShiftList<>();
 	
 	public abstract void linkResizeHandle(ResizeHandle handle);
+	
+	public void onMouseEvent(MouseEvent event) {}
 	
 	public final ShiftList<Effect> getEffects() {
 		return effects;

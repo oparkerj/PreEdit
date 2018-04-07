@@ -16,7 +16,7 @@ public abstract class Layer {
 	
 	public abstract String getName();
 	
-	public abstract void draw(Canvas canvas, GraphicsContext context) throws SilentFailException;
+	public abstract void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException;
 	
 	protected abstract void defineInputs(InputMap map);
 	

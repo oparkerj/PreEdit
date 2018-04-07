@@ -34,7 +34,7 @@ public abstract class ImageModule extends Module {
 	}
 	
 	@Override
-	public void draw(Canvas canvas, GraphicsContext context) throws SilentFailException {
+	public void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException {
 		Bounds bounds = getInputs().getValue("Location", LocationInput.class);
 		EditorCanvas.rotate(context, Util.centerX(bounds), Util.centerY(bounds), bounds.getMinZ());
 		context.drawImage(image, bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());

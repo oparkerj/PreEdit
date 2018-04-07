@@ -1,7 +1,6 @@
 package com.ssplugins.preedit.modules;
 
 import com.ssplugins.preedit.input.InputMap;
-import com.ssplugins.preedit.input.TextInput;
 import com.ssplugins.preedit.input.URLInput;
 import com.ssplugins.preedit.util.Util;
 import javafx.application.Platform;

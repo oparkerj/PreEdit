@@ -20,7 +20,7 @@ public class Solid extends Module {
 	}
 	
 	@Override
-	public void draw(Canvas canvas, GraphicsContext context) throws SilentFailException {
+	public void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException {
 		Bounds region = getInputs().getValue("Location", LocationInput.class);
 		Color color = getInputs().getValue("Color", ColorInput.class);
 		double cx = region.getMinX() + region.getWidth() / 2;
