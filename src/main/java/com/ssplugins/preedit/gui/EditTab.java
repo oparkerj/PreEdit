@@ -181,7 +181,7 @@ public class EditTab extends BorderPane {
 			else state.renderPassive();
 		});
 		canvas.addEventFilter(MouseEvent.ANY, event -> {
-			getSelectedModule().ifPresent(module -> module.onMouseEvent(event));
+			getSelectedModule().ifPresent(module -> module.onMouseEvent(event, true));
 		});
 		canvasPane.add(canvas, 0, 0);
 		//

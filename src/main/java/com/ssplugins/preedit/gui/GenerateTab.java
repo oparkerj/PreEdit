@@ -154,7 +154,7 @@ public class GenerateTab extends BorderPane {
 			state.render();
 		});
 		canvas.addEventFilter(MouseEvent.ANY, event -> {
-			getSelectedModule().ifPresent(module -> module.onMouseEvent(event));
+			getSelectedModule().ifPresent(module -> module.onMouseEvent(event, false));
 		});
 		canvasPane.add(canvas, 0, 0);
 		//

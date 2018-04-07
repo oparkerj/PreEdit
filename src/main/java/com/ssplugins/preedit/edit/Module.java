@@ -13,7 +13,7 @@ public abstract class Module extends Layer {
 	
 	public abstract void linkResizeHandle(ResizeHandle handle);
 	
-	public void onMouseEvent(MouseEvent event) {}
+	public void onMouseEvent(MouseEvent event, boolean editor) {}
 	
 	public final ShiftList<Effect> getEffects() {
 		return effects;
