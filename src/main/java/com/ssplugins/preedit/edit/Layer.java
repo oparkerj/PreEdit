@@ -20,6 +20,8 @@ public abstract class Layer {
 	
 	protected abstract void defineInputs(InputMap map);
 	
+	public void onSelectionChange(boolean selected) {}
+	
 	protected void preload() {}
 	
 	public final InputMap getInputs() {

@@ -199,6 +199,7 @@ public class EditTab extends BorderPane {
 		layers.setPrefHeight(200);
 		layers.setCellFactory(Module.getCellFactory());
 		layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (oldValue != null) oldValue.onSelectionChange(false);
 			if (newValue == null) {
 				canvas.getHandle().hide();
 				removeLayer.setDisable(true);
@@ -209,6 +210,7 @@ public class EditTab extends BorderPane {
 				setInputs(null);
 				return;
 			}
+			newValue.onSelectionChange(true);
 			removeLayer.setDisable(false);
 			layerUp.setDisable(false);
 			layerDown.setDisable(false);
@@ -216,6 +218,7 @@ public class EditTab extends BorderPane {
 			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
 			addEffect.setDisable(false);
+			state.render();
 		});
 		controls.add(layers, 0, 1);
 		//
@@ -269,6 +272,7 @@ public class EditTab extends BorderPane {
 		effects.setPrefHeight(200);
 		effects.setCellFactory(Effect.getCellFactory());
 		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (oldValue != null) oldValue.onSelectionChange(false);
 			if (newValue == null) {
 				removeEffect.setDisable(true);
 				effectUp.setDisable(true);
@@ -276,11 +280,13 @@ public class EditTab extends BorderPane {
 				setInputs(null);
 				return;
 			}
+			newValue.onSelectionChange(true);
 			removeEffect.setDisable(false);
 			effectUp.setDisable(false);
 			effectDown.setDisable(false);
 			canvas.getHandle().hide();
 			setInputs(newValue.getInputs());
+			state.render();
 		});
 		controls.add(effects, 2, 1);
 		//

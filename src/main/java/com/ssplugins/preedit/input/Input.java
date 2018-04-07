@@ -74,6 +74,12 @@ public abstract class Input<N extends Node, O> {
 		return userProvided.get();
 	}
 	
+	public final void setProvidedVisible(boolean visible) {
+		if (displayNode != null) {
+			displayNode.getCheckBox().setVisible(visible);
+		}
+	}
+	
 	public final void setUpdateTrigger(Runnable update) {
 		this.update = update;
 		setUpdateTrigger(node, update);

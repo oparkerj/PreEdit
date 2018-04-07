@@ -65,6 +65,14 @@ public class NumberField extends TextField {
 				setNumber(getNumber().doubleValue() - 1);
 			}
 		});
+		this.setOnScroll(event -> {
+			if (event.getDeltaY() > 0) {
+				setNumber(getNumber().doubleValue() + 1);
+			}
+			else {
+				setNumber(getNumber().doubleValue() - 1);
+			}
+		});
 		this.range.addListener((observable, oldValue, newValue) -> {
 			setNumber(newValue.clamp(getNumber().doubleValue()));
 		});

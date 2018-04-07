@@ -172,15 +172,18 @@ public class GenerateTab extends BorderPane {
 		layers.setPrefHeight(200);
 		layers.setCellFactory(Module.getCellFactory());
 		layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (oldValue != null) oldValue.onSelectionChange(false);
 			if (newValue == null) {
 				canvas.getHandle().hide();
 				effects.setItems(null);
 				setInputs(null);
 				return;
 			}
+			newValue.onSelectionChange(true);
 			setInputs(newValue.getInputs());
 			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
+			state.render();
 		});
 		controls.add(layers, 0, 1);
 		//
@@ -192,12 +195,15 @@ public class GenerateTab extends BorderPane {
 		effects.setPrefHeight(200);
 		effects.setCellFactory(Effect.getCellFactory());
 		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (oldValue != null) oldValue.onSelectionChange(false);
 			if (newValue == null) {
 				setInputs(null);
 				return;
 			}
+			newValue.onSelectionChange(true);
 			canvas.getHandle().hide();
 			setInputs(newValue.getInputs());
+			state.render();
 		});
 		controls.add(effects, 1, 1);
 		//
