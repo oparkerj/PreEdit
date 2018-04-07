@@ -3,10 +3,7 @@ package com.ssplugins.preedit;
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.effects.DropShadow;
 import com.ssplugins.preedit.gui.Scenes;
-import com.ssplugins.preedit.modules.FileImage;
-import com.ssplugins.preedit.modules.Solid;
-import com.ssplugins.preedit.modules.TextModule;
-import com.ssplugins.preedit.modules.URLImage;
+import com.ssplugins.preedit.modules.*;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.GUI;
 import com.ssplugins.preedit.util.Util;
@@ -33,6 +30,7 @@ public class PreEdit extends Application {
 		catalog.registerModule("Solid", Solid.class);
 		catalog.registerModule("URLImage", URLImage.class);
 		catalog.registerModule("FileImage", FileImage.class);
+		catalog.registerModule("Brush", Brush.class);
 		catalog.registerEffect("DropShadow", DropShadow.class);
 	}
 	

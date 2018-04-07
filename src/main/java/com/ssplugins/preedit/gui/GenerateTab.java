@@ -256,9 +256,7 @@ public class GenerateTab extends BorderPane {
 			int i = out.getName().lastIndexOf('.');
 			String format = out.getName().substring(i + 1);
 			if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
-				BufferedImage fix = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_RGB);
-				fix.createGraphics().drawImage(bi, 0, 0, java.awt.Color.WHITE, null);
-				bi = fix;
+				bi = Util.fixJPG(bi);
 			}
 			boolean png = ImageIO.write(bi, format, out);
 			if (!png) {

@@ -7,6 +7,7 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Bounds;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ListCell;
@@ -15,11 +16,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URL;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -121,6 +122,40 @@ public final class Util {
 				return T.valueOf(type, element.getAsString());
 			}
 		};
+	}
+	
+	public static JsonConverter<WritableImage> imageConverter() {
+		return new JsonConverter<WritableImage>() {
+			@Override
+			public JsonElement toJson(WritableImage image) {
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				try {
+					ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", out);
+				} catch (IOException ignored) {
+				}
+				byte[] data = out.toByteArray();
+				String d = Base64.getEncoder().encodeToString(data);
+				return new JsonPrimitive(d);
+			}
+			
+			@Override
+			public WritableImage fromJson(JsonElement element) {
+				byte[] data = Base64.getDecoder().decode(element.getAsString());
+				ByteArrayInputStream in = new ByteArrayInputStream(data);
+				try {
+					return SwingFXUtils.toFXImage(ImageIO.read(in), null);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+	}
+	
+	public static BufferedImage fixJPG(BufferedImage img) {
+		BufferedImage fix = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+		fix.createGraphics().drawImage(img, 0, 0, java.awt.Color.WHITE, null);
+		return fix;
 	}
 	
 	public static double centerX(Bounds bounds) {
