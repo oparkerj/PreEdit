@@ -8,26 +8,30 @@ import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.nodes.EditorCanvas;
-import com.ssplugins.preedit.util.Dialogs;
-import com.ssplugins.preedit.util.State;
-import com.ssplugins.preedit.util.TemplateInfo;
-import com.ssplugins.preedit.util.UITools;
+import com.ssplugins.preedit.util.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EditTab extends BorderPane {
+public class EditorTab extends BorderPane {
 	
 	//
 	private final Insets PADDING = new Insets(10);
@@ -36,11 +40,15 @@ public class EditTab extends BorderPane {
 	private Stage stage;
 	private State state;
 	private AtomicBoolean loading = new AtomicBoolean(false);
+	private boolean editControls;
 
 	private ToolBar toolbar;
 	private ComboBox<String> selector;
 	private Button btnNew;
 	private Button btnSave;
+	//
+	private Button btnExport;
+	private Button btnQuickSave;
 	
 	private ScrollPane canvasArea;
 	private GridPane canvasPane;
@@ -65,12 +73,13 @@ public class EditTab extends BorderPane {
 	private ScrollPane paramContainer;
 	private FlowPane paramArea;
 	
-	public EditTab(Stage stage) {
+	public EditorTab(boolean editControls, Stage stage) {
 		this.stage = stage;
+		this.editControls = editControls;
 		state = new State();
 		state.setRenderCall(() -> {
 			try {
-				canvas.renderImage(true, layers.getItems(), true);
+				canvas.renderImage(true, layers.getItems(), editControls);
 			} catch (SilentFailException ignored) {
 //				Dialogs.exception("debug", null, ignored);
 			}
@@ -92,9 +101,11 @@ public class EditTab extends BorderPane {
 			});
 		});
 		defineNodes();
-		Platform.runLater(() -> {
-			selector.setItems(FXCollections.observableArrayList(PreEdit.getCatalog().getTemplates()));
-		});
+		Platform.runLater(this::updateTemplates);
+	}
+	
+	void updateTemplates() {
+		selector.setItems(FXCollections.observableArrayList(PreEdit.getCatalog().getTemplates()));
 	}
 	
 	private void defineNodes() {
@@ -104,7 +115,10 @@ public class EditTab extends BorderPane {
 		selector = new ComboBox<>();
 		selector.setPromptText("<select template>");
 		selector.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue == null) return;
+			if (newValue == null) {
+				resetNodes();
+				return;
+			}
 			if (loading.get()) {
 				loading.set(false);
 				return;
@@ -112,7 +126,7 @@ public class EditTab extends BorderPane {
 			checkSave();
 			Optional<Template> template = PreEdit.getCatalog().loadTemplate(newValue);
 			if (template.isPresent()) {
-				if (!state.isSaved()) {
+				if (!state.isSaved() && !PreEdit.getCatalog().templateExists(oldValue)) {
 					selector.getItems().remove(oldValue);
 					return;
 				}
@@ -125,34 +139,51 @@ public class EditTab extends BorderPane {
 		});
 		toolbar.getItems().add(selector);
 		//
-		btnNew = new Button("New");
-		btnNew.setOnAction(event -> {
-			Optional<TemplateInfo> op = Dialogs.newTemplate(null);
-			op.ifPresent(info -> {
-				checkSave();
-				Catalog catalog = PreEdit.getCatalog();
-				if (catalog.templateExists(info.getName())) {
-					Dialogs.show("Template already exists.", null, AlertType.INFORMATION);
-					return;
-				}
-				resetNodes();
-				Template template = catalog.newTemplate(info.getName(), info.getWidth(), info.getHeight());
-				loading.set(true);
-				state.templateProperty().set(template);
-				selector.getItems().add(template.getName());
-				selector.setValue(template.getName());
+		if (editControls) {
+			btnNew = new Button("New");
+			btnNew.setOnAction(event -> {
+				Optional<TemplateInfo> op = Dialogs.newTemplate(null);
+				op.ifPresent(info -> {
+					checkSave();
+					Catalog catalog = PreEdit.getCatalog();
+					if (catalog.templateExists(info.getName())) {
+						Dialogs.show("Template already exists.", null, AlertType.INFORMATION);
+						return;
+					}
+					resetNodes();
+					Template template = catalog.newTemplate(info.getName(), info.getWidth(), info.getHeight());
+					loading.set(true);
+					state.templateProperty().set(template);
+					selector.getItems().add(template.getName());
+					selector.setValue(template.getName());
+				});
 			});
-		});
-		toolbar.getItems().add(btnNew);
-		//
-		btnSave = new Button("Save");
-		btnSave.setDisable(true);
-		btnSave.disableProperty().bind(state.savedProperty());
-		btnSave.setOnAction(event -> {
-			PreEdit.getCatalog().saveTemplate(state.getTemplate());
-			state.savedProperty().set(true);
-		});
-		toolbar.getItems().add(btnSave);
+			toolbar.getItems().add(btnNew);
+			//
+			btnSave = new Button("Save");
+			btnSave.setDisable(true);
+			btnSave.disableProperty().bind(state.savedProperty());
+			btnSave.setOnAction(event -> {
+				PreEdit.getCatalog().saveTemplate(state.getTemplate());
+				state.savedProperty().set(true);
+			});
+			toolbar.getItems().add(btnSave);
+		}
+		else {
+			btnExport = new Button("Export");
+			btnExport.setDisable(true);
+			btnExport.setOnAction(event -> {
+				Dialogs.saveFile(stage, null).ifPresent(this::exportImage);
+			});
+			toolbar.getItems().add(btnExport);
+			//
+			btnQuickSave = new Button("Quick Save");
+			btnQuickSave.setDisable(true);
+			btnQuickSave.setOnAction(event -> {
+				exportImage(new File("image.png"));
+			});
+			toolbar.getItems().add(btnQuickSave);
+		}
 		//
 		canvasArea = new ScrollPane();
 		canvasArea.setMinWidth(CANVAS_MIN);
@@ -176,12 +207,14 @@ public class EditTab extends BorderPane {
 			canvas.setLayerCount(newValue.getModules().size());
 			canvas.setCanvasSize(newValue.getWidth(), newValue.getHeight());
 			layers.setItems(newValue.getModules());
-			addLayer.setDisable(false);
+			disable(addLayer, false);
+			disable(btnExport, false);
+			disable(btnQuickSave, false);
 			if (loading.get()) state.render();
 			else state.renderPassive();
 		});
 		canvas.addEventFilter(MouseEvent.ANY, event -> {
-			getSelectedModule().ifPresent(module -> module.onMouseEvent(event, true));
+			getSelectedModule().ifPresent(module -> module.onMouseEvent(event, editControls));
 		});
 		canvasPane.add(canvas, 0, 0);
 		//
@@ -202,67 +235,69 @@ public class EditTab extends BorderPane {
 			if (oldValue != null) oldValue.onSelectionChange(false);
 			if (newValue == null) {
 				canvas.getHandle().hide();
-				removeLayer.setDisable(true);
-				layerUp.setDisable(true);
-				layerDown.setDisable(true);
+				disable(removeLayer, true);
+				disable(layerUp, true);
+				disable(layerDown, true);
 				effects.setItems(null);
-				addEffect.setDisable(true);
+				disable(addEffect, true);
 				setInputs(null);
 				return;
 			}
 			newValue.onSelectionChange(true);
-			removeLayer.setDisable(false);
-			layerUp.setDisable(false);
-			layerDown.setDisable(false);
+			disable(removeLayer, false);
+			disable(layerUp, false);
+			disable(layerDown, false);
 			setInputs(newValue.getInputs());
 			newValue.linkResizeHandle(canvas.getHandleUnbound());
 			effects.setItems(newValue.getEffects());
-			addEffect.setDisable(false);
+			disable(addEffect, false);
 			state.render();
 		});
 		controls.add(layers, 0, 1);
 		//
-		layerButtons = new VBox(3);
-		controls.add(layerButtons, 1, 1);
-		//
-		addLayer = smallButton("+");
-		addLayer.setDisable(true);
-		addLayer.setOnAction(event -> {
-			Optional<String> op = Dialogs.choose("Choose a module to add:", null, PreEdit.getCatalog().getModules());
-			op.flatMap(PreEdit.getCatalog()::createModule).ifPresent(module -> {
-				layers.getItems().add(0, module);
-				canvas.addLayer();
+		if (editControls) {
+			layerButtons = new VBox(3);
+			controls.add(layerButtons, 1, 1);
+			//
+			addLayer = smallButton("+");
+			addLayer.setDisable(true);
+			addLayer.setOnAction(event -> {
+				Optional<String> op = Dialogs.choose("Choose a module to add:", null, PreEdit.getCatalog().getModules());
+				op.flatMap(PreEdit.getCatalog()::createModule).ifPresent(module -> {
+					layers.getItems().add(0, module);
+					canvas.addLayer();
+					state.render();
+				});
+			});
+			layerButtons.getChildren().add(addLayer);
+			//
+			removeLayer = smallButton("-");
+			removeLayer.setDisable(true);
+			removeLayer.setOnAction(event -> {
+				getSelectedModule().ifPresent(module -> {
+					layers.getItems().remove(module);
+					canvas.removeLayer();
+					state.render();
+				});
+			});
+			layerButtons.getChildren().add(removeLayer);
+			//
+			layerUp = smallButton("^");
+			layerUp.setDisable(true);
+			layerUp.setOnAction(event -> {
+				shiftUp(layers);
 				state.render();
 			});
-		});
-		layerButtons.getChildren().add(addLayer);
-		//
-		removeLayer = smallButton("-");
-		removeLayer.setDisable(true);
-		removeLayer.setOnAction(event -> {
-			getSelectedModule().ifPresent(module -> {
-				layers.getItems().remove(module);
-				canvas.removeLayer();
+			layerButtons.getChildren().add(layerUp);
+			//
+			layerDown = smallButton("v");
+			layerDown.setDisable(true);
+			layerDown.setOnAction(event -> {
+				shiftDown(layers);
 				state.render();
 			});
-		});
-		layerButtons.getChildren().add(removeLayer);
-		//
-		layerUp = smallButton("^");
-		layerUp.setDisable(true);
-		layerUp.setOnAction(event -> {
-			shiftUp(layers);
-			state.render();
-		});
-		layerButtons.getChildren().add(layerUp);
-		//
-		layerDown = smallButton("v");
-		layerDown.setDisable(true);
-		layerDown.setOnAction(event -> {
-			shiftDown(layers);
-			state.render();
-		});
-		layerButtons.getChildren().add(layerDown);
+			layerButtons.getChildren().add(layerDown);
+		}
 		//
 		labelEffects = new Label("Effects:");
 		controls.add(labelEffects, 2, 0);
@@ -274,16 +309,16 @@ public class EditTab extends BorderPane {
 		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (oldValue != null) oldValue.onSelectionChange(false);
 			if (newValue == null) {
-				removeEffect.setDisable(true);
-				effectUp.setDisable(true);
-				effectDown.setDisable(true);
+				disable(removeEffect, true);
+				disable(effectUp, true);
+				disable(effectDown, true);
 				setInputs(null);
 				return;
 			}
 			newValue.onSelectionChange(true);
-			removeEffect.setDisable(false);
-			effectUp.setDisable(false);
-			effectDown.setDisable(false);
+			disable(removeEffect, false);
+			disable(effectUp, false);
+			disable(effectDown, false);
 			canvas.getHandle().hide();
 			setInputs(newValue.getInputs());
 			state.render();
@@ -293,42 +328,44 @@ public class EditTab extends BorderPane {
 		effectButtons = new VBox(3);
 		controls.add(effectButtons, 3, 1);
 		//
-		addEffect = smallButton("+");
-		addEffect.setDisable(true);
-		addEffect.setOnAction(event -> {
-			Optional<String> op = Dialogs.choose("Choose an effect to add:", null, PreEdit.getCatalog().getEffects());
-			op.flatMap(PreEdit.getCatalog()::createEffect).ifPresent(effect -> {
-				effects.getItems().add(0, effect);
+		if (editControls) {
+			addEffect = smallButton("+");
+			addEffect.setDisable(true);
+			addEffect.setOnAction(event -> {
+				Optional<String> op = Dialogs.choose("Choose an effect to add:", null, PreEdit.getCatalog().getEffects());
+				op.flatMap(PreEdit.getCatalog()::createEffect).ifPresent(effect -> {
+					effects.getItems().add(0, effect);
+					state.render();
+				});
+			});
+			effectButtons.getChildren().add(addEffect);
+			//
+			removeEffect = smallButton("-");
+			removeEffect.setDisable(true);
+			removeEffect.setOnAction(event -> {
+				getSelectedEffect().ifPresent(effect -> {
+					effects.getItems().remove(effect);
+					state.render();
+				});
+			});
+			effectButtons.getChildren().add(removeEffect);
+			//
+			effectUp = smallButton("^");
+			effectUp.setDisable(true);
+			effectUp.setOnAction(event -> {
+				shiftUp(effects);
 				state.render();
 			});
-		});
-		effectButtons.getChildren().add(addEffect);
-		//
-		removeEffect = smallButton("-");
-		removeEffect.setDisable(true);
-		removeEffect.setOnAction(event -> {
-			getSelectedEffect().ifPresent(effect -> {
-				effects.getItems().remove(effect);
+			effectButtons.getChildren().add(effectUp);
+			//
+			effectDown = smallButton("v");
+			effectDown.setDisable(true);
+			effectDown.setOnAction(event -> {
+				shiftDown(effects);
 				state.render();
 			});
-		});
-		effectButtons.getChildren().add(removeEffect);
-		//
-		effectUp = smallButton("^");
-		effectUp.setDisable(true);
-		effectUp.setOnAction(event -> {
-			shiftUp(effects);
-			state.render();
-		});
-		effectButtons.getChildren().add(effectUp);
-		//
-		effectDown = smallButton("v");
-		effectDown.setDisable(true);
-		effectDown.setOnAction(event -> {
-			shiftDown(effects);
-			state.render();
-		});
-		effectButtons.getChildren().add(effectDown);
+			effectButtons.getChildren().add(effectDown);
+		}
 		//
 		paramContainer = new ScrollPane();
 		paramContainer.setBorder(UITools.border(Color.BLACK));
@@ -356,28 +393,35 @@ public class EditTab extends BorderPane {
 		return button;
 	}
 	
+	private void disable(Node node, boolean disable) {
+		if (node == null) return;
+		node.setDisable(disable);
+	}
+	
 	private void resetNodes() {
 		state.savedProperty().set(true);
+		disable(btnExport, true);
+		disable(btnQuickSave, true);
 		canvas.clearAll();
 		ObservableList<Module> layerItems = layers.getItems();
 		if (layerItems != null) layerItems.clear();
-		addLayer.setDisable(true);
-		removeLayer.setDisable(true);
-		layerUp.setDisable(true);
-		layerDown.setDisable(true);
+		disable(addLayer, true);
+		disable(removeLayer, true);
+		disable(layerUp, true);
+		disable(layerDown, true);
 		ObservableList<Effect> effectItems = effects.getItems();
 		if (effectItems != null) effectItems.clear();
-		addEffect.setDisable(true);
-		removeEffect.setDisable(true);
-		effectUp.setDisable(true);
-		effectDown.setDisable(true);
+		disable(addEffect, true);
+		disable(removeEffect, true);
+		disable(effectUp, true);
+		disable(effectDown, true);
 		paramArea.getChildren().clear();
 	}
 	
 	private void setInputs(InputMap map) {
 		paramArea.getChildren().clear();
 		if (map == null) return;
-		UITools.setInputNodes(map, state, paramArea, false);
+		UITools.setInputNodes(map, state, paramArea, !editControls);
 	}
 	
 	private Optional<Module> getSelectedModule() {
@@ -418,6 +462,33 @@ public class EditTab extends BorderPane {
 		list.getItems().add(r, removed);
 		selection.select(r);
 		list.scrollTo(r);
+	}
+	
+	private void exportImage(File out) {
+		if (state.getTemplate() == null) return;
+		Optional<WritableImage> img = Util.renderImage(canvas, state.getTemplate().getModules());
+		if (!img.isPresent()) {
+			Dialogs.show("There are currently invalid parameters. Unable to export image.", null, AlertType.WARNING);
+			return;
+		}
+		try {
+			BufferedImage bi = SwingFXUtils.fromFXImage(img.get(), null);
+			int i = out.getName().lastIndexOf('.');
+			String format = out.getName().substring(i + 1);
+			if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
+				bi = Util.fixJPG(bi);
+			}
+			boolean png = ImageIO.write(bi, format, out);
+			if (!png) {
+				Dialogs.show("Invalid file extension.", null, AlertType.WARNING);
+				return;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			Dialogs.exception("Unable to export image.", null, e);
+		}
+		state.render();
+		Dialogs.show("Exported " + out.getName(), null, AlertType.INFORMATION);
 	}
 	
 }

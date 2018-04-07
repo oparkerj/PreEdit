@@ -2,7 +2,7 @@ package com.ssplugins.preedit;
 
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.effects.DropShadow;
-import com.ssplugins.preedit.gui.Scenes;
+import com.ssplugins.preedit.gui.Menu;
 import com.ssplugins.preedit.modules.*;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.GUI;
@@ -39,6 +39,7 @@ public class PreEdit extends Application {
 	
 	private Catalog catalog;
 	private Stage stage;
+	private Menu menu;
 	
 	public static PreEdit getInstance() {
 		return instance;
@@ -60,7 +61,8 @@ public class PreEdit extends Application {
 			Platform.exit();
 		});
 		stage.setTitle(NAME);
-		GUI menu = Scenes.menu(stage);
+		this.menu = new Menu(stage);
+		GUI menu = this.menu.getGUI();
 		setGUI(menu, () -> {
 			stage.show();
 			stage.setMinWidth(stage.getWidth());
