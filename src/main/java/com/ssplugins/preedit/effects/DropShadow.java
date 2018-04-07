@@ -14,7 +14,7 @@ public class DropShadow extends Effect {
 	}
 	
 	@Override
-	public void draw(Canvas canvas, GraphicsContext context) throws SilentFailException {
+	public void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException {
 		javafx.scene.effect.DropShadow shadow = new javafx.scene.effect.DropShadow();
 		shadow.setOffsetX(5);
 		shadow.setOffsetY(5);
