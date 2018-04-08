@@ -7,6 +7,10 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import javafx.application.Platform;
+import javafx.beans.binding.NumberBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Bounds;
 import javafx.scene.SnapshotParameters;
@@ -164,6 +168,14 @@ public final class Util {
 	
 	public static double centerY(Bounds bounds) {
 		return bounds.getMinY() + bounds.getHeight() / 2;
+	}
+	
+	public static Property<Number> bindingToProperty(NumberBinding binding) {
+		ObjectProperty<Number> o = new SimpleObjectProperty<>(binding.getValue());
+		binding.addListener((observable, oldValue, newValue) -> {
+			o.set(newValue);
+		});
+		return o;
 	}
 	
 }

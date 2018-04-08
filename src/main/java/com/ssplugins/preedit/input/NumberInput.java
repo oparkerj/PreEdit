@@ -6,7 +6,9 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Range;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 import java.text.NumberFormat;
 
@@ -36,6 +38,12 @@ public class NumberInput extends Input<NumberField, Number> {
 	
 	public ObjectProperty<Number> numberProperty() {
 		return getNode().numberProperty();
+	}
+	
+	public IntegerProperty intProperty() {
+		IntegerProperty p = new SimpleIntegerProperty();
+		p.bindBidirectional(numberProperty());
+		return p;
 	}
 	
 	public void setRange(Range range) {

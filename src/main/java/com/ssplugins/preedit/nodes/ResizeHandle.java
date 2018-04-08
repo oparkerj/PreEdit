@@ -12,7 +12,9 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import java.util.Optional;
@@ -30,9 +32,9 @@ public class ResizeHandle extends AnchorPane {
 	private Property<Number> x, y, width, height, angle;
 	private ObservableValue<Bounds> boundsProperty;
 	private ChangeListener<Bounds> boundsListener = getBoundsListener();
+	private Border border = UITools.border(Color.MAGENTA);
 	
 	public ResizeHandle() {
-		Border border = UITools.border(Color.MAGENTA);
 		this.setBorder(border);
 		topLeft = new Pane();
 		setupAnchor(topLeft, Pos.TOP_LEFT, Cursor.NW_RESIZE, border);
@@ -231,22 +233,27 @@ public class ResizeHandle extends AnchorPane {
 		show();
 		switch (property) {
 			case X:
+				unbind(x, this.layoutXProperty());
 				x = numberProperty;
 				this.layoutXProperty().bindBidirectional(numberProperty);
 				break;
 			case Y:
+				unbind(y, this.layoutYProperty());
 				y = numberProperty;
 				this.layoutYProperty().bindBidirectional(numberProperty);
 				break;
 			case WIDTH:
+				unbind(width, this.minWidthProperty());
 				width = numberProperty;
 				this.minWidthProperty().bindBidirectional(numberProperty);
 				break;
 			case HEIGHT:
+				unbind(height, this.minHeightProperty());
 				height = numberProperty;
 				this.minHeightProperty().bindBidirectional(numberProperty);
 				break;
 			case ANGLE:
+				unbind(angle, this.rotateProperty());
 				angle = numberProperty;
 				this.rotateProperty().bindBidirectional(numberProperty);
 				break;

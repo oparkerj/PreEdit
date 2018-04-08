@@ -4,9 +4,12 @@ import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.*;
 import com.ssplugins.preedit.nodes.ResizeHandle;
+import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.SafePixelWriter;
 import com.ssplugins.preedit.util.Util;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventType;
 import javafx.scene.canvas.Canvas;
@@ -15,28 +18,32 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+import java.util.Optional;
+
 public class Brush extends Module {
 	
 	private ObjectProperty<WritableImage> image;
 	private ObjectProperty<Mode> mode;
 	
 	private boolean circle;
-	private int cx, cy;
+	private IntegerProperty cx, cy;
 	
 	@Override
 	protected void preload() {
 		image = new SimpleObjectProperty<>();
 		mode = new SimpleObjectProperty<>(Mode.DRAW);
+		cx = new SimpleIntegerProperty();
+		cy = new SimpleIntegerProperty();
 	}
 	
 	@Override
 	public void onMouseEvent(MouseEvent event, boolean editor) {
 		EventType<? extends MouseEvent> type = event.getEventType();
-		cx = (int) event.getX();
-		cy = (int) event.getY();
+		cx.set((int) event.getX());
+		cy.set((int) event.getY());
 		if (type == MouseEvent.MOUSE_CLICKED || type == MouseEvent.MOUSE_DRAGGED) {
 			try {
-				if (!editor && !getInputs().getValue("Settings", CheckboxInput.class)) return;
+				if (!editor) return;
 				int size = getInputs().getValue("Size", NumberInput.class).intValue();
 				circle((int) event.getX(), (int) event.getY(), size, true);
 			} catch (SilentFailException ignored) {}
@@ -115,23 +122,21 @@ public class Brush extends Module {
 		}
 		context.drawImage(image.get(), 0, 0);
 		if (circle) {
-			if (!editor && !getInputs().getValue("Settings", CheckboxInput.class)) return;
+			if (!editor) return;
 			int size = getInputs().getValue("Size", NumberInput.class).intValue();
 			int d = size * 2;
 			context.setFill(Color.GRAY);
-			context.strokeRoundRect(cx - size, cy - size, d, d, d, d);
+			context.strokeRoundRect(cx.get() - size, cy.get() - size, d, d, d, d);
 		}
 	}
 	
 	@Override
 	protected void defineInputs(InputMap map) {
-		CheckboxInput settings = new CheckboxInput("User can edit?");
-		settings.setProvidedVisible(false);
-		map.addInput("Settings", settings);
 		ChoiceInput<Mode> mode = new ChoiceInput<>(Mode.values(), Mode.DRAW, Util.enumConverter(Mode.class));
 		mode.valueProperty().bindBidirectional(this.mode);
 		map.addInput("Mode", mode);
 		NumberInput size = new NumberInput(false);
+		size.setRange(Range.lowerBound(1));
 		size.setValue(10);
 		map.addInput("Size", size);
 		map.addInput("Color", new ColorInput());
