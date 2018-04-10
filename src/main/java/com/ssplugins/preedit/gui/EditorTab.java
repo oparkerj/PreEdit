@@ -111,6 +111,16 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		selector.setItems(FXCollections.observableArrayList(base.getCatalog().getTemplates()));
 	}
 	
+	@Override
+	public ToolBar getToolbar() {
+		return toolbar;
+	}
+	
+	@Override
+	public void addToolbarNode(Node node) {
+        toolbar.getItems().add(node);
+	}
+	
 	private void defineNodes() {
 		toolbar = new ToolBar();
 		this.setTop(toolbar);

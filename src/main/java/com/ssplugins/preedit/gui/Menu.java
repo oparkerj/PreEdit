@@ -58,8 +58,13 @@ public class Menu implements GUI {
 	public EditorTab getEditTab() {
 		return editTab;
 	}
-	
-	@Override
+    
+    @Override
+    public void addTab(Tab tab) {
+        tabPane.getTabs().add(tab);
+    }
+    
+    @Override
 	public PreEditTab getGeneratorTab() {
 		return generateTab;
 	}
@@ -68,4 +73,5 @@ public class Menu implements GUI {
 	public PreEditTab getEditorTab() {
 		return editTab;
 	}
+	
 }
