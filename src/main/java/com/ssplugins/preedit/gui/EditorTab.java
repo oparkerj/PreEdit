@@ -1,6 +1,7 @@
 package com.ssplugins.preedit.gui;
 
 import com.ssplugins.preedit.PreEdit;
+import com.ssplugins.preedit.api.PreEditTab;
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
@@ -31,12 +32,13 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EditorTab extends BorderPane {
+public class EditorTab extends BorderPane implements PreEditTab {
 	
 	//
 	private final Insets PADDING = new Insets(10);
 	private final int CANVAS_MIN = 400;
 	
+	private PreEdit base;
 	private Stage stage;
 	private State state;
 	private AtomicBoolean loading = new AtomicBoolean(false);
@@ -73,8 +75,9 @@ public class EditorTab extends BorderPane {
 	private ScrollPane paramContainer;
 	private FlowPane paramArea;
 	
-	public EditorTab(boolean editControls, Stage stage) {
-		this.stage = stage;
+	public EditorTab(boolean editControls, PreEdit base) {
+	    this.base = base;
+		this.stage = base.getStage();
 		this.editControls = editControls;
 		state = new State();
 		state.setRenderCall(() -> {
@@ -105,7 +108,7 @@ public class EditorTab extends BorderPane {
 	}
 	
 	void updateTemplates() {
-		selector.setItems(FXCollections.observableArrayList(PreEdit.getCatalog().getTemplates()));
+		selector.setItems(FXCollections.observableArrayList(base.getCatalog().getTemplates()));
 	}
 	
 	private void defineNodes() {
@@ -124,9 +127,9 @@ public class EditorTab extends BorderPane {
 				return;
 			}
 			checkSave();
-			Optional<Template> template = PreEdit.getCatalog().loadTemplate(newValue);
+			Optional<Template> template = base.getCatalog().loadTemplate(newValue);
 			if (template.isPresent()) {
-				if (!state.isSaved() && !PreEdit.getCatalog().templateExists(oldValue)) {
+				if (!state.isSaved() && !base.getCatalog().templateExists(oldValue)) {
 					selector.getItems().remove(oldValue);
 					return;
 				}
@@ -145,7 +148,7 @@ public class EditorTab extends BorderPane {
 				Optional<TemplateInfo> op = Dialogs.newTemplate(null);
 				op.ifPresent(info -> {
 					checkSave();
-					Catalog catalog = PreEdit.getCatalog();
+					Catalog catalog = base.getCatalog();
 					if (catalog.templateExists(info.getName())) {
 						Dialogs.show("Template already exists.", null, AlertType.INFORMATION);
 						return;
@@ -164,7 +167,7 @@ public class EditorTab extends BorderPane {
 			btnSave.setDisable(true);
 			btnSave.disableProperty().bind(state.savedProperty());
 			btnSave.setOnAction(event -> {
-				PreEdit.getCatalog().saveTemplate(state.getTemplate());
+				base.getCatalog().saveTemplate(state.getTemplate());
 				state.savedProperty().set(true);
 			});
 			toolbar.getItems().add(btnSave);
@@ -262,8 +265,8 @@ public class EditorTab extends BorderPane {
 			addLayer = smallButton("+");
 			addLayer.setDisable(true);
 			addLayer.setOnAction(event -> {
-				Optional<String> op = Dialogs.choose("Choose a module to add:", null, PreEdit.getCatalog().getModules());
-				op.flatMap(PreEdit.getCatalog()::createModule).ifPresent(module -> {
+				Optional<String> op = Dialogs.choose("Choose a module to add:", null, base.getCatalog().getModules());
+				op.flatMap(base.getCatalog()::createModule).ifPresent(module -> {
 					layers.getItems().add(0, module);
 					canvas.addLayer();
 					state.render();
@@ -332,8 +335,8 @@ public class EditorTab extends BorderPane {
 			addEffect = smallButton("+");
 			addEffect.setDisable(true);
 			addEffect.setOnAction(event -> {
-				Optional<String> op = Dialogs.choose("Choose an effect to add:", null, PreEdit.getCatalog().getEffects());
-				op.flatMap(PreEdit.getCatalog()::createEffect).ifPresent(effect -> {
+				Optional<String> op = Dialogs.choose("Choose an effect to add:", null, base.getCatalog().getEffects());
+				op.flatMap(base.getCatalog()::createEffect).ifPresent(effect -> {
 					effects.getItems().add(0, effect);
 					state.render();
 				});
@@ -436,7 +439,7 @@ public class EditorTab extends BorderPane {
 		if (!state.isSaved()) {
 			Optional<ButtonType> op = Dialogs.saveDialog("Save the current template before loading?", null);
 			op.filter(buttonType -> buttonType.getButtonData() == ButtonBar.ButtonData.YES)
-			  .ifPresent(buttonType -> PreEdit.getCatalog().saveTemplate(state.getTemplate()));
+			  .ifPresent(buttonType -> base.getCatalog().saveTemplate(state.getTemplate()));
 		}
 	}
 	

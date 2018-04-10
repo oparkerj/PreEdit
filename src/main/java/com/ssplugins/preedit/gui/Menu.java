@@ -1,31 +1,34 @@
 package com.ssplugins.preedit.gui;
 
 import com.ssplugins.preedit.PreEdit;
-import com.ssplugins.preedit.util.GUI;
+import com.ssplugins.preedit.api.PreEditTab;
+import com.ssplugins.preedit.util.GridScene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.stage.Stage;
 
-public class Menu {
+public class Menu implements GUI {
 	
-	private GUI gui;
+    private PreEdit base;
+    
+	private GridScene gui;
 	
 	private TabPane tabPane;
 	private EditorTab generateTab;
 	private EditorTab editTab;
 	
-	public Menu(Stage stage) {
-		gui = menu(stage);
+	public Menu(PreEdit base) {
+	    this.base = base;
+		gui = menu(base);
 	}
 	
-	private GUI menu(Stage stage) {
-		GUI gui = new GUI(PreEdit.NAME);
+	private GridScene menu(PreEdit base) {
+		GridScene gui = new GridScene(PreEdit.NAME);
 		
-		generateTab = new EditorTab(false, stage);
+		generateTab = new EditorTab(false, base);
 		Tab tabGenerate = new Tab("Generate");
 		tabGenerate.setContent(generateTab);
-		editTab = new EditorTab(true, stage);
+		editTab = new EditorTab(true, base);
 		Tab tabEdit = new Tab("Edit");
 		tabEdit.setContent(editTab);
 		
@@ -40,7 +43,7 @@ public class Menu {
 		return gui;
 	}
 	
-	public GUI getGUI() {
+	public GridScene getGUI() {
 		return gui;
 	}
 	
@@ -56,4 +59,13 @@ public class Menu {
 		return editTab;
 	}
 	
+	@Override
+	public PreEditTab getGeneratorTab() {
+		return generateTab;
+	}
+	
+	@Override
+	public PreEditTab getEditorTab() {
+		return editTab;
+	}
 }

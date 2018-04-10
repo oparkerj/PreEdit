@@ -8,12 +8,12 @@ import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.Util;
+import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -65,7 +65,7 @@ public class TextModule extends Module {
 		text.textProperty().bind(content.textProperty());
 		text.fontProperty().bind(font);
 		map.addInput("Content", content);
-		ChoiceInput<String> fontFamily = new ChoiceInput<>(Font.getFamilies(), font.get().getName(), JsonConverter.forString());
+		ChoiceInput<String> fontFamily = new ChoiceInput<>(Toolkit.getToolkit().getFontLoader().getFamilies(), font.get().getName(), JsonConverter.forString());
 		fontFamily.valueProperty().addListener((observable, oldValue, newValue) -> {
 			update(newValue, weight, posture, font.get().getSize());
 		});
