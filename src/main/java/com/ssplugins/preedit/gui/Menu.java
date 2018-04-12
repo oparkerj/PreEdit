@@ -14,7 +14,9 @@ public class Menu implements GUI {
 	private GridScene gui;
 	
 	private TabPane tabPane;
+	private Tab generateTabRaw;
 	private EditorTab generateTab;
+	private Tab editTabRaw;
 	private EditorTab editTab;
 	
 	public Menu(PreEdit base) {
@@ -26,17 +28,17 @@ public class Menu implements GUI {
 		GridScene gui = new GridScene(PreEdit.NAME);
 		
 		generateTab = new EditorTab(false, base);
-		Tab tabGenerate = new Tab("Generate");
-		tabGenerate.setContent(generateTab);
+		generateTabRaw = new Tab("Generate");
+		generateTabRaw.setContent(generateTab);
 		editTab = new EditorTab(true, base);
-		Tab tabEdit = new Tab("Edit");
-		tabEdit.setContent(editTab);
+		editTabRaw = new Tab("Edit");
+		editTabRaw.setContent(editTab);
 		
-		tabPane = new TabPane(tabGenerate, tabEdit);
+		tabPane = new TabPane(generateTabRaw, editTabRaw);
 		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 		tabPane.setTabMinWidth(50);
 		tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue == tabGenerate) generateTab.updateTemplates();
+			if (newValue == generateTabRaw) generateTab.updateTemplates();
 		});
 		gui.add("pane", 0, 0, tabPane);
 		
@@ -58,6 +60,19 @@ public class Menu implements GUI {
 	public EditorTab getEditTab() {
 		return editTab;
 	}
+	
+	public Tab getGenerateTabRaw() {
+	    return generateTabRaw;
+    }
+    
+    public Tab getEditTabRaw() {
+        return editTabRaw;
+    }
+    
+    @Override
+    public void selectTab(Tab tab) {
+        tabPane.getSelectionModel().select(tab);
+    }
     
     @Override
     public void addTab(Tab tab) {

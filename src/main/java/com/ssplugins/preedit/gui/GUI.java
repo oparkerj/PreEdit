@@ -11,4 +11,6 @@ public interface GUI {
     
     void addTab(Tab tab);
     
+    void selectTab(Tab tab);
+    
 }

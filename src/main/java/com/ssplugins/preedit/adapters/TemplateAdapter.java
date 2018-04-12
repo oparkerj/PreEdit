@@ -28,7 +28,11 @@ public class TemplateAdapter implements JsonSerializer<Template>, JsonDeserializ
 		out.addProperty("name", template.getName());
 		out.addProperty("width", template.getWidth());
 		out.addProperty("height", template.getHeight());
-		out.add("modules", context.serialize(template.getModules(), moduleType));
+        JsonArray modules = new JsonArray();
+        template.getModules().forEach(module -> {
+            modules.add(context.serialize(module, Module.class));
+        });
+		out.add("modules", modules);
 		return out;
 	}
 	

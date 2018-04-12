@@ -1,10 +1,7 @@
 package com.ssplugins.preedit.edit;
 
 import com.google.gson.*;
-import com.ssplugins.preedit.adapters.EffectAdapter;
-import com.ssplugins.preedit.adapters.InputMapAdapter;
-import com.ssplugins.preedit.adapters.ModuleAdapter;
-import com.ssplugins.preedit.adapters.TemplateAdapter;
+import com.ssplugins.preedit.adapters.*;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.util.Dialogs;
 
@@ -27,7 +24,9 @@ public class Catalog {
 	public Catalog() {
 		GsonBuilder gsonBuilder = new GsonBuilder().serializeNulls();
 		gsonBuilder.registerTypeAdapter(Effect.class, new EffectAdapter(this));
-		gsonBuilder.registerTypeAdapter(Module.class, new ModuleAdapter(this));
+        ModuleAdapter moduleAdapter = new ModuleAdapter(this);
+		gsonBuilder.registerTypeAdapter(Module.class, moduleAdapter);
+        gsonBuilder.registerTypeAdapter(NodeModule.class, moduleAdapter);
 		gsonBuilder.registerTypeAdapter(InputMap.class, new InputMapAdapter());
 		gsonBuilder.registerTypeAdapter(Template.class, new TemplateAdapter());
 		gson = gsonBuilder.create();

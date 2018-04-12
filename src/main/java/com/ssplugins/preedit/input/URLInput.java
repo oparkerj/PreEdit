@@ -12,4 +12,5 @@ public class URLInput extends TextInput {
 	protected boolean isValid(String value) {
 		return super.isValid(value) && Util.validURL(value);
 	}
+	
 }
