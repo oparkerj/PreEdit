@@ -3,6 +3,7 @@ package com.ssplugins.preedit.input;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.ssplugins.preedit.util.JsonConverter;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
 
@@ -11,6 +12,10 @@ public class ColorInput extends Input<ColorPicker, Color> {
 	public ColorInput() {
 		this.ready();
 	}
+	
+	public ObjectProperty<Color> valueProperty() {
+	    return getNode().valueProperty();
+    }
 	
 	@Override
 	protected ColorPicker createInputNode() {

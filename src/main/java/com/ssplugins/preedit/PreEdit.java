@@ -3,7 +3,7 @@ package com.ssplugins.preedit;
 import com.ssplugins.preedit.api.AddonLoader;
 import com.ssplugins.preedit.api.PreEditAPI;
 import com.ssplugins.preedit.edit.Catalog;
-import com.ssplugins.preedit.effects.DropShadow;
+import com.ssplugins.preedit.effects.ShadowEffect;
 import com.ssplugins.preedit.gui.GUI;
 import com.ssplugins.preedit.gui.Menu;
 import com.ssplugins.preedit.modules.*;
@@ -55,7 +55,8 @@ public class PreEdit extends Application implements PreEditAPI {
 		catalog.registerModule("URLImage", URLImage.class);
 		catalog.registerModule("FileImage", FileImage.class);
 		catalog.registerModule("Brush", Brush.class);
-		catalog.registerEffect("DropShadow", DropShadow.class);
+		catalog.registerModule("Text2", Text2.class);
+		catalog.registerEffect("DropShadow", ShadowEffect.class);
 	}
 	
 	private void loadAddons() {
@@ -85,6 +86,12 @@ public class PreEdit extends Application implements PreEditAPI {
 		Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
 			Dialogs.exception("Something went wrong.", null, e);
 			Platform.exit();
+		});
+		stage.setOnCloseRequest(event -> {
+            if (!menu.getEditTab().getState().isSaved()) {
+                menu.selectTab(menu.getEditTabRaw());
+                menu.getEditTab().checkSave();
+            }
 		});
 		stage.setTitle(NAME);
 		this.menu = new Menu(this);

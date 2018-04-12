@@ -111,6 +111,18 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		selector.setItems(FXCollections.observableArrayList(base.getCatalog().getTemplates()));
 	}
 	
+	public State getState() {
+		return state;
+	}
+    
+    public void checkSave() {
+        if (!state.isSaved()) {
+            Optional<ButtonType> op = Dialogs.saveDialog("Save the current template?", null);
+            op.filter(buttonType -> buttonType.getButtonData() == ButtonBar.ButtonData.YES)
+              .ifPresent(buttonType -> base.getCatalog().saveTemplate(state.getTemplate()));
+        }
+    }
+	
 	@Override
 	public ToolBar getToolbar() {
 		return toolbar;
@@ -443,14 +455,6 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	
 	private Optional<Effect> getSelectedEffect() {
 		return Optional.ofNullable(effects.getSelectionModel().getSelectedItem());
-	}
-	
-	private void checkSave() {
-		if (!state.isSaved()) {
-			Optional<ButtonType> op = Dialogs.saveDialog("Save the current template before loading?", null);
-			op.filter(buttonType -> buttonType.getButtonData() == ButtonBar.ButtonData.YES)
-			  .ifPresent(buttonType -> base.getCatalog().saveTemplate(state.getTemplate()));
-		}
 	}
 	
 	private <T> void shiftUp(ListView<T> list) {

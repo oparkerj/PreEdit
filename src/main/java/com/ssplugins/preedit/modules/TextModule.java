@@ -24,8 +24,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 public class TextModule extends Module {
-	
-    private TextLayout layout;
+ 
 	private Text text;
 	private ObjectProperty<Font> font;
 	private FontWeight weight;

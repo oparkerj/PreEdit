@@ -66,6 +66,7 @@ public class NumberField extends TextField {
 			}
 		});
 		this.setOnScroll(event -> {
+			event.consume();
 			if (event.getDeltaY() > 0) {
 				setNumber(getNumber().doubleValue() + 1);
 			}
