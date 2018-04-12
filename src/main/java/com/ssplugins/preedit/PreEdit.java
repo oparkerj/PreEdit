@@ -50,12 +50,11 @@ public class PreEdit extends Application implements PreEditAPI {
     }
 	
 	private void registerLocalModules() {
-		catalog.registerModule("Text", TextModule.class);
 		catalog.registerModule("Solid", Solid.class);
 		catalog.registerModule("URLImage", URLImage.class);
 		catalog.registerModule("FileImage", FileImage.class);
 		catalog.registerModule("Brush", Brush.class);
-		catalog.registerModule("Text2", Text2.class);
+		catalog.registerModule("Text", TextModule.class);
 		catalog.registerEffect("DropShadow", ShadowEffect.class);
 	}
 	
