@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class GUI extends Scene {
+public class GridScene extends Scene {
 	
 	private GridPane pane;
 	private String title;
 	private Map<String, Node> nodes = new HashMap<>();
 	
-	public GUI(String title) {
+	public GridScene(String title) {
 		super(new GridPane());
 		pane = (GridPane) this.getRoot();
 		this.title = title;

@@ -11,6 +11,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Border;
@@ -222,11 +223,11 @@ public class ResizeHandle extends AnchorPane {
 	}
 	
 	public void link(ObservableValue<Bounds> property) {
-		show();
-		boundsProperty = property;
-		property.addListener(boundsListener);
-		this.minWidthProperty().set(property.getValue().getWidth());
-		this.minHeightProperty().set(property.getValue().getHeight());
+        show();
+        boundsProperty = property;
+        property.addListener(boundsListener);
+        this.minWidthProperty().set(property.getValue().getWidth());
+        this.minHeightProperty().set(property.getValue().getHeight());
 	}
 	
 	public void link(HandleProperty property, Property<Number> numberProperty) {

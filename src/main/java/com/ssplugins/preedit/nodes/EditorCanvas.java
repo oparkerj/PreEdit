@@ -2,6 +2,7 @@ package com.ssplugins.preedit.nodes;
 
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
+import com.ssplugins.preedit.edit.NodeModule;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -127,37 +128,46 @@ public class EditorCanvas extends StackPane {
 		else handle.hide();
 		ListIterator<Module> it = modules.listIterator(modules.size());
 		for (Node node : this.getChildren()) {
-			if (!(node instanceof Canvas)) continue;
-			Canvas canvas = (Canvas) node;
+			if (!(node instanceof PaneCanvas)) continue;
+			PaneCanvas paneCanvas = (PaneCanvas) node;
+			paneCanvas.clearNode();
 			if (!it.hasPrevious()) break;
 			Module m = it.previous();
+			Canvas canvas = paneCanvas.getCanvas();
 			GraphicsContext gc = canvas.getGraphicsContext2D();
 			gc.save();
-			m.draw(canvas, gc, editor);
-			renderEffects(m.getEffects(), canvas, gc, editor);
+            if (m instanceof NodeModule) {
+                Node n = ((NodeModule) m).getNode();
+                paneCanvas.setNode(n);
+                renderEffects(m.getEffects(), canvas, gc, n, editor);
+            }
+            else {
+                m.draw(canvas, gc, editor);
+                renderEffects(m.getEffects(), canvas, gc, null, editor);
+            }
 			gc.restore();
 		}
 	}
 	
-	private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context, boolean editor) throws SilentFailException {
+	private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context, Node node, boolean editor) throws SilentFailException {
 		ListIterator<Effect> it = list.listIterator(list.size());
 		while (it.hasPrevious()) {
 			Effect e = it.previous();
-			e.draw(c, context, editor);
+			e.apply(c, context, node, editor);
 		}
 	}
 	
-	private Canvas newLayer() {
-		Canvas c = new Canvas(this.getMinWidth(), this.getMinHeight());
-		c.widthProperty().bind(this.minWidthProperty());
-		c.heightProperty().bind(this.minHeightProperty());
+	private PaneCanvas newLayer() {
+		PaneCanvas c = new PaneCanvas(this.getMinWidth(), this.getMinHeight());
+        c.minWidthProperty().bind(this.minWidthProperty());
+		c.minHeightProperty().bind(this.minHeightProperty());
 		this.getChildren().add(this.getChildren().size() - 1, c);
 		return c;
 	}
 	
 	private List<Canvas> getLayers() {
-		return this.getChildren().stream().filter(node -> node instanceof Canvas)
-				   .map(Canvas.class::cast).collect(Collectors.toList());
+		return this.getChildren().stream().filter(node -> node instanceof PaneCanvas)
+                   .map(node -> ((PaneCanvas) node).getCanvas()).collect(Collectors.toList());
 	}
 	
 	private void clear(Canvas canvas) {

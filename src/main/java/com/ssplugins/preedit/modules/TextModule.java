@@ -8,20 +8,23 @@ import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.Util;
+import com.sun.javafx.scene.text.TextLayout;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 public class TextModule extends Module {
-	
+ 
 	private Text text;
 	private ObjectProperty<Font> font;
 	private FontWeight weight;
@@ -31,13 +34,31 @@ public class TextModule extends Module {
 		font.set(Font.font(name, weight, posture, size));
 	}
 	
+	private static boolean LOADED = false;
+	// Manually load fonts on Windows.
+    // For some reason not all computers load all fonts.
+	private static void loadFonts() {
+	    if (LOADED) return;
+	    LOADED = true;
+        File fonts = new File("C:" + File.separator + "Windows" + File.separator + "Fonts");
+        File[] files = fonts.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (!f.getName().toLowerCase().endsWith(".ttf")) continue;
+            try {
+                Font.loadFont(f.toURI().toURL().toString(), 12);
+            } catch (MalformedURLException ignored) {}
+        }
+    }
+	
 	@Override
 	protected void preload() {
 		text = new Text();
 		font = new SimpleObjectProperty<>(Font.getDefault());
 		weight = FontWeight.NORMAL;
 		posture = FontPosture.REGULAR;
-	}
+		loadFonts();
+    }
 	
 	@Override
 	public String getName() {
