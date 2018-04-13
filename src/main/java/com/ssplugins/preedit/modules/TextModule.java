@@ -67,25 +67,25 @@ public class TextModule extends NodeModule {
         fontFamily.valueProperty().addListener((observable, oldValue, newValue) -> {
             update(newValue, weight, posture, font.get().getSize());
         });
-        map.addInput("Family", fontFamily);
+        map.addInput("Font Family", fontFamily);
         ChoiceInput<FontWeight> fontWeight = new ChoiceInput<>(FontWeight.values(), FontWeight.NORMAL, Util.enumConverter(FontWeight.class));
         fontWeight.setCellFactory(Util.enumCellFactory());
         fontWeight.valueProperty().addListener((observable, oldValue, newValue) -> {
             weight = newValue;
             update(font.get().getFamily(), newValue, posture, font.get().getSize());
         });
-        map.addInput("Weight", fontWeight);
+        map.addInput("Font Weight", fontWeight);
         ChoiceInput<FontPosture> fontPosture = new ChoiceInput<>(FontPosture.values(), FontPosture.REGULAR, Util.enumConverter(FontPosture.class));
         fontPosture.setCellFactory(Util.enumCellFactory());
         fontPosture.valueProperty().addListener((observable, oldValue, newValue) -> {
             posture = newValue;
             update(font.get().getFamily(), weight, newValue, font.get().getSize());
         });
-        map.addInput("Posture", fontPosture);
+        map.addInput("Font Posture", fontPosture);
         NumberInput wrap = new NumberInput(true);
         text.wrappingWidthProperty().bind(wrap.numberProperty());
         wrap.setRange(Range.lowerBound(0));
-        map.addInput("Wrap", wrap);
+        map.addInput("Wrap Width", wrap);
         NumberInput fontSize = new NumberInput(true);
         fontSize.setValue(Font.getDefault().getSize());
         fontSize.numberProperty().addListener((observable, oldValue, newValue) -> {

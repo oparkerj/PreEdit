@@ -36,6 +36,7 @@ public class PreEdit extends Application implements PreEditAPI {
     private Menu menu;
 	
 	public PreEdit() {
+		instance = this;
 		catalog = new Catalog();
 		registerLocalModules();
 		loadAddons();

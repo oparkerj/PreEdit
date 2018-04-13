@@ -25,6 +25,9 @@ public class UserInput<N extends Node> extends GridPane {
 		userProvided = new CheckBox("Provided");
 		userProvided.setAllowIndeterminate(false);
 		userProvided.setSelected(false);
+		this.disabledProperty().addListener((observable, oldValue, newValue) -> {
+		    if (newValue) userProvided.setSelected(false);
+        });
 		//
 		this.setBorder(BORDER);
 		this.setPadding(new Insets(10));

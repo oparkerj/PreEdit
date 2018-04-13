@@ -90,6 +90,8 @@ public final class Dialogs {
 			return Util.runFXSafeFlat(() -> chooseFile(stage, title, filters));
 		}
 		FileChooser chooser = new FileChooser();
+        File dir = new File("images");
+        if (dir.exists()) chooser.setInitialDirectory(dir);
 		chooser.setTitle(title == null ? PreEdit.NAME : title);
 		chooser.getExtensionFilters().addAll(filters);
 		return Optional.ofNullable(chooser.showOpenDialog(stage));

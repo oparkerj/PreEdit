@@ -80,6 +80,12 @@ public abstract class Input<N extends Node, O> {
 		}
 	}
 	
+	public final void setDisabled(boolean disabled) {
+		if (displayNode != null) {
+			displayNode.setDisable(disabled);
+		}
+	}
+	
 	public final void setUpdateTrigger(Runnable update) {
 		this.update = update;
 		setUpdateTrigger(node, update);
