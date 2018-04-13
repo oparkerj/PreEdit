@@ -43,6 +43,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	private State state;
 	private AtomicBoolean loading = new AtomicBoolean(false);
 	private boolean editControls;
+	private UndoHistory history;
 
 	private ToolBar toolbar;
 	private ComboBox<String> selector;
@@ -79,6 +80,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	    this.base = base;
 		this.stage = base.getStage();
 		this.editControls = editControls;
+        this.history = new UndoHistory();
 		state = new State();
 		state.setRenderCall(() -> {
 			try {
@@ -114,6 +116,10 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	public State getState() {
 		return state;
 	}
+	
+	public UndoHistory getUndoHistory() {
+	    return history;
+    }
     
     public void checkSave() {
         if (!state.isSaved()) {
