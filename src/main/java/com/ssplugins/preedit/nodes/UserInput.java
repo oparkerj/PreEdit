@@ -16,12 +16,15 @@ public class UserInput<N extends Node> extends GridPane {
 	private static final Border BORDER = new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
 	
 	private Label label;
+	private Label note;
 	private CheckBox userProvided;
 	private N inputNode;
 	
 	public UserInput(N inputNode) {
 		this.inputNode = inputNode;
 		label = new Label();
+        note = new Label();
+        note.setWrapText(true);
 		userProvided = new CheckBox("Provided");
 		userProvided.setAllowIndeterminate(false);
 		userProvided.setSelected(false);
@@ -76,5 +79,9 @@ public class UserInput<N extends Node> extends GridPane {
 	public Node getInputNode() {
 		return inputNode;
 	}
+	
+	public Label getNote() {
+	    return note;
+    }
 	
 }

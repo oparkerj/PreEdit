@@ -11,6 +11,8 @@ import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Bounds;
 import javafx.scene.SnapshotParameters;
@@ -30,7 +32,9 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public final class Util {
@@ -177,5 +181,21 @@ public final class Util {
 		});
 		return o;
 	}
+    
+    public static <T> void task(ObservableValue<T> value, Predicate<T> predicate, Runnable callback) {
+        Thread thread = new Thread(() -> {
+            AtomicBoolean b = new AtomicBoolean(false);
+            ChangeListener<T> listener = (observable, oldValue, newValue) -> {
+                b.set(predicate.test(newValue));
+            };
+            value.addListener(listener);
+            while (true) {
+                if (b.get()) break;
+            }
+            value.removeListener(listener);
+        });
+        thread.setDaemon(true);
+        thread.start();
+    }
 	
 }

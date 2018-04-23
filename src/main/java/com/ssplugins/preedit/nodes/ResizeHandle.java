@@ -208,13 +208,14 @@ public class ResizeHandle extends AnchorPane {
 	}
 	
 	public void link(LocationInput input) {
-		if (input.isGeneratorMode() && !input.isUserProvided()) {
-			setDraggable(false);
-			return;
-		}
 		show();
 		setSizeable(input.isSizeable());
 		setSpinnable(input.canSpin());
+		if (input.isGeneratorMode() && !input.isUserProvided()) {
+			setDraggable(false);
+			setSizeable(false);
+			setSpinnable(false);
+		}
 		link(HandleProperty.X, input.xProperty());
 		link(HandleProperty.Y, input.yProperty());
 		link(HandleProperty.WIDTH, input.widthProperty());

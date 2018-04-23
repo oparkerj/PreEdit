@@ -20,13 +20,17 @@ public abstract class ImageModule extends Module {
 	public void setImage(Image image) {
 		this.image = image;
 		if (image != null) {
-			getInputs().getInput("Location", LocationInput.class).ifPresent(input -> {
-				input.widthProperty().set((int) image.getWidth());
-				input.heightProperty().set((int) image.getHeight());
-			});
+            getInputs().getInput("Location", LocationInput.class).ifPresent(input -> {
+                input.widthProperty().set((int) image.getWidth());
+                input.heightProperty().set((int) image.getHeight());
+            });
 		}
-		getInputs().getInput("hidden", HiddenInput.class).ifPresent(HiddenInput::callUpdate);
+		update();
 	}
+	
+	private void update() {
+        getInputs().getInput("hidden", HiddenInput.class).ifPresent(HiddenInput::callUpdate);
+    }
 	
 	@Override
 	public void linkResizeHandle(ResizeHandle handle) {

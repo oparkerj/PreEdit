@@ -17,6 +17,9 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 public class TextModule extends NodeModule {
     
     private Text text;
@@ -31,6 +34,21 @@ public class TextModule extends NodeModule {
         font.set(Font.font(name, weight, posture, size));
     }
     
+    private static boolean LOADED = false;
+    private static void loadFonts() {
+        if (LOADED) return;
+        LOADED = true;
+        File fonts = new File("C:" + File.separator + "Windows" + File.separator + "Fonts");
+        File[] files = fonts.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (!f.getName().toLowerCase().endsWith(".ttf")) continue;
+            try {
+                Font.loadFont(f.toURI().toURL().toString(), 12);
+            } catch (MalformedURLException ignored) {}
+        }
+    }
+    
     @Override
     protected void preload() {
         text = new Text();
@@ -39,6 +57,7 @@ public class TextModule extends NodeModule {
         unwrapped.fontProperty().bind(text.fontProperty());
         font = new SimpleObjectProperty<>(Font.getDefault());
         yOffset = new SimpleDoubleProperty();
+        loadFonts();
     }
     
     @Override

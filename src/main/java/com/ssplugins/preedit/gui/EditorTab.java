@@ -238,6 +238,16 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			canvas.setLayerCount(newValue.getModules().size());
 			canvas.setCanvasSize(newValue.getWidth(), newValue.getHeight());
 			layers.setItems(newValue.getModules());
+			newValue.getModules().forEach(module -> {
+			    module.getInputs().getInputs().forEach((s, input) -> {
+			        input.setUpdateTrigger(state::renderPassive);
+                });
+			    module.getEffects().forEach(effect -> {
+			        effect.getInputs().getInputs().forEach((s, input) -> {
+			            input.setUpdateTrigger(state::renderPassive);
+                    });
+                });
+            });
 			disable(addLayer, false);
 			disable(btnExport, false);
 			disable(btnQuickSave, false);

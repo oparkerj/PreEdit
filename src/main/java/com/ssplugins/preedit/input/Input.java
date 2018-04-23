@@ -8,8 +8,10 @@ import com.ssplugins.preedit.util.JsonConverter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class Input<N extends Node, O> {
@@ -95,6 +97,18 @@ public abstract class Input<N extends Node, O> {
 		if (type.isAssignableFrom(this.getClass())) return Optional.of(type.cast(this));
 		return Optional.empty();
 	}
+    
+    public final void note(String note) {
+        note(note, null);
+    }
+    
+    public final void note(String note, Consumer<Label> label) {
+        if (displayNode != null) {
+            if (note == null) note = "";
+            displayNode.getNote().setText(note);
+            if (label != null) label.accept(displayNode.getNote());
+        }
+    }
 	
 	public final N getNode() {
 		return node;

@@ -28,10 +28,15 @@ public class URLImage extends ImageModule {
 				return;
 			}
 			new Thread(() -> {
-				Image img = new Image(link);
-				Platform.runLater(() -> {
-					setImage(img);
-				});
+                try {
+                    Image img = new Image(link);
+                    input.note(null);
+                    Platform.runLater(() -> {
+                        setImage(img);
+                    });
+                } catch (IllegalArgumentException e) {
+                    input.note("Unable to get image from URL.");
+                }
 			}).start();
 		});
 		map.addInput("URL", input);
