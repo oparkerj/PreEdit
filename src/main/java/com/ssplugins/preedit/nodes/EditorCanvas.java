@@ -134,10 +134,12 @@ public class EditorCanvas extends StackPane {
 			if (!it.hasPrevious()) break;
 			Module m = it.previous();
 			Canvas canvas = paneCanvas.getCanvas();
+			canvas.setEffect(null);
 			GraphicsContext gc = canvas.getGraphicsContext2D();
 			gc.save();
             if (m instanceof NodeModule) {
                 Node n = ((NodeModule) m).getNode();
+				n.setEffect(null);
                 paneCanvas.setNode(n);
                 renderEffects(m.getEffects(), canvas, gc, n, editor);
             }
