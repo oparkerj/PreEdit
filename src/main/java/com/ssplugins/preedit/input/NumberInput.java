@@ -15,11 +15,15 @@ import java.text.NumberFormat;
 public class NumberInput extends Input<NumberField, Number> {
 	
 	private boolean decimal;
+	private double step = 1;
 	
 	public NumberInput(boolean decimal) {
 		this.decimal = decimal;
 		this.ready();
-		this.setSlideAction((node, initial, dx) -> node.setNumber(initial + dx), field -> field.getNumber().doubleValue());
+		this.setSlideAction((node, initial, dx) -> {
+		    dx *= step;
+		    node.setNumber(initial + dx);
+        }, field -> field.getNumber().doubleValue());
 	}
 	
 	public static JsonConverter<Number> numberConverter() {
@@ -49,8 +53,16 @@ public class NumberInput extends Input<NumberField, Number> {
 	public void setRange(Range range) {
 		getNode().setRange(range);
 	}
-	
-	@Override
+    
+    public double getStep() {
+        return step;
+    }
+    
+    public void setStep(double step) {
+        this.step = step;
+    }
+    
+    @Override
 	protected NumberField createInputNode() {
 		if (decimal) {
 			return new NumberField(0, NumberFormat.getNumberInstance());
