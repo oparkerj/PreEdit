@@ -8,6 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 public abstract class Module extends Layer {
@@ -19,8 +20,19 @@ public abstract class Module extends Layer {
 	public abstract void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException;
 	
 	public void onMouseEvent(MouseEvent event, boolean editor) {}
-	
-	public final ShiftList<Effect> getEffects() {
+    
+    @Override
+    public int userInputs() {
+        return super.userInputs() + effects.stream().map(Layer::userInputs).reduce((x, y) -> x + y).orElse(0);
+    }
+    
+    @Override
+    public void setEditor(boolean editor) {
+        super.setEditor(editor);
+        effects.forEach(effect -> effect.setEditor(editor));
+    }
+    
+    public final ShiftList<Effect> getEffects() {
 		return effects;
 	}
 	
@@ -44,6 +56,8 @@ public abstract class Module extends Layer {
 				setText("");
 				return;
 			}
+            if (!item.isEditor() && item.userInputs() == 0) setTextFill(Color.GRAY);
+			else setTextFill(Color.BLACK);
 			setText(item.getName());
 		}
 	}

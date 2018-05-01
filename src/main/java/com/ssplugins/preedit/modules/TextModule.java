@@ -12,10 +12,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -55,6 +52,7 @@ public class TextModule extends NodeModule {
         unwrapped = new Text();
         unwrapped.textProperty().bind(text.textProperty());
         unwrapped.fontProperty().bind(text.fontProperty());
+        unwrapped.textAlignmentProperty().bind(text.textAlignmentProperty());
         font = new SimpleObjectProperty<>(Font.getDefault());
         yOffset = new SimpleDoubleProperty();
         loadFonts();
@@ -124,6 +122,12 @@ public class TextModule extends NodeModule {
         text.layoutYProperty().bind(location.yProperty().add(yOffset));
         text.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
+        ChoiceInput<TextAlignment> textAlignment = new ChoiceInput<>(TextAlignment.values(), TextAlignment.LEFT, Util.enumConverter(TextAlignment.class));
+        textAlignment.setCellFactory(Util.enumCellFactory());
+        textAlignment.valueProperty().addListener((observable, oldValue, newValue) -> {
+            text.setTextAlignment(newValue);
+        });
+        map.addInput("Alignment", textAlignment);
     }
     
 }

@@ -7,6 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 public abstract class Effect extends Layer {
@@ -25,6 +26,8 @@ public abstract class Effect extends Layer {
 				setText("");
 				return;
 			}
+            if (!item.isEditor() && item.userInputs() == 0) setTextFill(Color.GRAY);
+            else setTextFill(Color.BLACK);
 			setText(item.getName());
 		}
 	}

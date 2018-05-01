@@ -58,20 +58,12 @@ public class NumberField extends TextField {
 			NumberField.this.setText(format.format(range.get().clamp(newValue.doubleValue())));
 		});
 		this.setOnKeyPressed(event -> {
+		    double d = event.isControlDown() ? 0.1 : 1;
 			if (event.getCode() == KeyCode.UP) {
-				setNumber(getNumber().doubleValue() + 1);
+				setNumber(getNumber().doubleValue() + d);
 			}
 			else if (event.getCode() == KeyCode.DOWN) {
-				setNumber(getNumber().doubleValue() - 1);
-			}
-		});
-		this.setOnScroll(event -> {
-			event.consume();
-			if (event.getDeltaY() > 0) {
-				setNumber(getNumber().doubleValue() + 1);
-			}
-			else {
-				setNumber(getNumber().doubleValue() - 1);
+				setNumber(getNumber().doubleValue() - d);
 			}
 		});
 		this.range.addListener((observable, oldValue, newValue) -> {

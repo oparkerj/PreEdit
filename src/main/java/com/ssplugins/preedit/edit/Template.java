@@ -43,6 +43,10 @@ public class Template {
 	public void removeModule(int i) {
 		modules.remove(i);
 	}
+    
+    public void setEditor(boolean editor) {
+	    modules.forEach(module -> module.setEditor(editor));
+    }
 	
 	@Override
 	public String toString() {

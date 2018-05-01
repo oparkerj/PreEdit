@@ -12,6 +12,10 @@ public class InputMap {
 	
 	private Map<String, Input> inputs = new HashMap<>();
 	
+	public int size() {
+		return inputs.size();
+	}
+	
 	public <I extends Input> void addInput(String name, I input) {
 		if (!input.isReady()) throw new IllegalArgumentException("Invalid input element. (Not ready)");
 		inputs.put(name, input);

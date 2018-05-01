@@ -2,10 +2,7 @@ package com.ssplugins.preedit.gui;
 
 import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.api.PreEditTab;
-import com.ssplugins.preedit.edit.Catalog;
-import com.ssplugins.preedit.edit.Effect;
-import com.ssplugins.preedit.edit.Module;
-import com.ssplugins.preedit.edit.Template;
+import com.ssplugins.preedit.edit.*;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.nodes.EditorCanvas;
@@ -20,6 +17,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -105,6 +104,13 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				}
 			});
 		});
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (editControls) {
+                if (event.getCode() == KeyCode.S && event.isControlDown()) {
+                    save();
+                }
+            }
+        });
 		defineNodes();
 		Platform.runLater(this::updateTemplates);
 	}
@@ -125,8 +131,13 @@ public class EditorTab extends BorderPane implements PreEditTab {
         if (!state.isSaved()) {
             Optional<ButtonType> op = Dialogs.saveDialog("Save the current template?", null);
             op.filter(buttonType -> buttonType.getButtonData() == ButtonBar.ButtonData.YES)
-              .ifPresent(buttonType -> base.getCatalog().saveTemplate(state.getTemplate()));
+              .ifPresent(buttonType -> save());
         }
+    }
+    
+    public void save() {
+        base.getCatalog().saveTemplate(state.getTemplate());
+        state.savedProperty().set(true);
     }
 	
 	@Override
@@ -195,8 +206,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			btnSave.setDisable(true);
 			btnSave.disableProperty().bind(state.savedProperty());
 			btnSave.setOnAction(event -> {
-				base.getCatalog().saveTemplate(state.getTemplate());
-				state.savedProperty().set(true);
+				save();
 			});
 			toolbar.getItems().add(btnSave);
 		}
@@ -234,6 +244,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		//
 		canvas = new EditorCanvas(CANVAS_MIN, CANVAS_MIN);
 		state.templateProperty().addListener((observable, oldValue, newValue) -> {
+		    newValue.setEditor(editControls);
 			canvas.clearAll();
 			canvas.setLayerCount(newValue.getModules().size());
 			canvas.setCanvasSize(newValue.getWidth(), newValue.getHeight());
@@ -305,6 +316,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			addLayer.setOnAction(event -> {
 				Optional<String> op = Dialogs.choose("Choose a module to add:", null, base.getCatalog().getModules());
 				op.flatMap(base.getCatalog()::createModule).ifPresent(module -> {
+				    module.setEditor(editControls);
 					layers.getItems().add(0, module);
 					canvas.addLayer();
 					state.render();
@@ -375,6 +387,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			addEffect.setOnAction(event -> {
 				Optional<String> op = Dialogs.choose("Choose an effect to add:", null, base.getCatalog().getEffects());
 				op.flatMap(base.getCatalog()::createEffect).ifPresent(effect -> {
+				    effect.setEditor(editControls);
 					effects.getItems().add(0, effect);
 					state.render();
 				});
