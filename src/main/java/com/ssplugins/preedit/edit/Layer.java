@@ -1,5 +1,6 @@
 package com.ssplugins.preedit.edit;
 
+import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.input.Input;
 import com.ssplugins.preedit.input.InputMap;
 
@@ -17,7 +18,7 @@ public abstract class Layer {
 	
 	protected abstract void defineInputs(InputMap map);
 	
-	public void onSelectionChange(boolean selected) {}
+	public void onSelectionChange(EditorTab tab, boolean selected) {}
 	
 	protected void preload() {}
 	

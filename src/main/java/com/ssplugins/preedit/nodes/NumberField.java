@@ -44,7 +44,12 @@ public class NumberField extends TextField {
 	}
 	
 	private Function<Number, Optional<Number>> numberFilter() {
-		return n -> Optional.of(n).filter(d -> range.get() != null).map(d -> range.get().clamp(d.doubleValue()));
+		return n -> Optional.of(n).filter(d -> range.get() != null).map(d -> {
+			try {
+				return format.parse(format.format(d));
+			} catch (ParseException ignored) {}
+			return 0;
+		}).map(d -> range.get().clamp(d.doubleValue()));
 	}
 	
 	private void registerEvents() {

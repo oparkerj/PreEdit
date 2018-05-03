@@ -10,6 +10,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
@@ -67,6 +68,11 @@ public class TextModule extends NodeModule {
     public void linkResizeHandle(ResizeHandle handle) {
         getInputs().getInput("Location", LocationInput.class).ifPresent(handle::link);
         handle.link(text.layoutBoundsProperty());
+    }
+    
+    @Override
+    public Bounds getBounds() {
+        return unwrapped.getLayoutBounds();
     }
     
     @Override

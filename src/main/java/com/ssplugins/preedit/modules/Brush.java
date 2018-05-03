@@ -2,6 +2,7 @@ package com.ssplugins.preedit.modules;
 
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.input.*;
 import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.Range;
@@ -12,13 +13,13 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventType;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-
-import java.util.Optional;
 
 public class Brush extends Module {
 	
@@ -52,7 +53,7 @@ public class Brush extends Module {
 	}
 	
 	@Override
-	public void onSelectionChange(boolean selected) {
+	public void onSelectionChange(EditorTab tab, boolean selected) {
 		circle = selected;
 	}
 	
@@ -108,6 +109,13 @@ public class Brush extends Module {
 	@Override
 	public void linkResizeHandle(ResizeHandle handle) {
 		handle.hide();
+	}
+	
+	@Override
+	public Bounds getBounds() {
+	    WritableImage img = image.get();
+	    if (img == null) return new BoundingBox(0, 0, 0, 0);
+        return new BoundingBox(0, 0, img.getWidth(), img.getHeight());
 	}
 	
 	@Override

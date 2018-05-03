@@ -93,14 +93,22 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				if (newNode == layers) {
 					getSelectedModule().ifPresent(module -> {
 						setInputs(module.getInputs());
+                        module.onSelectionChange(this, true);
 						module.linkResizeHandle(canvas.getHandleUnbound());
 					});
+					getSelectedEffect().ifPresent(effect -> {
+					    effect.onSelectionChange(this, false);
+                    });
 				}
 				else if (newNode == effects) {
 					getSelectedEffect().ifPresent(effect -> {
 						canvas.getHandle().hide();
+                        effect.onSelectionChange(this, true);
 						setInputs(effect.getInputs());
 					});
+					getSelectedModule().ifPresent(module -> {
+					    module.onSelectionChange(this, false);
+                    });
 				}
 			});
 		});
@@ -122,6 +130,10 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	public State getState() {
 		return state;
 	}
+	
+	public EditorCanvas getCanvas() {
+	    return canvas;
+    }
 	
 	public UndoHistory getUndoHistory() {
 	    return history;
@@ -284,7 +296,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		layers.setPrefHeight(200);
 		layers.setCellFactory(Module.getCellFactory());
 		layers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (oldValue != null) oldValue.onSelectionChange(false);
+			if (oldValue != null) oldValue.onSelectionChange(this, false);
 			if (newValue == null) {
 				canvas.getHandle().hide();
 				disable(removeLayer, true);
@@ -295,7 +307,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				setInputs(null);
 				return;
 			}
-			newValue.onSelectionChange(true);
+			newValue.onSelectionChange(this, true);
 			disable(removeLayer, false);
 			disable(layerUp, false);
 			disable(layerDown, false);
@@ -360,7 +372,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		effects.setPrefHeight(200);
 		effects.setCellFactory(Effect.getCellFactory());
 		effects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (oldValue != null) oldValue.onSelectionChange(false);
+			if (oldValue != null) oldValue.onSelectionChange(this, false);
 			if (newValue == null) {
 				disable(removeEffect, true);
 				disable(effectUp, true);
@@ -368,7 +380,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				setInputs(null);
 				return;
 			}
-			newValue.onSelectionChange(true);
+			newValue.onSelectionChange(this, true);
 			disable(removeEffect, false);
 			disable(effectUp, false);
 			disable(effectDown, false);
@@ -397,10 +409,13 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			removeEffect = smallButton("-");
 			removeEffect.setDisable(true);
 			removeEffect.setOnAction(event -> {
-				getSelectedEffect().ifPresent(effect -> {
-					effects.getItems().remove(effect);
-					state.render();
-				});
+			    getSelectedModule().ifPresent(module -> {
+                    getSelectedEffect().ifPresent(effect -> {
+                        module.removeEffect(effect);
+                        state.render();
+                    });
+                });
+				
 			});
 			effectButtons.getChildren().add(removeEffect);
 			//

@@ -13,7 +13,19 @@ import javafx.util.Callback;
 
 public abstract class Effect extends Layer {
     
+    private Module module;
+    
+    public final Module getModule() {
+        return module;
+    }
+    
+    public final void setModule(Module module) {
+        this.module = module;
+    }
+    
     public abstract void apply(Canvas canvas, GraphicsContext context, @Nullable Node node, boolean editor) throws SilentFailException;
+    
+    public abstract void reset();
 	
 	public static Callback<ListView<Effect>, ListCell<Effect>> getCellFactory() {
 		return param -> new EffectCell();
@@ -38,6 +50,7 @@ public abstract class Effect extends Layer {
         if (node != null) node.setEffect(effect);
     }
     
+    // Need this workaround since the Effect base class doesn't have setInput
     private void addEffect(Node node, javafx.scene.effect.Effect effect) {
 	    if (node == null) return;
         javafx.scene.effect.Effect old = node.getEffect();
@@ -57,7 +70,6 @@ public abstract class Effect extends Layer {
         else if (effect instanceof ColorAdjust) {
             ((ColorAdjust) effect).setInput(old);
         }
-        // ColorInput (fill, no input)
         else if (effect instanceof DisplacementMap) {
             ((DisplacementMap) effect).setInput(old);
         }
@@ -70,7 +82,6 @@ public abstract class Effect extends Layer {
         else if (effect instanceof Glow) {
             ((Glow) effect).setInput(old);
         }
-        // ImageInput (passthrough, no input)
         else if (effect instanceof InnerShadow) {
             ((InnerShadow) effect).setInput(old);
         }

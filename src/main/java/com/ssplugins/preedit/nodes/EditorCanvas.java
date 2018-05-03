@@ -61,6 +61,10 @@ public class EditorCanvas extends StackPane {
 		context.translate(-cx, -cy);
 	}
 	
+	public NodeHandle createNodeHandle() {
+        return new NodeHandle(posPane);
+    }
+	
 	public ResizeHandle getHandle() {
 		return handle;
 	}
@@ -152,9 +156,10 @@ public class EditorCanvas extends StackPane {
 	}
 	
 	private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context, Node node, boolean editor) throws SilentFailException {
-		ListIterator<Effect> it = list.listIterator(list.size());
-		while (it.hasPrevious()) {
-			Effect e = it.previous();
+		ListIterator<Effect> it = list.listIterator();
+		while (it.hasNext()) {
+			Effect e = it.next();
+			e.reset();
 			e.apply(c, context, node, editor);
 		}
 	}
@@ -175,5 +180,43 @@ public class EditorCanvas extends StackPane {
 	private void clear(Canvas canvas) {
 		canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 	}
+	
+	public class NodeHandle {
+	    private Pane pane;
+	    private boolean added;
+	    
+        private Node node;
+        
+        private NodeHandle(Pane pane) {
+            this.pane = pane;
+        }
+        
+        public Node getNode() {
+            return node;
+        }
+        
+        public void setNode(Node node) {
+            boolean a = added;
+            if (a) remove();
+            this.node = node;
+            if (a) add();
+        }
+        
+        public void add() {
+            if (!added) {
+                if (node == null) return;
+                added = true;
+                pane.getChildren().add(node);
+            }
+        }
+        
+        public void remove() {
+            if (added) {
+                added = false;
+                pane.getChildren().remove(node);
+            }
+        }
+        
+    }
 	
 }

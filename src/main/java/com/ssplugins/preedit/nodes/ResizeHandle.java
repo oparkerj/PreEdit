@@ -11,7 +11,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Border;
@@ -23,8 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ResizeHandle extends AnchorPane {
 	
-	private static final double HANDLE_SIZE = 8;
-	private static final double HALF_HANDLE = HANDLE_SIZE / 2;
+	public static final double HANDLE_SIZE = 8;
+	public static final double HALF_HANDLE = HANDLE_SIZE / 2;
 	
 	private Pane topLeft, topRight, bottomLeft, bottomRight, top, right, bottom, left, rotate;
 	private SizeHandler handler;
@@ -33,18 +32,19 @@ public class ResizeHandle extends AnchorPane {
 	private Property<Number> x, y, width, height, angle;
 	private ObservableValue<Bounds> boundsProperty;
 	private ChangeListener<Bounds> boundsListener = getBoundsListener();
-	private Border border = UITools.border(Color.MAGENTA);
+	public final static Border BORDER = UITools.border(Color.MAGENTA);
+	public final static Border BORDER_ALT = UITools.border(Color.BLUE);
 	
 	public ResizeHandle() {
-		this.setBorder(border);
+		this.setBorder(BORDER);
 		topLeft = new Pane();
-		setupAnchor(topLeft, Pos.TOP_LEFT, Cursor.NW_RESIZE, border);
+		setupAnchor(topLeft, Pos.TOP_LEFT, Cursor.NW_RESIZE, BORDER);
 		topRight = new Pane();
-		setupAnchor(topRight, Pos.TOP_RIGHT, Cursor.NE_RESIZE, border);
+		setupAnchor(topRight, Pos.TOP_RIGHT, Cursor.NE_RESIZE, BORDER);
 		bottomLeft = new Pane();
-		setupAnchor(bottomLeft, Pos.BOTTOM_LEFT, Cursor.SW_RESIZE, border);
+		setupAnchor(bottomLeft, Pos.BOTTOM_LEFT, Cursor.SW_RESIZE, BORDER);
 		bottomRight = new Pane();
-		setupAnchor(bottomRight, Pos.BOTTOM_RIGHT, Cursor.SE_RESIZE, border);
+		setupAnchor(bottomRight, Pos.BOTTOM_RIGHT, Cursor.SE_RESIZE, BORDER);
 		top = new Pane();
 		setupAnchor(top, Pos.TOP_CENTER, Cursor.N_RESIZE, null);
 		right = new Pane();
@@ -70,52 +70,56 @@ public class ResizeHandle extends AnchorPane {
 		hide();
 	}
 	
-	private void setupAnchor(Pane pane, Pos anchor, Cursor cursor, Border border) {
+	public static void setupAnchor(Pane pane, Pos anchor, Cursor cursor, Border border) {
 		setupAnchor(pane, anchor, cursor, border, 0);
 	}
 	
-	private void setupAnchor(Pane pane, Pos anchor, Cursor cursor, Border border, int offset) {
+	public static void setupAnchor(Pane pane, Pos anchor, Cursor cursor, Border border, int offset) {
 		pane.setMinWidth(HANDLE_SIZE);
 		pane.setMinHeight(HANDLE_SIZE);
 		if (border != null) pane.setBorder(border);
 		if (cursor != null) pane.setCursor(cursor);
 		double factor = (HANDLE_SIZE * offset + HALF_HANDLE);
+		positionAnchor(pane, anchor, factor, factor);
+	}
+	
+	public static void positionAnchor(Pane pane, Pos anchor, double x, double y) {
 		switch (anchor) {
 			case TOP_CENTER:
-				AnchorPane.setTopAnchor(pane, -factor);
-				AnchorPane.setLeftAnchor(pane, factor);
-				AnchorPane.setRightAnchor(pane, factor);
+				AnchorPane.setTopAnchor(pane, -y);
+				AnchorPane.setLeftAnchor(pane, x);
+				AnchorPane.setRightAnchor(pane, x);
 				break;
 			case TOP_LEFT:
-				AnchorPane.setTopAnchor(pane, -factor);
-				AnchorPane.setLeftAnchor(pane, -factor);
+				AnchorPane.setTopAnchor(pane, -y);
+				AnchorPane.setLeftAnchor(pane, -x);
 				break;
 			case TOP_RIGHT:
-				AnchorPane.setTopAnchor(pane, -factor);
-				AnchorPane.setRightAnchor(pane, -factor);
+				AnchorPane.setTopAnchor(pane, -y);
+				AnchorPane.setRightAnchor(pane, -x);
 				break;
 			case CENTER_LEFT:
-				AnchorPane.setLeftAnchor(pane, -factor);
-				AnchorPane.setTopAnchor(pane, factor);
-				AnchorPane.setBottomAnchor(pane, factor);
+				AnchorPane.setLeftAnchor(pane, -x);
+				AnchorPane.setTopAnchor(pane, y);
+				AnchorPane.setBottomAnchor(pane, y);
 				break;
 			case CENTER_RIGHT:
-				AnchorPane.setRightAnchor(pane, -factor);
-				AnchorPane.setTopAnchor(pane, factor);
-				AnchorPane.setBottomAnchor(pane, factor);
+				AnchorPane.setRightAnchor(pane, -x);
+				AnchorPane.setTopAnchor(pane, y);
+				AnchorPane.setBottomAnchor(pane, y);
 				break;
 			case BOTTOM_LEFT:
-				AnchorPane.setBottomAnchor(pane, -factor);
-				AnchorPane.setLeftAnchor(pane, -factor);
+				AnchorPane.setBottomAnchor(pane, -y);
+				AnchorPane.setLeftAnchor(pane, -x);
 				break;
 			case BOTTOM_CENTER:
-				AnchorPane.setBottomAnchor(pane, -factor);
-				AnchorPane.setLeftAnchor(pane, factor);
-				AnchorPane.setRightAnchor(pane, factor);
+				AnchorPane.setBottomAnchor(pane, -y);
+				AnchorPane.setLeftAnchor(pane, x);
+				AnchorPane.setRightAnchor(pane, x);
 				break;
 			case BOTTOM_RIGHT:
-				AnchorPane.setBottomAnchor(pane, -factor);
-				AnchorPane.setRightAnchor(pane, -factor);
+				AnchorPane.setBottomAnchor(pane, -y);
+				AnchorPane.setRightAnchor(pane, -x);
 				break;
 			default:
 				break;

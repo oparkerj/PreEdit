@@ -8,6 +8,7 @@ import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.Util;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -31,6 +32,20 @@ public abstract class ImageModule extends Module {
 	private void update() {
         getInputs().getInput("hidden", HiddenInput.class).ifPresent(HiddenInput::callUpdate);
     }
+    
+    @Override
+	public Bounds getBounds() {
+		try {
+            Bounds bounds = getInputs().getValue("Location", LocationInput.class);
+            return new BoundingBox(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+        } catch (SilentFailException ignored) {}
+        return new BoundingBox(0, 0, 0, 0);
+	}
+	
+	@Override
+	public String getName() {
+		return null;
+	}
 	
 	@Override
 	public void linkResizeHandle(ResizeHandle handle) {
@@ -46,7 +61,7 @@ public abstract class ImageModule extends Module {
 	
 	@Override
 	protected void defineInputs(InputMap map) {
-		map.addInput("Location", new LocationInput(true, true));
+        map.addInput("Location", new LocationInput(true, true));
 		map.addInput("hidden", new HiddenInput());
 	}
 	

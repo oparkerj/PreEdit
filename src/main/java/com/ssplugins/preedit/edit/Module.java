@@ -3,6 +3,7 @@ package com.ssplugins.preedit.edit;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.wrapper.ShiftList;
+import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
@@ -18,6 +19,8 @@ public abstract class Module extends Layer {
 	public abstract void linkResizeHandle(ResizeHandle handle);
 	
 	public abstract void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException;
+	
+	public abstract Bounds getBounds();
 	
 	public void onMouseEvent(MouseEvent event, boolean editor) {}
     
@@ -37,11 +40,13 @@ public abstract class Module extends Layer {
 	}
 	
 	public final void addEffect(Effect effect) {
+		effect.setModule(this);
 		effects.add(effect);
 	}
 	
-	public final void removeEffect(int i) {
-		effects.remove(i);
+	public final void removeEffect(Effect effect) {
+	    effect.setModule(null);
+		effects.remove(effect);
 	}
 	
 	public static Callback<ListView<Module>, ListCell<Module>> getCellFactory() {

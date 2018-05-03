@@ -3,7 +3,7 @@ package com.ssplugins.preedit;
 import com.ssplugins.preedit.api.AddonLoader;
 import com.ssplugins.preedit.api.PreEditAPI;
 import com.ssplugins.preedit.edit.Catalog;
-import com.ssplugins.preedit.effects.ShadowEffect;
+import com.ssplugins.preedit.effects.*;
 import com.ssplugins.preedit.gui.GUI;
 import com.ssplugins.preedit.gui.Menu;
 import com.ssplugins.preedit.modules.*;
@@ -57,6 +57,17 @@ public class PreEdit extends Application implements PreEditAPI {
 		catalog.registerModule("Brush", Brush.class);
 		catalog.registerModule("Text", TextModule.class);
 		catalog.registerEffect("DropShadow", ShadowEffect.class);
+		catalog.registerEffect("BoxBlur", BoxBlurEffect.class);
+		catalog.registerEffect("Bloom", BloomEffect.class);
+		catalog.registerEffect("ColorAdjust", ColorAdjustEffect.class);
+		// TODO figure out a way to do displacement map.
+        catalog.registerEffect("GaussianBlur", GaussianEffect.class);
+        catalog.registerEffect("Glow", GlowEffect.class);
+        catalog.registerEffect("InnerShadow", InnerShadowEffect.class);
+        // TODO maybe lighting effect
+		catalog.registerEffect("PerspectiveTransform", PerspectiveEffect.class);
+        catalog.registerEffect("MotionBlur", MotionBlurEffect.class);
+        catalog.registerEffect("Reflection", ReflectionEffect.class);
 	}
 	
 	private void loadAddons() {
