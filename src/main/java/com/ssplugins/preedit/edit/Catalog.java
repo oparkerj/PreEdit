@@ -59,6 +59,19 @@ public class Catalog {
 	public Template newTemplate(String name, int width, int height) {
 		return new Template(name, width, height);
 	}
+    
+    public boolean removeTemplate(Template template) {
+        return removeTemplate(template.getName());
+    }
+	
+	public boolean removeTemplate(String name) {
+		if (templateExists(name)) {
+			data.remove(name);
+			saveData();
+			return true;
+		}
+		return false;
+	}
 	
 	public boolean templateExists(String name) {
 		return data.keySet().contains(name);
@@ -76,12 +89,16 @@ public class Catalog {
 	
 	public void saveTemplate(Template template) {
 		data.add(template.getName(), gson.toJsonTree(template, Template.class));
-		try {
-			Files.write(TEMPLATE_PATH, data.toString().getBytes());
-		} catch (IOException e) {
-			Dialogs.exception("Unable to save template.", null, e);
-		}
+		saveData();
 	}
+	
+	public void saveData() {
+        try {
+            Files.write(TEMPLATE_PATH, data.toString().getBytes());
+        } catch (IOException e) {
+            Dialogs.exception("Unable to save template.", null, e);
+        }
+    }
 	
 	public Set<String> getModules() {
 		return modules.keySet();

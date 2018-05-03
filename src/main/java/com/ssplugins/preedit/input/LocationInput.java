@@ -6,10 +6,8 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.wrapper.GridMap;
 import com.ssplugins.preedit.util.JsonConverter;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -23,6 +21,8 @@ public class LocationInput extends Input<GridMap, Bounds> {
 	private DoubleProperty angle;
 	private boolean size, rotate;
 	
+	private ObjectProperty<Bounds> bounds;
+	
 	public LocationInput(boolean size, boolean rotate) {
 		this(size, rotate, 0, 0, 100, 100, 0);
 	}
@@ -35,8 +35,28 @@ public class LocationInput extends Input<GridMap, Bounds> {
 		this.angle = new SimpleDoubleProperty(angle);
 		this.size = size;
 		this.rotate = rotate;
+        this.bounds = new SimpleObjectProperty<>(new BoundingBox(x, y, angle, width, height, 0));
+        boundsListener();
 		this.ready();
 	}
+	
+	private void boundsListener() {
+        x.addListener((observable, oldValue, newValue) -> {
+            bounds.set(new BoundingBox(newValue.doubleValue(), getY(), getAngle(), getWidth(), getHeight(), 0));
+        });
+        y.addListener((observable, oldValue, newValue) -> {
+            bounds.set(new BoundingBox(getX(), newValue.doubleValue(), getAngle(), getWidth(), getHeight(), 0));
+        });
+        width.addListener((observable, oldValue, newValue) -> {
+            bounds.set(new BoundingBox(getX(), getY(), getAngle(), newValue.doubleValue(), getHeight(), 0));
+        });
+        height.addListener((observable, oldValue, newValue) -> {
+            bounds.set(new BoundingBox(getX(), getY(), getAngle(), getWidth(), newValue.doubleValue(), 0));
+        });
+        angle.addListener((observable, oldValue, newValue) -> {
+            bounds.set(new BoundingBox(getX(), getY(), newValue.doubleValue(), getWidth(), getHeight(), 0));
+        });
+    }
 	
 	public boolean isSizeable() {
 		return size;
@@ -84,6 +104,10 @@ public class LocationInput extends Input<GridMap, Bounds> {
 	
 	public DoubleProperty angleProperty() {
 		return angle;
+	}
+	
+	public ObservableValue<Bounds> boundsProperty() {
+		return bounds;
 	}
 	
 	@Override

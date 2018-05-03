@@ -19,12 +19,13 @@ public class URLImage extends ImageModule {
 		URLInput input = new URLInput();
 		input.textProperty().addListener((observable, oldValue, newValue) -> {
 			String link = input.getValue().orElse(null);
+			boolean init = input.isInit();
 			if (link == null) {
-				setImage(null);
+				setImage(null, init);
 				return;
 			}
 			if (!Util.validURL(link)) {
-				setImage(null);
+				setImage(null, init);
 				return;
 			}
 			new Thread(() -> {
@@ -32,7 +33,7 @@ public class URLImage extends ImageModule {
                     Image img = new Image(link);
                     input.note(null);
                     Platform.runLater(() -> {
-                        setImage(img);
+                        setImage(img, init);
                     });
                 } catch (IllegalArgumentException e) {
                     input.note("Unable to get image from URL.");

@@ -19,7 +19,7 @@ public abstract class Input<N extends Node, O> {
 	private N node;
 	private UserInput<N> displayNode;
 	private JsonConverter<O> converter;
-	private boolean ready, gen;
+	private boolean ready, gen, init;
 	private BooleanProperty userProvided = new SimpleBooleanProperty(false);
 	private Runnable update;
 	
@@ -52,8 +52,12 @@ public abstract class Input<N extends Node, O> {
 	public final boolean isReady() {
 		return ready;
 	}
-	
-	protected final void setSlideAction(UserInput.SlideAction<N> action, Function<N, Double> function) {
+    
+    public final boolean isInit() {
+        return init;
+    }
+    
+    protected final void setSlideAction(UserInput.SlideAction<N> action, Function<N, Double> function) {
 		displayNode.setSlideAction(action, function);
 	}
 	
@@ -137,12 +141,18 @@ public abstract class Input<N extends Node, O> {
 		setNodeValue(node, o);
 	}
 	
+	public final void init(O o) {
+		init = true;
+		setValue(o);
+		init = false;
+	}
+	
 	public final JsonElement serialize() {
 		return getValue().map(converter::toJson).orElse(JsonNull.INSTANCE);
 	}
 	
 	public final void deserialize(JsonElement value) {
-		setNodeValue(node, converter.fromJson(value));
+	    init(converter.fromJson(value));
 	}
 	
 	public final boolean isValid() {

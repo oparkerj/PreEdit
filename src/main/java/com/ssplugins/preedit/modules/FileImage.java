@@ -21,18 +21,19 @@ public class FileImage extends ImageModule {
 		input.pathProperty().ifPresent(property -> property.addListener((observable, oldValue, newValue) -> {
 			try {
 				File f = input.getValue().orElse(null);
+				boolean init = input.isInit();
 				if (f == null) {
-					setImage(null);
+					setImage(null, init);
 					return;
 				}
 				new Thread(() -> {
 					Image img = new Image("file:" + f.getAbsolutePath());
 					Platform.runLater(() -> {
-						setImage(img);
+						setImage(img, init);
 					});
 				}).start();
 			} catch (Exception e) {
-				setImage(null);
+				setImage(null, false);
 			}
 		}));
 		map.addInput("File", input);

@@ -10,6 +10,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -71,8 +72,8 @@ public class TextModule extends NodeModule {
     }
     
     @Override
-    public Bounds getBounds() {
-        return unwrapped.getLayoutBounds();
+    public ObservableValue<Bounds> getBounds() {
+        return text.layoutBoundsProperty();
     }
     
     @Override
@@ -124,8 +125,8 @@ public class TextModule extends NodeModule {
         unwrapped.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             yOffset.set(-newValue.getMinY());
         });
-        text.layoutXProperty().bind(location.xProperty());
-        text.layoutYProperty().bind(location.yProperty().add(yOffset));
+        text.xProperty().bind(location.xProperty());
+        text.yProperty().bind(location.yProperty().add(yOffset));
         text.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
         ChoiceInput<TextAlignment> textAlignment = new ChoiceInput<>(TextAlignment.values(), TextAlignment.LEFT, Util.enumConverter(TextAlignment.class));

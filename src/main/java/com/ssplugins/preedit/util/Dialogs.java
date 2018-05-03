@@ -73,6 +73,18 @@ public final class Dialogs {
 		return dialog.showAndWait();
 	}
 	
+	public static Optional<ButtonType> confirm(String msg, String title) {
+		if (!Platform.isFxApplicationThread()) {
+			return Util.runFXSafeFlat(() -> confirm(msg, title));
+		}
+		ButtonType no = new ButtonType("No", ButtonBar.ButtonData.NO);
+		ButtonType yes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+		Alert alert = new Alert(AlertType.CONFIRMATION, msg, no, yes);
+		alert.setTitle(title == null ? PreEdit.NAME : title);
+		alert.setContentText(msg);
+		return alert.showAndWait();
+	}
+	
 	public static Optional<ButtonType> saveDialog(String msg, String title) {
 		if (!Platform.isFxApplicationThread()) {
 			return Util.runFXSafeFlat(() -> saveDialog(msg, title));

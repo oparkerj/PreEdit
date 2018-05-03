@@ -3,6 +3,7 @@ package com.ssplugins.preedit.edit;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.wrapper.ShiftList;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -20,7 +21,7 @@ public abstract class Module extends Layer {
 	
 	public abstract void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException;
 	
-	public abstract Bounds getBounds();
+	public abstract ObservableValue<Bounds> getBounds();
 	
 	public void onMouseEvent(MouseEvent event, boolean editor) {}
     
@@ -34,8 +35,13 @@ public abstract class Module extends Layer {
         super.setEditor(editor);
         effects.forEach(effect -> effect.setEditor(editor));
     }
-    
-    public final ShiftList<Effect> getEffects() {
+	
+	@Override
+	public boolean isValid() {
+		return super.isValid() && effects.stream().allMatch(Layer::isValid);
+	}
+	
+	public final ShiftList<Effect> getEffects() {
 		return effects;
 	}
 	
@@ -59,11 +65,17 @@ public abstract class Module extends Layer {
 			super.updateItem(item, empty);
 			if (empty) {
 				setText("");
+				setContextMenu(null);
 				return;
 			}
             if (!item.isEditor() && item.userInputs() == 0) setTextFill(Color.GRAY);
 			else setTextFill(Color.BLACK);
-			setText(item.getName());
+			setText(item.getDisplayName());
+   
+			if (item.isEditor()) {
+                item.setRenameAction(Layer.renameEvent(item, getListView()));
+                setContextMenu(item.getMenu());
+            }
 		}
 	}
 	

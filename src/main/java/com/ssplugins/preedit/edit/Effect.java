@@ -2,6 +2,8 @@ package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.sun.istack.internal.Nullable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,14 +15,19 @@ import javafx.util.Callback;
 
 public abstract class Effect extends Layer {
     
-    private Module module;
+    private ObjectProperty<Module> module;
     
-    public final Module getModule() {
+    public Module getModule() {
+        return moduleProperty().get();
+    }
+    
+    public ObjectProperty<Module> moduleProperty() {
+        if (module == null) module = new SimpleObjectProperty<>();
         return module;
     }
     
-    public final void setModule(Module module) {
-        this.module = module;
+    public void setModule(Module module) {
+        moduleProperty().set(module);
     }
     
     public abstract void apply(Canvas canvas, GraphicsContext context, @Nullable Node node, boolean editor) throws SilentFailException;
@@ -37,11 +44,17 @@ public abstract class Effect extends Layer {
 			super.updateItem(item, empty);
 			if (empty) {
 				setText("");
+				setContextMenu(null);
 				return;
 			}
             if (!item.isEditor() && item.userInputs() == 0) setTextFill(Color.GRAY);
             else setTextFill(Color.BLACK);
 			setText(item.getName());
+   
+			if (item.isEditor()) {
+                item.setRenameAction(Layer.renameEvent(item, getListView()));
+                setContextMenu(item.getMenu());
+            }
 		}
 	}
     

@@ -95,11 +95,11 @@ public class EditorCanvas extends StackPane {
 	}
 	
 	public void removeLayer() {
-		this.getChildren().stream().filter(node -> node instanceof Canvas).findFirst().ifPresent(node -> this.getChildren().remove(node));
+		this.getChildren().stream().filter(node -> node instanceof PaneCanvas).findFirst().ifPresent(node -> this.getChildren().remove(node));
 	}
 	
 	public void setLayerCount(int layers) {
-		long count = this.getChildren().stream().filter(node -> node instanceof Canvas).count();
+		long count = this.getChildren().stream().filter(node -> node instanceof PaneCanvas).count();
 		long d = layers - count;
 		if (d > 0) {
 			LongStream.range(0, d).forEach(value -> this.addLayer());
@@ -110,7 +110,11 @@ public class EditorCanvas extends StackPane {
 	}
 	
 	public void clearAll() {
-		getLayers().forEach(this::clear);
+		this.getChildren().stream().filter(node -> node instanceof PaneCanvas)
+            .forEach(node -> {
+                ((PaneCanvas) node).clearNode();
+                clear(((PaneCanvas) node).getCanvas());
+            });
 		clear(getTransparentLayer());
 	}
 	
@@ -200,6 +204,11 @@ public class EditorCanvas extends StackPane {
             if (a) remove();
             this.node = node;
             if (a) add();
+        }
+        
+        public void toggle(boolean add) {
+            if (add) add();
+            else remove();
         }
         
         public void add() {

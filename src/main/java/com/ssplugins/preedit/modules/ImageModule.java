@@ -1,68 +1,73 @@
 package com.ssplugins.preedit.modules;
 
-import com.ssplugins.preedit.edit.Module;
-import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.edit.NodeModule;
 import com.ssplugins.preedit.input.HiddenInput;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
-import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.nodes.ResizeHandle;
-import com.ssplugins.preedit.util.Util;
-import javafx.geometry.BoundingBox;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
-public abstract class ImageModule extends Module {
-	
-	private Image image;
-	
-	public void setImage(Image image) {
-		this.image = image;
-		if (image != null) {
+public class ImageModule extends NodeModule {
+    
+    private Image image;
+    private ImageView view;
+    
+    public void setImage(Image image, boolean init) {
+        this.image = image;
+        view.setImage(image);
+        if (image != null && !init) {
             getInputs().getInput("Location", LocationInput.class).ifPresent(input -> {
                 input.widthProperty().set((int) image.getWidth());
                 input.heightProperty().set((int) image.getHeight());
             });
-		}
-		update();
-	}
-	
-	private void update() {
-        getInputs().getInput("hidden", HiddenInput.class).ifPresent(HiddenInput::callUpdate);
+        }
     }
     
     @Override
-	public Bounds getBounds() {
-		try {
-            Bounds bounds = getInputs().getValue("Location", LocationInput.class);
-            return new BoundingBox(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
-        } catch (SilentFailException ignored) {}
-        return new BoundingBox(0, 0, 0, 0);
-	}
-	
-	@Override
-	public String getName() {
-		return null;
-	}
-	
-	@Override
-	public void linkResizeHandle(ResizeHandle handle) {
-		getInputs().getInput("Location", LocationInput.class).ifPresent(handle::link);
-	}
-	
-	@Override
-	public void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException {
-		Bounds bounds = getInputs().getValue("Location", LocationInput.class);
-		EditorCanvas.rotate(context, Util.centerX(bounds), Util.centerY(bounds), bounds.getMinZ());
-		context.drawImage(image, bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
-	}
-	
-	@Override
-	protected void defineInputs(InputMap map) {
-        map.addInput("Location", new LocationInput(true, true));
-		map.addInput("hidden", new HiddenInput());
-	}
-	
+    protected void preload() {
+        view = new ImageView();
+    }
+    
+    @Override
+    public Node getNode() {
+        return view;
+    }
+    
+    @Override
+    public void linkResizeHandle(ResizeHandle handle) {
+        getInputs().getInput("Location", LocationInput.class).ifPresent(handle::link);
+    }
+    
+    @Override
+    public ObservableValue<Bounds> getBounds() {
+        return view.layoutBoundsProperty();
+    }
+    
+    @Override
+    public String getName() {
+        return null;
+    }
+    
+    @Override
+    protected void defineInputs(InputMap map) {
+        LocationInput location = new LocationInput(true, true);
+        view.xProperty().bind(location.xProperty());
+        view.yProperty().bind(location.yProperty());
+        location.widthProperty().addListener((observable, oldValue, newValue) -> {
+            view.prefWidth(newValue.doubleValue());
+            view.setFitWidth(newValue.doubleValue());
+        });
+        location.heightProperty().addListener((observable, oldValue, newValue) -> {
+            view.prefHeight(newValue.doubleValue());
+            view.setFitHeight(newValue.doubleValue());
+        });
+        view.rotateProperty().bind(location.angleProperty());
+        map.addInput("Location", location);
+        map.addInput("hidden", new HiddenInput());
+    }
+    
 }

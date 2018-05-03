@@ -12,6 +12,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventType;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
@@ -112,10 +113,10 @@ public class Brush extends Module {
 	}
 	
 	@Override
-	public Bounds getBounds() {
+	public ObservableValue<Bounds> getBounds() {
 	    WritableImage img = image.get();
-	    if (img == null) return new BoundingBox(0, 0, 0, 0);
-        return new BoundingBox(0, 0, img.getWidth(), img.getHeight());
+	    if (img == null) return new SimpleObjectProperty<>(new BoundingBox(0, 0, 0, 0));
+        return new SimpleObjectProperty<>(new BoundingBox(0, 0, img.getWidth(), img.getHeight()));
 	}
 	
 	@Override

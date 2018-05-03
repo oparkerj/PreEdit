@@ -5,6 +5,7 @@ import com.ssplugins.preedit.input.ColorInput;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.nodes.ResizeHandle;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -30,13 +31,13 @@ public class Solid extends NodeModule {
 	}
     
     @Override
-    public Bounds getBounds() {
-        return rect.getLayoutBounds();
+    public ObservableValue<Bounds> getBounds() {
+        return rect.layoutBoundsProperty();
     }
     
     @Override
 	public String getName() {
-		return "Solid2";
+		return "Solid";
 	}
 	
 	@Override
@@ -46,8 +47,10 @@ public class Solid extends NodeModule {
         rect.fillProperty().bind(color.valueProperty());
         map.addInput("Color", color);
         LocationInput location = new LocationInput(true, true, 0, 0, 100, 100, 0);
-        rect.layoutXProperty().bind(location.xProperty());
-        rect.layoutYProperty().bind(location.yProperty());
+        rect.xProperty().bind(location.xProperty());
+        rect.yProperty().bind(location.yProperty());
+//        rect.layoutXProperty().bind(location.xProperty());
+//        rect.layoutYProperty().bind(location.yProperty());
         rect.widthProperty().bind(location.widthProperty());
         rect.heightProperty().bind(location.heightProperty());
         rect.rotateProperty().bind(location.angleProperty());

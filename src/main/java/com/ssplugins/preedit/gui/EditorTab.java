@@ -48,6 +48,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	private ComboBox<String> selector;
 	private Button btnNew;
 	private Button btnSave;
+	private Button btnDelete;
 	//
 	private Button btnExport;
 	private Button btnQuickSave;
@@ -221,6 +222,19 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				save();
 			});
 			toolbar.getItems().add(btnSave);
+			//
+            btnDelete = new Button("Delete");
+            btnDelete.setDisable(true);
+            btnDelete.setOnAction(event -> {
+                Optional<ButtonType> op = Dialogs.confirm("Are you sure you want to delete the current template?", null);
+                op.filter(button -> button.getButtonData() == ButtonBar.ButtonData.YES)
+                  .ifPresent(button -> {
+                      resetNodes();
+                      base.getCatalog().removeTemplate(state.getTemplate());
+                      updateTemplates();
+                  });
+            });
+            toolbar.getItems().addAll(btnDelete);
 		}
 		else {
 			btnExport = new Button("Export");
@@ -271,6 +285,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
                     });
                 });
             });
+			disable(btnDelete, false);
 			disable(addLayer, false);
 			disable(btnExport, false);
 			disable(btnQuickSave, false);
@@ -400,7 +415,8 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				Optional<String> op = Dialogs.choose("Choose an effect to add:", null, base.getCatalog().getEffects());
 				op.flatMap(base.getCatalog()::createEffect).ifPresent(effect -> {
 				    effect.setEditor(editControls);
-					effects.getItems().add(0, effect);
+                    getSelectedModule().ifPresent(module -> module.addEffect(effect));
+//					effects.getItems().add(0, effect);
 					state.render();
 				});
 			});
@@ -469,6 +485,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	
 	private void resetNodes() {
 		state.savedProperty().set(true);
+		disable(btnDelete, true);
 		disable(btnExport, true);
 		disable(btnQuickSave, true);
 		canvas.clearAll();
