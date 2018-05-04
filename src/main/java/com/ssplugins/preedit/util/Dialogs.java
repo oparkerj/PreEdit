@@ -38,6 +38,7 @@ public final class Dialogs {
 			return Util.runFXSafeFlat(() -> exception(msg, title, t));
 		}
 		Alert alert = new Alert(AlertType.ERROR);
+		alert.initModality(Modality.APPLICATION_MODAL);
 		alert.setTitle(title == null ? PreEdit.NAME : title);
 		alert.setContentText(msg);
 		
@@ -49,11 +50,13 @@ public final class Dialogs {
 		return alert.showAndWait();
 	}
 	
-	public static Optional<String> input(String msg, String title) {
+	public static Optional<String> input(String msg, String def, String title) {
 		if (!Platform.isFxApplicationThread()) {
-			return Util.runFXSafeFlat(() -> input(msg, title));
+            String finalDef = def;
+            return Util.runFXSafeFlat(() -> input(msg, finalDef, title));
 		}
-		TextInputDialog dialog = new TextInputDialog();
+		if (def == null) def = "";
+		TextInputDialog dialog = new TextInputDialog(def);
 		dialog.setTitle(title == null ? PreEdit.NAME : title);
 		dialog.setContentText(msg);
 		dialog.initModality(Modality.APPLICATION_MODAL);

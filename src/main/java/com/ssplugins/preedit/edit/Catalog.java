@@ -39,6 +39,7 @@ public class Catalog {
 			File file = new File(TEMPLATE_PATH.toUri());
 			if (!file.exists()) {
 				Files.write(TEMPLATE_PATH, "{}".getBytes());
+                data = new JsonObject();
 				return;
 			}
 			String json = new String(Files.readAllBytes(TEMPLATE_PATH));

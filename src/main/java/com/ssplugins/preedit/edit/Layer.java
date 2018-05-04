@@ -87,7 +87,7 @@ public abstract class Layer {
 	
 	public static <T> EventHandler<ActionEvent> renameEvent(Layer layer, ListView<T> view) {
 	    return event -> {
-            Optional<String> op = Dialogs.input("New name:", null);
+            Optional<String> op = Dialogs.input("New name:", layer.getDisplayName(), null);
             op.ifPresent(s -> {
                 layer.setDisplayName(s);
                 Util.refreshList(view);

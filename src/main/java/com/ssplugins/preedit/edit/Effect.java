@@ -1,7 +1,6 @@
 package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
-import com.sun.istack.internal.Nullable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
@@ -30,7 +29,7 @@ public abstract class Effect extends Layer {
         moduleProperty().set(module);
     }
     
-    public abstract void apply(Canvas canvas, GraphicsContext context, @Nullable Node node, boolean editor) throws SilentFailException;
+    public abstract void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) throws SilentFailException;
     
     public abstract void reset();
 	
