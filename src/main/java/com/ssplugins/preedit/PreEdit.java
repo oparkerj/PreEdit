@@ -12,6 +12,7 @@ import com.ssplugins.preedit.util.GridScene;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -104,6 +105,7 @@ public class PreEdit extends Application implements PreEditAPI {
                 menu.getEditTab().checkSave();
             }
 		});
+		stage.getIcons().add(new Image(PreEdit.class.getResourceAsStream("/icon.png")));
 		stage.setTitle(NAME);
 		this.menu = new Menu(this);
 		GridScene menu = this.menu.getGUI();
