@@ -13,6 +13,12 @@ public class URLImage extends ImageModule {
 		return "URLImage";
 	}
 	
+	public void setURL(String url) {
+		getInputs().getInput("URL", URLInput.class).ifPresent(urlInput -> {
+			urlInput.setValue(url);
+		});
+	}
+	
 	@Override
 	protected void defineInputs(InputMap map) {
 		super.defineInputs(map);

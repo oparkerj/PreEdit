@@ -48,6 +48,12 @@ public class TextModule extends NodeModule {
         }
     }
     
+    public void setText(String text) {
+        getInputs().getInput("Content", TextAreaInput.class).ifPresent(textAreaInput -> {
+            textAreaInput.setValue(text);
+        });
+    }
+    
     @Override
     protected void preload() {
         text = new Text();

@@ -20,12 +20,18 @@ import java.util.Optional;
 
 public class FileInput extends Input<GridMap, File> {
 	
+	Label label;
+	
 	public FileInput() {
 		this.ready();
 	}
 	
 	public Optional<StringProperty> pathProperty() {
 		return getNode().get("label", Label.class).map(Labeled::textProperty);
+	}
+	
+	public void setFile(File file) {
+		label.setText(file.getAbsolutePath());
 	}
 	
 	@Override
@@ -35,11 +41,11 @@ public class FileInput extends Input<GridMap, File> {
 		btn.setOnAction(event -> {
 			Optional<File> op = Dialogs.chooseFile(PreEdit.stage(), null, new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif"));
 			op.ifPresent(file -> {
-				map.get("label", Label.class).ifPresent(label -> label.setText(file.getAbsolutePath()));
+				label.setText(file.getAbsolutePath());
 			});
 		});
 		map.add("button", 0, 0, btn);
-		Label label = new Label();
+		label = new Label();
 		label.setPrefWidth(100);
 		label.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
 		map.add("label", 1, 0, label);
@@ -53,7 +59,7 @@ public class FileInput extends Input<GridMap, File> {
 	
 	@Override
 	protected void setNodeValue(GridMap node, File value) {
-		node.get("label", Label.class).ifPresent(label -> label.setText(value.getAbsolutePath()));
+		label.setText(value.getAbsolutePath());
 	}
 	
 	@Override
@@ -78,7 +84,7 @@ public class FileInput extends Input<GridMap, File> {
 	
 	@Override
 	protected void setUpdateTrigger(GridMap node, Runnable update) {
-		node.get("label", Label.class).ifPresent(label -> label.textProperty().addListener(observable -> update.run()));
+        label.textProperty().addListener(observable -> update.run());
 	}
 	
 }

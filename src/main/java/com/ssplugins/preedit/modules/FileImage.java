@@ -14,6 +14,12 @@ public class FileImage extends ImageModule {
 		return "FileImage";
 	}
 	
+	public void setFile(File file) {
+		getInputs().getInput("File", FileInput.class).ifPresent(fileInput -> {
+			fileInput.setFile(file);
+		});
+	}
+	
 	@Override
 	protected void defineInputs(InputMap map) {
 		super.defineInputs(map);
