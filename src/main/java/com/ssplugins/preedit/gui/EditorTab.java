@@ -287,6 +287,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
                     Bounds bounds = btnCopy.localToScreen(btnCopy.getBoundsInLocal());
                     popup.show(btnCopy, bounds.getMaxX(), bounds.getMinY());
                 });
+                state.render();
             });
             btnCopy.setDisable(true);
             btnCopy.disableProperty().bind(templateLoadedProperty().not());
