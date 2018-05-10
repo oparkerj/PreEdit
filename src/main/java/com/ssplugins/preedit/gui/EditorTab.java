@@ -2,26 +2,35 @@ package com.ssplugins.preedit.gui;
 
 import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.api.PreEditTab;
-import com.ssplugins.preedit.edit.*;
+import com.ssplugins.preedit.edit.Catalog;
+import com.ssplugins.preedit.edit.Effect;
+import com.ssplugins.preedit.edit.Module;
+import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.InputMap;
+import com.ssplugins.preedit.input.LocationInput;
+import com.ssplugins.preedit.modules.FileImage;
+import com.ssplugins.preedit.modules.TextModule;
+import com.ssplugins.preedit.modules.URLImage;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.util.*;
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
@@ -31,6 +40,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class EditorTab extends BorderPane implements PreEditTab {
 	
 	//
@@ -52,6 +62,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 	//
 	private Button btnExport;
 	private Button btnQuickSave;
+	private Button btnCopy;
 	
 	private ScrollPane canvasArea;
 	private GridPane canvasPane;
@@ -163,7 +174,17 @@ public class EditorTab extends BorderPane implements PreEditTab {
         toolbar.getItems().add(node);
 	}
 	
-	private void defineNodes() {
+	@Override
+	public BooleanBinding templateLoadedProperty() {
+		return state.templateLoadedProperty();
+	}
+    
+    @Override
+    public Optional<BufferedImage> renderImage() {
+        return renderPNG();
+    }
+    
+    private void defineNodes() {
 		toolbar = new ToolBar();
 		this.setTop(toolbar);
 		//
@@ -229,8 +250,8 @@ public class EditorTab extends BorderPane implements PreEditTab {
                 Optional<ButtonType> op = Dialogs.confirm("Are you sure you want to delete the current template?", null);
                 op.filter(button -> button.getButtonData() == ButtonBar.ButtonData.YES)
                   .ifPresent(button -> {
-                      resetNodes();
                       base.getCatalog().removeTemplate(state.getTemplate());
+                      resetNodes();
                       updateTemplates();
                   });
             });
@@ -250,6 +271,26 @@ public class EditorTab extends BorderPane implements PreEditTab {
 				exportImage(new File("image.png"));
 			});
 			toolbar.getItems().add(btnQuickSave);
+			//
+            btnCopy = new Button("Copy to Clipboard");
+            btnCopy.setOnAction(event -> {
+                renderRaw().ifPresent(image -> {
+                    Clipboard board = Clipboard.getSystemClipboard();
+                    ClipboardContent content = new ClipboardContent();
+                    content.putImage(image);
+                    board.setContent(content);
+                
+                    Popup popup = new Popup();
+                    popup.setAutoFix(true);
+                    popup.setAutoHide(true);
+                    popup.getContent().add(new Label("Copied"));
+                    Bounds bounds = btnCopy.localToScreen(btnCopy.getBoundsInLocal());
+                    popup.show(btnCopy, bounds.getMaxX(), bounds.getMinY());
+                });
+            });
+            btnCopy.setDisable(true);
+            btnCopy.disableProperty().bind(templateLoadedProperty().not());
+            toolbar.getItems().add(btnCopy);
 		}
 		//
 		canvasArea = new ScrollPane();
@@ -270,6 +311,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		//
 		canvas = new EditorCanvas(CANVAS_MIN, CANVAS_MIN);
 		state.templateProperty().addListener((observable, oldValue, newValue) -> {
+		    if (newValue == null) return;
 		    newValue.setEditor(editControls);
 			canvas.clearAll();
 			canvas.setLayerCount(newValue.getModules().size());
@@ -296,6 +338,72 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			getSelectedModule().ifPresent(module -> module.onMouseEvent(event, editControls));
 		});
 		canvasPane.add(canvas, 0, 0);
+		///////////////////// Draggables ///////////////////////
+        if (editControls) {
+            canvasArea.setOnDragOver(event -> {
+                if (state.getTemplate() == null) return;
+                Dragboard board = event.getDragboard();
+                if (board.hasFiles() || board.hasImage() || board.hasRtf() || board.hasString() || board.hasUrl()) {
+                    event.acceptTransferModes(TransferMode.LINK);
+                }
+                else event.consume();
+            });
+            canvasArea.setOnDragDropped(event -> {
+                if (state.getTemplate() == null) return;
+                Dragboard board = event.getDragboard();
+                boolean dropped = false;
+                if (board.hasFiles()) {
+                    dropped = true;
+                    try {
+                        File file = board.getFiles().get(0);
+                        String name = file.getName().toLowerCase();
+                        if (!name.endsWith(".png") && !name.endsWith(".jpg") && !name.endsWith(".jpeg")
+                                && !name.endsWith(".gif") && !name.endsWith(".bmp"))
+                            throw new IllegalArgumentException();
+                        Optional<FileImage> op = base.getCatalog().createModule(FileImage.class);
+                        op.ifPresent(fileImage -> {
+                            this.addModule(fileImage);
+                            fileImage.setFile(file);
+                            fileImage.getInputs().getInput("Location", LocationInput.class).ifPresent(locationInput -> {
+                                Point2D p = canvas.sceneToLocal(event.getSceneX(), event.getSceneY());
+                                locationInput.xProperty().setValue(p.getX());
+                                locationInput.yProperty().setValue(p.getY());
+                            });
+                            layers.getSelectionModel().select(fileImage);
+                        });
+                    } catch (IllegalArgumentException ignored) {}
+                }
+                else if (board.hasUrl()) {
+                    try {
+                        String url = board.getUrl();
+                        Optional<URLImage> op = base.getCatalog().createModule(URLImage.class);
+                        op.ifPresent(urlImage -> {
+                            this.addModule(urlImage);
+                            urlImage.setURL(url);
+                            urlImage.getInputs().getInput("Location", LocationInput.class).ifPresent(locationInput -> {
+                                Point2D p = canvas.sceneToLocal(event.getSceneX(), event.getSceneY());
+                                locationInput.xProperty().setValue(p.getX());
+                                locationInput.yProperty().setValue(p.getY());
+                            });
+                            layers.getSelectionModel().select(urlImage);
+                        });
+                    } catch (IllegalArgumentException ignored) {}
+                }
+                else if (board.hasRtf()) {
+                    String text = board.getRtf();
+                    Optional<TextModule> op = base.getCatalog().createModule(TextModule.class);
+                    dragTextToModule(event, text, op);
+                }
+                else if (board.hasString()) {
+                    String text = board.getString();
+                    Optional<TextModule> op = base.getCatalog().createModule(TextModule.class);
+                    dragTextToModule(event, text, op);
+                }
+                event.setDropCompleted(dropped);
+                event.consume();
+            });
+        }
+        ////////////////////////////////////////////////////////
 		//
 		controls = new GridPane();
 		controls.setPadding(PADDING);
@@ -342,12 +450,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			addLayer.setDisable(true);
 			addLayer.setOnAction(event -> {
 				Optional<String> op = Dialogs.choose("Choose a module to add:", null, base.getCatalog().getModules());
-				op.flatMap(base.getCatalog()::createModule).ifPresent(module -> {
-				    module.setEditor(editControls);
-					layers.getItems().add(0, module);
-					canvas.addLayer();
-					state.render();
-				});
+				op.flatMap(base.getCatalog()::createModule).ifPresent(this::addModule);
 			});
 			layerButtons.getChildren().add(addLayer);
 			//
@@ -413,12 +516,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 			addEffect.setDisable(true);
 			addEffect.setOnAction(event -> {
 				Optional<String> op = Dialogs.choose("Choose an effect to add:", null, base.getCatalog().getEffects());
-				op.flatMap(base.getCatalog()::createEffect).ifPresent(effect -> {
-				    effect.setEditor(editControls);
-                    getSelectedModule().ifPresent(module -> module.addEffect(effect));
-//					effects.getItems().add(0, effect);
-					state.render();
-				});
+				op.flatMap(base.getCatalog()::createEffect).ifPresent(this::addEffect);
 			});
 			effectButtons.getChildren().add(addEffect);
 			//
@@ -470,8 +568,21 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		paramContainer.setContent(paramArea);
 		//
 	}
-	
-	private Button smallButton(String text) {
+    
+    private void dragTextToModule(DragEvent event, String text, Optional<TextModule> op) {
+        op.ifPresent(textModule -> {
+            this.addModule(textModule);
+            textModule.setText(text);
+            textModule.getInputs().getInput("Location", LocationInput.class).ifPresent(locationInput -> {
+                Point2D p = canvas.sceneToLocal(event.getSceneX(), event.getSceneY());
+                locationInput.xProperty().setValue(p.getX());
+                locationInput.yProperty().setValue(p.getY());
+            });
+            layers.getSelectionModel().select(textModule);
+        });
+    }
+    
+    private Button smallButton(String text) {
 		Button button = new Button(text);
 		button.setMinWidth(25);
 		button.setMinHeight(25);
@@ -488,6 +599,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		disable(btnDelete, true);
 		disable(btnExport, true);
 		disable(btnQuickSave, true);
+//		disable(btnCopy, true);
 		canvas.clearAll();
 		ObservableList<Module> layerItems = layers.getItems();
 		if (layerItems != null) layerItems.clear();
@@ -502,6 +614,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		disable(effectUp, true);
 		disable(effectDown, true);
 		paramArea.getChildren().clear();
+		state.templateProperty().set(null);
 	}
 	
 	private void setInputs(InputMap map) {
@@ -542,15 +655,25 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		list.scrollTo(r);
 	}
 	
+	private Optional<WritableImage> renderRaw() {
+        if (state.getTemplate() == null) return Optional.empty();
+        return Util.renderImage(canvas, state.getTemplate().getModules());
+    }
+	
+	private Optional<BufferedImage> renderPNG() {
+        if (state.getTemplate() == null) return Optional.empty();
+        return Util.renderImage(canvas, state.getTemplate().getModules()).map(image -> SwingFXUtils.fromFXImage(image, null));
+    }
+	
 	private void exportImage(File out) {
 		if (state.getTemplate() == null) return;
-		Optional<WritableImage> img = Util.renderImage(canvas, state.getTemplate().getModules());
+		Optional<BufferedImage> img = renderPNG();
 		if (!img.isPresent()) {
 			Dialogs.show("There are currently invalid parameters. Unable to export image.", null, AlertType.WARNING);
 			return;
 		}
 		try {
-			BufferedImage bi = SwingFXUtils.fromFXImage(img.get(), null);
+			BufferedImage bi = img.get();
 			int i = out.getName().lastIndexOf('.');
 			String format = out.getName().substring(i + 1);
 			if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
@@ -568,5 +691,17 @@ public class EditorTab extends BorderPane implements PreEditTab {
 		state.render();
 		Dialogs.show("Exported " + out.getName(), null, AlertType.INFORMATION);
 	}
-	
+    
+    private void addModule(Module module) {
+        module.setEditor(editControls);
+        layers.getItems().add(0, module);
+        canvas.addLayer();
+        state.render();
+    }
+    
+    private void addEffect(Effect effect) {
+        effect.setEditor(editControls);
+        getSelectedModule().ifPresent(module -> module.addEffect(effect));
+        state.render();
+    }
 }
