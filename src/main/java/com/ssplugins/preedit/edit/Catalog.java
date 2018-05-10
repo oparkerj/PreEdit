@@ -32,8 +32,24 @@ public class Catalog {
 		gson = gsonBuilder.create();
 		loadTemplates();
 	}
-	
-	private void loadTemplates() {
+    
+    private static Optional<Module> instantiateModule(Class<? extends Module> aClass) {
+        try {
+            return Optional.ofNullable(aClass.newInstance());
+        } catch (InstantiationException | IllegalAccessException e) {
+            return Optional.empty();
+        }
+    }
+    
+    private static Optional<Effect> instantiateEffect(Class<? extends Effect> aClass) {
+        try {
+            return Optional.of(aClass.newInstance());
+        } catch (InstantiationException | IllegalAccessException e) {
+            return Optional.empty();
+        }
+    }
+    
+    private void loadTemplates() {
 		try {
 			JsonParser parser = new JsonParser();
 			File file = new File(TEMPLATE_PATH.toUri());
@@ -67,6 +83,7 @@ public class Catalog {
 	
 	public boolean removeTemplate(String name) {
 		if (templateExists(name)) {
+			// todo check if template is open. close it
 			data.remove(name);
 			saveData();
 			return true;
@@ -126,23 +143,19 @@ public class Catalog {
 	}
 	
 	public Optional<Module> createModule(String name) {
-		return findModule(name).flatMap(aClass -> {
-			try {
-				return Optional.ofNullable(aClass.newInstance());
-			} catch (InstantiationException | IllegalAccessException e) {
-				return Optional.empty();
-			}
-		});
+		return findModule(name).flatMap(Catalog::instantiateModule);
 	}
 	
 	public Optional<Effect> createEffect(String name) {
-		return findEffect(name).flatMap(aClass -> {
-			try {
-				return Optional.of(aClass.newInstance());
-			} catch (InstantiationException | IllegalAccessException e) {
-				return Optional.empty();
-			}
-		});
+		return findEffect(name).flatMap(Catalog::instantiateEffect);
 	}
+    
+    public <T extends Module> Optional<T> createModule(Class<T> type) {
+        return Catalog.instantiateModule(type).map(type::cast);
+    }
+    
+    public <T extends Effect> Optional<T> createEffect(Class<T> type) {
+        return Catalog.instantiateEffect(type).map(type::cast);
+    }
 	
 }
