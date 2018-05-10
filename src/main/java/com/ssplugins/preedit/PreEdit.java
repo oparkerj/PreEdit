@@ -11,6 +11,7 @@ import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.GridScene;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -19,8 +20,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Objects;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class PreEdit extends Application implements PreEditAPI {
@@ -35,12 +35,13 @@ public class PreEdit extends Application implements PreEditAPI {
     private Catalog catalog;
     private Stage stage;
     private Menu menu;
+    
+    private List<AddonLoader> addons = new ArrayList<>();
 	
 	public PreEdit() {
 		instance = this;
 		catalog = new Catalog();
 		registerLocalModules();
-		loadAddons();
 	}
 	
 	public static PreEdit getInstance() {
@@ -71,12 +72,12 @@ public class PreEdit extends Application implements PreEditAPI {
         catalog.registerEffect("Reflection", ReflectionEffect.class);
 	}
 	
-	private void loadAddons() {
+	private List<String> loadAddons() {
 		File dir = new File("addons");
 		dir.mkdirs();
-		if (!dir.exists()) return;
+		if (!dir.exists()) return Collections.emptyList();
 		File[] files = dir.listFiles();
-		if (files == null) return;
+		if (files == null) return Collections.emptyList();
 		URL[] urls = Stream.of(files)
 						   .filter(file -> file.getName().toLowerCase().endsWith(".jar"))
 						   .map(file -> {
@@ -87,44 +88,74 @@ public class PreEdit extends Application implements PreEditAPI {
 						   })
 						   .filter(Objects::nonNull)
 						   .toArray(URL[]::new);
+        List<String> failed = new ArrayList<>();
 		ClassLoader loader = URLClassLoader.newInstance(urls);
 		ServiceLoader<AddonLoader> loaders = ServiceLoader.load(AddonLoader.class, loader);
-		loaders.forEach(addonLoader -> addonLoader.load(this));
+		loaders.forEach(addonLoader -> {
+            String name = addonLoader.getName();
+		    try {
+                addonLoader.load(this);
+                addons.add(addonLoader);
+            } catch (Throwable t) {
+                failed.add(name);
+            }
+        });
+		return failed;
 	}
 	
 	@Override
 	public void start(Stage stage) {
-		this.stage = stage;
-		Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
-			Dialogs.exception("Something went wrong.", null, e);
-			Platform.exit();
-		});
-		stage.setOnCloseRequest(event -> {
+        this.stage = stage;
+        Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
+            Dialogs.exception("Something went wrong.", null, e);
+            Platform.exit();
+        });
+        stage.setOnCloseRequest(event -> {
             if (!menu.getEditTab().getState().isSaved()) {
                 menu.selectTab(menu.getEditTabRaw());
                 menu.getEditTab().checkSave();
             }
-		});
-		stage.getIcons().add(new Image(PreEdit.class.getResourceAsStream("/icon.png")));
-		stage.setTitle(NAME);
-		this.menu = new Menu(this);
-		GridScene menu = this.menu.getGUI();
-		stage.setScene(menu);
+            addons.forEach(addonLoader -> {
+                try {
+                    addonLoader.onShutdown(this);
+                } catch (Throwable t) {
+                    Dialogs.exception("The addon '" + addonLoader.getName() + "' encountered an error while shutting down.", null, t);
+                }
+            });
+        });
+        stage.getIcons().add(new Image(PreEdit.class.getResourceAsStream("/icon.png")));
+        stage.setTitle(NAME);
+        this.menu = new Menu(this);
+        //
+        List<String> failed = loadAddons();
+        if (failed.size() > 0) {
+            StringBuilder builder = new StringBuilder("The following addons failed to load:");
+            failed.forEach(s -> builder.append("\n").append(s));
+            Dialogs.show(builder.toString(), null, Alert.AlertType.INFORMATION);
+        }
+        //
+        GridScene menu = this.menu.getGUI();
+        stage.setScene(menu);
         stage.show();
-		stage.setMinWidth(stage.getWidth());
-		stage.setMinHeight(stage.getHeight());
-		// Make content scale with window.
-		menu.get("pane", TabPane.class).ifPresent(tabPane -> {
-			tabPane.prefWidthProperty().bind(stage.widthProperty());
-			tabPane.prefHeightProperty().bind(stage.heightProperty());
-		});
+        stage.setMinWidth(stage.getWidth());
+        stage.setMinHeight(stage.getHeight());
+        // Make content scale with window.
+        menu.get("pane", TabPane.class).ifPresent(tabPane -> {
+            tabPane.prefWidthProperty().bind(stage.widthProperty());
+            tabPane.prefHeightProperty().bind(stage.heightProperty());
+        });
 	}
+    
+    public Menu getMenu() {
+	    return menu;
+    }
     
     @Override
     public GUI getGUI() {
         return menu;
     }
     
+    @Override
     public Catalog getCatalog() {
         return catalog;
     }
