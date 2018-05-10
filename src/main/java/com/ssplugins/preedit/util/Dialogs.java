@@ -30,6 +30,7 @@ public final class Dialogs {
 		Alert alert = new Alert(type);
 		alert.setTitle(title == null ? PreEdit.NAME : title);
 		alert.setContentText(msg);
+		alert.initModality(Modality.APPLICATION_MODAL);
 		return alert.showAndWait();
 	}
 	
@@ -132,7 +133,7 @@ public final class Dialogs {
 		}
 		Dialog<TemplateInfo> dialog = new Dialog<>();
 		dialog.setTitle(title == null ? PreEdit.NAME : title);
-		dialog.setContentText("Create a new template:");
+//		dialog.setContentText("Create a new template:");
 		ButtonType createButton = new ButtonType("Create", ButtonBar.ButtonData.FINISH);
 		dialog.getDialogPane().getButtonTypes().add(createButton);
 		

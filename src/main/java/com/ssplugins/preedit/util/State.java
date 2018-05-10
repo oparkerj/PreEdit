@@ -1,6 +1,7 @@
 package com.ssplugins.preedit.util;
 
 import com.ssplugins.preedit.edit.Template;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,6 +18,7 @@ public class State {
 	private BooleanProperty upToDate = new SimpleBooleanProperty(true);
 	private BooleanProperty saved = new SimpleBooleanProperty(true);
 	private ObjectProperty<Template> template = new SimpleObjectProperty<>(null);
+	private BooleanBinding templateLoaded;
 	
 	public State() {
 		upToDate.addListener((observable, oldValue, newValue) -> {
@@ -30,6 +32,7 @@ public class State {
 				}
 			}
 		});
+        templateLoaded = template.isNotNull();
 	}
 	
 	public void render() {
@@ -77,4 +80,12 @@ public class State {
 	public ObjectProperty<Template> templateProperty() {
 		return template;
 	}
+    
+    public Boolean getTemplateLoaded() {
+        return templateLoaded.get();
+    }
+    
+    public BooleanBinding templateLoadedProperty() {
+        return templateLoaded;
+    }
 }
