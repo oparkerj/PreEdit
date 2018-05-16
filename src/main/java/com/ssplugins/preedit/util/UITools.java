@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 public final class UITools {
 	
 	public static void setInputNodes(InputMap map, State state, FlowPane paramArea, boolean gen) {
-		map.getInputs().forEach((s, input) -> {
+		map.sorted().forEach((s, input) -> {
 			input.setUpdateTrigger(state::render);
 			if (gen) {
 				input.setGeneratorMode();

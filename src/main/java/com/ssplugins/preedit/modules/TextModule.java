@@ -127,6 +127,12 @@ public class TextModule extends NodeModule {
         color.setValue(Color.BLACK);
         text.fillProperty().bind(color.valueProperty());
         map.addInput("Color", color);
+        ChoiceInput<TextAlignment> textAlignment = new ChoiceInput<>(TextAlignment.values(), TextAlignment.LEFT, Util.enumConverter(TextAlignment.class));
+        textAlignment.setCellFactory(Util.enumCellFactory());
+        textAlignment.valueProperty().addListener((observable, oldValue, newValue) -> {
+            text.setTextAlignment(newValue);
+        });
+        map.addInput("Alignment", textAlignment);
         LocationInput location = new LocationInput(false, true);
         unwrapped.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             yOffset.set(-newValue.getMinY());
@@ -135,12 +141,6 @@ public class TextModule extends NodeModule {
         text.yProperty().bind(location.yProperty().add(yOffset));
         text.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
-        ChoiceInput<TextAlignment> textAlignment = new ChoiceInput<>(TextAlignment.values(), TextAlignment.LEFT, Util.enumConverter(TextAlignment.class));
-        textAlignment.setCellFactory(Util.enumCellFactory());
-        textAlignment.valueProperty().addListener((observable, oldValue, newValue) -> {
-            text.setTextAlignment(newValue);
-        });
-        map.addInput("Alignment", textAlignment);
     }
     
 }

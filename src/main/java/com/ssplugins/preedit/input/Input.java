@@ -14,12 +14,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class Input<N extends Node, O> {
+public abstract class Input<N extends Node, O> implements Comparable<Input> {
 	
 	private N node;
 	private UserInput<N> displayNode;
 	private JsonConverter<O> converter;
 	private boolean ready, gen, init;
+	private int order = -1;
 	private BooleanProperty userProvided = new SimpleBooleanProperty(false);
 	private Runnable update;
 	
@@ -48,8 +49,16 @@ public abstract class Input<N extends Node, O> {
 		this.converter = getJsonConverter();
 		getValue();
 	}
-	
-	public final boolean isReady() {
+    
+    public final int getOrder() {
+        return order;
+    }
+    
+    public final void setOrder(int order) {
+        this.order = order;
+    }
+    
+    public final boolean isReady() {
 		return ready;
 	}
     
@@ -162,5 +171,9 @@ public abstract class Input<N extends Node, O> {
 	private void setValid(boolean valid) {
 		if (displayNode != null) displayNode.setValid(valid);
 	}
-
+	
+	@Override
+	public final int compareTo(Input o) {
+		return Integer.compare(order, o.order);
+	}
 }

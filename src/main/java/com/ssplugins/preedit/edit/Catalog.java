@@ -83,7 +83,7 @@ public class Catalog {
 	
 	public boolean removeTemplate(String name) {
 		if (templateExists(name)) {
-			// todo check if template is open. close it
+			// TODO check if template is open. close it
 			data.remove(name);
 			saveData();
 			return true;
