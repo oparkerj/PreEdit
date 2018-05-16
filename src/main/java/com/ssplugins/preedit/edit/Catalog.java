@@ -1,7 +1,10 @@
 package com.ssplugins.preedit.edit;
 
 import com.google.gson.*;
-import com.ssplugins.preedit.adapters.*;
+import com.ssplugins.preedit.adapters.EffectAdapter;
+import com.ssplugins.preedit.adapters.InputMapAdapter;
+import com.ssplugins.preedit.adapters.ModuleAdapter;
+import com.ssplugins.preedit.adapters.TemplateAdapter;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.util.Dialogs;
 

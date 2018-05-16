@@ -1,7 +1,6 @@
 package com.ssplugins.preedit.nodes;
 
 import com.ssplugins.preedit.input.LocationInput;
-import com.ssplugins.preedit.util.Util;
 import com.ssplugins.preedit.util.wrapper.OptionalProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;

@@ -4,13 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
-import com.ssplugins.preedit.util.wrapper.GridMap;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.wrapper.GridMap;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 
 import java.text.NumberFormat;

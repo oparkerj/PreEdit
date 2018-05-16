@@ -6,8 +6,6 @@ import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.nodes.EditorCanvas.NodeHandle;
 import com.ssplugins.preedit.nodes.FreesizeHandle;
-import com.ssplugins.preedit.util.Util;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
