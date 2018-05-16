@@ -34,6 +34,7 @@ public class TextModule extends NodeModule {
     }
     
     private static boolean LOADED = false;
+    
     private static void loadFonts() {
         if (LOADED) return;
         LOADED = true;
@@ -44,7 +45,8 @@ public class TextModule extends NodeModule {
             if (!f.getName().toLowerCase().endsWith(".ttf")) continue;
             try {
                 Font.loadFont(f.toURI().toURL().toString(), 12);
-            } catch (MalformedURLException ignored) {}
+            } catch (MalformedURLException ignored) {
+            }
         }
     }
     

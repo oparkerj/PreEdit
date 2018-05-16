@@ -27,17 +27,17 @@ public class ShadowEffect extends Effect {
     }
     
     @Override
-	public String getName() {
-		return "DropShadow";
-	}
-	
-	@Override
-	public void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) {
-		quickApply(shadow, canvas, node);
-	}
-	
-	@Override
-	protected void defineInputs(InputMap map) {
+    public String getName() {
+        return "DropShadow";
+    }
+    
+    @Override
+    public void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) {
+        quickApply(shadow, canvas, node);
+    }
+    
+    @Override
+    protected void defineInputs(InputMap map) {
         ChoiceInput<BlurType> blurType = new ChoiceInput<>(BlurType.values(), shadow.getBlurType(), Util.enumConverter(BlurType.class));
         blurType.setCellFactory(Util.enumCellFactory());
         shadow.blurTypeProperty().bind(blurType.valueProperty());
@@ -53,6 +53,6 @@ public class ShadowEffect extends Effect {
         map.addNumberProperty("Offset X", shadow.offsetXProperty(), null, true);
         map.addNumberProperty("Offset Y", shadow.offsetYProperty(), null, true);
         map.addNumberProperty("Spread", shadow.spreadProperty(), Range.from(0, 1), true, 0.005);
-	}
-	
+    }
+    
 }

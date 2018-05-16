@@ -24,87 +24,87 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class PreEdit extends Application implements PreEditAPI {
-	
-	public static void main(String[] args) {
-		Application.launch(PreEdit.class);
-	}
-	
+    
+    public static void main(String[] args) {
+        Application.launch(PreEdit.class);
+    }
+    
     public static final String NAME = "PreEdit";
-	private static PreEdit instance;
+    private static PreEdit instance;
     
     private Catalog catalog;
     private Stage stage;
     private Menu menu;
     
     private List<AddonLoader> addons = new ArrayList<>();
-	
-	public PreEdit() {
-		instance = this;
-		catalog = new Catalog();
-		registerLocalModules();
-	}
-	
-	public static PreEdit getInstance() {
-	    return instance;
+    
+    public PreEdit() {
+        instance = this;
+        catalog = new Catalog();
+        registerLocalModules();
+    }
+    
+    public static PreEdit getInstance() {
+        return instance;
     }
     
     public static Stage stage() {
-	    return getInstance().stage;
+        return getInstance().stage;
     }
-	
-	private void registerLocalModules() {
-		catalog.registerModule("Solid", Solid.class);
-		catalog.registerModule("URLImage", URLImage.class);
-		catalog.registerModule("FileImage", FileImage.class);
-		catalog.registerModule("Brush", Brush.class);
-		catalog.registerModule("Text", TextModule.class);
-		catalog.registerEffect("DropShadow", ShadowEffect.class);
-		catalog.registerEffect("BoxBlur", BoxBlurEffect.class);
-		catalog.registerEffect("Bloom", BloomEffect.class);
-		catalog.registerEffect("ColorAdjust", ColorAdjustEffect.class);
-		// TODO figure out a way to do displacement map.
+    
+    private void registerLocalModules() {
+        catalog.registerModule("Solid", Solid.class);
+        catalog.registerModule("URLImage", URLImage.class);
+        catalog.registerModule("FileImage", FileImage.class);
+        catalog.registerModule("Brush", Brush.class);
+        catalog.registerModule("Text", TextModule.class);
+        catalog.registerEffect("DropShadow", ShadowEffect.class);
+        catalog.registerEffect("BoxBlur", BoxBlurEffect.class);
+        catalog.registerEffect("Bloom", BloomEffect.class);
+        catalog.registerEffect("ColorAdjust", ColorAdjustEffect.class);
+        // TODO figure out a way to do displacement map.
         catalog.registerEffect("GaussianBlur", GaussianEffect.class);
         catalog.registerEffect("Glow", GlowEffect.class);
         catalog.registerEffect("InnerShadow", InnerShadowEffect.class);
         // TODO maybe lighting effect
-		catalog.registerEffect("PerspectiveTransform", PerspectiveEffect.class);
+        catalog.registerEffect("PerspectiveTransform", PerspectiveEffect.class);
         catalog.registerEffect("MotionBlur", MotionBlurEffect.class);
         catalog.registerEffect("Reflection", ReflectionEffect.class);
-	}
-	
-	private List<String> loadAddons() {
-		File dir = new File("addons");
-		dir.mkdirs();
-		if (!dir.exists()) return Collections.emptyList();
-		File[] files = dir.listFiles();
-		if (files == null) return Collections.emptyList();
-		URL[] urls = Stream.of(files)
-						   .filter(file -> file.getName().toLowerCase().endsWith(".jar"))
-						   .map(file -> {
-							   try {
-								   return file.toURI().toURL();
-							   } catch (MalformedURLException ignored) {}
-							   return null;
-						   })
-						   .filter(Objects::nonNull)
-						   .toArray(URL[]::new);
+    }
+    
+    private List<String> loadAddons() {
+        File dir = new File("addons");
+        dir.mkdirs();
+        if (!dir.exists()) return Collections.emptyList();
+        File[] files = dir.listFiles();
+        if (files == null) return Collections.emptyList();
+        URL[] urls = Stream.of(files)
+                           .filter(file -> file.getName().toLowerCase().endsWith(".jar"))
+                           .map(file -> {
+                               try {
+                                   return file.toURI().toURL();
+                               } catch (MalformedURLException ignored) {
+                               }
+                               return null;
+                           })
+                           .filter(Objects::nonNull).toArray(URL[]::new);
         List<String> failed = new ArrayList<>();
-		ClassLoader loader = URLClassLoader.newInstance(urls);
-		ServiceLoader<AddonLoader> loaders = ServiceLoader.load(AddonLoader.class, loader);
-		loaders.forEach(addonLoader -> {
+        ClassLoader loader = URLClassLoader.newInstance(urls);
+        ServiceLoader<AddonLoader> loaders = ServiceLoader.load(AddonLoader.class, loader);
+        loaders.forEach(addonLoader -> {
             String name = addonLoader.getName();
-		    try {
+            try {
                 addonLoader.load(this);
                 addons.add(addonLoader);
             } catch (Throwable t) {
                 failed.add(name);
             }
         });
-		return failed;
-	}
-	
-	@Override
-	public void start(Stage stage) {
+        return failed;
+    }
+    
+    @Override
+    public void start(Stage stage) {
         this.stage = stage;
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
             Dialogs.exception("Something went wrong.", null, e);
@@ -144,10 +144,10 @@ public class PreEdit extends Application implements PreEditAPI {
             tabPane.prefWidthProperty().bind(stage.widthProperty());
             tabPane.prefHeightProperty().bind(stage.heightProperty());
         });
-	}
+    }
     
     public Menu getMenu() {
-	    return menu;
+        return menu;
     }
     
     @Override

@@ -199,16 +199,16 @@ public class FreesizeHandle extends AnchorPane {
     
     public class Point {
         private DoubleProperty x, y;
-    
+        
         public Point() {
             this(0, 0);
         }
-    
+        
         public Point(double x, double y) {
             this.x = new SimpleDoubleProperty(x);
             this.y = new SimpleDoubleProperty(y);
         }
-    
+        
         public void addListener(PointUpdate update) {
             x.addListener((observable, oldValue, newValue) -> {
                 update.onUpdate(newValue.doubleValue(), y.get());
@@ -224,31 +224,31 @@ public class FreesizeHandle extends AnchorPane {
             y.setValue(y.get() + 1);
             y.setValue(y.get() - 1);
         }
-    
+        
         public double getX() {
             return x.get();
         }
-    
+        
         public DoubleProperty xProperty() {
             return x;
         }
-    
+        
         public void setX(double x) {
             this.x.set(x);
         }
-    
+        
         public double getY() {
             return y.get();
         }
-    
+        
         public DoubleProperty yProperty() {
             return y;
         }
-    
+        
         public void setY(double y) {
             this.y.set(y);
         }
-    
+        
         public void link(LocationInput input) {
             x.bindBidirectional(input.xProperty());
             y.bindBidirectional(input.yProperty());
@@ -257,7 +257,7 @@ public class FreesizeHandle extends AnchorPane {
     
     public interface PointUpdate {
         void onUpdate(double x, double y);
-    
+        
         static PointUpdate paneLayout(Pane pane) {
             return (x, y) -> {
                 pane.setLayoutX(x - HALF_HANDLE);

@@ -21,14 +21,14 @@ public class Solid extends NodeModule {
     }
     
     @Override
-	public Node getNode() {
-		return rect;
-	}
-	
-	@Override
-	public void linkResizeHandle(ResizeHandle handle) {
-		getInputs().getInput("Location", LocationInput.class).ifPresent(handle::link);
-	}
+    public Node getNode() {
+        return rect;
+    }
+    
+    @Override
+    public void linkResizeHandle(ResizeHandle handle) {
+        getInputs().getInput("Location", LocationInput.class).ifPresent(handle::link);
+    }
     
     @Override
     public ObservableValue<Bounds> getBounds() {
@@ -36,12 +36,12 @@ public class Solid extends NodeModule {
     }
     
     @Override
-	public String getName() {
-		return "Solid";
-	}
-	
-	@Override
-	protected void defineInputs(InputMap map) {
+    public String getName() {
+        return "Solid";
+    }
+    
+    @Override
+    protected void defineInputs(InputMap map) {
         ColorInput color = new ColorInput();
         color.setValue(Color.WHITE);
         rect.fillProperty().bind(color.valueProperty());
@@ -49,12 +49,12 @@ public class Solid extends NodeModule {
         LocationInput location = new LocationInput(true, true, 0, 0, 100, 100, 0);
         rect.xProperty().bind(location.xProperty());
         rect.yProperty().bind(location.yProperty());
-//        rect.layoutXProperty().bind(location.xProperty());
-//        rect.layoutYProperty().bind(location.yProperty());
+        //        rect.layoutXProperty().bind(location.xProperty());
+        //        rect.layoutYProperty().bind(location.yProperty());
         rect.widthProperty().bind(location.widthProperty());
         rect.heightProperty().bind(location.heightProperty());
         rect.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
-	}
-	
+    }
+    
 }

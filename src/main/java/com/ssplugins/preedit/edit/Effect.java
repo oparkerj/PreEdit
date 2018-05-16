@@ -32,30 +32,30 @@ public abstract class Effect extends Layer {
     public abstract void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) throws SilentFailException;
     
     public abstract void reset();
-	
-	public static Callback<ListView<Effect>, ListCell<Effect>> getCellFactory() {
-		return param -> new EffectCell();
-	}
-	
-	private static class EffectCell extends ListCell<Effect> {
-		@Override
-		protected void updateItem(Effect item, boolean empty) {
-			super.updateItem(item, empty);
-			if (empty) {
-				setText("");
-				setContextMenu(null);
-				return;
-			}
+    
+    public static Callback<ListView<Effect>, ListCell<Effect>> getCellFactory() {
+        return param -> new EffectCell();
+    }
+    
+    private static class EffectCell extends ListCell<Effect> {
+        @Override
+        protected void updateItem(Effect item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setText("");
+                setContextMenu(null);
+                return;
+            }
             if (!item.isEditor() && item.userInputs() == 0) setTextFill(Color.GRAY);
             else setTextFill(Color.BLACK);
-			setText(item.getName());
-   
-			if (item.isEditor()) {
+            setText(item.getName());
+            
+            if (item.isEditor()) {
                 item.setRenameAction(Layer.renameEvent(item, getListView()));
                 setContextMenu(item.getMenu());
             }
-		}
-	}
+        }
+    }
     
     public final void quickApply(javafx.scene.effect.Effect effect, Canvas canvas, Node node) {
         addEffect(canvas, effect);
@@ -64,7 +64,7 @@ public abstract class Effect extends Layer {
     
     // Need this workaround since the Effect base class doesn't have setInput
     private void addEffect(Node node, javafx.scene.effect.Effect effect) {
-	    if (node == null) return;
+        if (node == null) return;
         javafx.scene.effect.Effect old = node.getEffect();
         if (old == null) {
             node.setEffect(effect);
@@ -117,5 +117,5 @@ public abstract class Effect extends Layer {
         }
         node.setEffect(effect);
     }
-	
+    
 }
