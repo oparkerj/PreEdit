@@ -4,7 +4,7 @@ import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
-import com.ssplugins.preedit.nodes.EditorCanvas.NodeHandle;
+import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.nodes.FreesizeHandle;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -15,7 +15,7 @@ public class PerspectiveEffect extends Effect {
     
     private PerspectiveTransform transform;
     private FreesizeHandle handle;
-    private NodeHandle nodeHandle;
+    private EditorCanvas.NodeHandle nodeHandle;
     
     @Override
     protected void preload() {
