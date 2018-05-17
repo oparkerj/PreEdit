@@ -98,6 +98,15 @@ public class Catalog {
         return data.keySet().contains(name);
     }
     
+    public Optional<Template> jsonToTemplate(JsonObject template) {
+        try {
+            Template t = gson.fromJson(template, Template.class);
+            return Optional.ofNullable(t);
+        } catch (JsonSyntaxException e) {
+            return Optional.empty();
+        }
+    }
+    
     public Optional<Template> loadTemplate(String name) {
         if (!templateExists(name)) return Optional.empty();
         try {

@@ -2,10 +2,7 @@ package com.ssplugins.preedit.nodes;
 
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.util.wrapper.OptionalProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
