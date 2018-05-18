@@ -25,6 +25,7 @@ public class UserInput<N extends Node> extends GridPane {
         label = new Label();
         note = new Label();
         note.setWrapText(true);
+        note.managedProperty().bind(note.textProperty().isNotEmpty());
         userProvided = new CheckBox("Provided");
         userProvided.setAllowIndeterminate(false);
         userProvided.setSelected(false);
@@ -38,7 +39,8 @@ public class UserInput<N extends Node> extends GridPane {
         this.setVgap(5);
         this.add(label, 0, 0);
         this.add(userProvided, 1, 0);
-        this.add(inputNode, 0, 1, 2, 1);
+        this.add(note, 0, 1, 2, 1);
+        this.add(inputNode, 0, 2, 2, 1);
     }
     
     public interface SlideAction<T> {

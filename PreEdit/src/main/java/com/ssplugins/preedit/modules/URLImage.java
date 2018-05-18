@@ -1,10 +1,17 @@
 package com.ssplugins.preedit.modules;
 
+import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.URLInput;
 import com.ssplugins.preedit.util.Util;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class URLImage extends ImageModule {
     
@@ -36,13 +43,19 @@ public class URLImage extends ImageModule {
             }
             new Thread(() -> {
                 try {
-                    Image img = new Image(link);
-                    input.note(null);
-                    Platform.runLater(() -> {
-                        setImage(img, init);
-                    });
-                } catch (IllegalArgumentException e) {
-                    input.note("Unable to get image from URL.");
+                    URLConnection conn = new URL(link).openConnection();
+                    conn.setRequestProperty("User-Agent", PreEdit.NAME + " (" + PreEdit.REPO + ")");
+                    try (InputStream stream = conn.getInputStream()) {
+                        Image img = new Image(stream);
+                        img.exceptionProperty().addListener((ob, ov, e) -> {
+                            input.note("Unable to load image: " + e.getMessage());
+                        });
+                        Platform.runLater(() -> {
+                            setImage(img, init);
+                        });
+                    }
+                } catch (IllegalArgumentException | IOException e) {
+                    input.note("Unable to get image from URL: " + e.getMessage());
                 }
             }).start();
         });

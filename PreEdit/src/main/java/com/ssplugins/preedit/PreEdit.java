@@ -30,6 +30,7 @@ public class PreEdit extends Application implements PreEditAPI {
     }
     
     public static final String NAME = "PreEdit";
+    public static final String REPO = "https://github.com/567legodude/PreEdit";
     private static PreEdit instance;
     
     private Catalog catalog;

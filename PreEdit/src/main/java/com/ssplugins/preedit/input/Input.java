@@ -5,6 +5,8 @@ import com.google.gson.JsonNull;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.UserInput;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.Util;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
@@ -116,6 +118,11 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     }
     
     public final void note(String note, Consumer<Label> label) {
+        if (!Platform.isFxApplicationThread()) {
+            String finalNote = note;
+            Util.runFXSafe(() -> note(finalNote, label));
+            return;
+        }
         if (displayNode != null) {
             if (note == null) note = "";
             displayNode.getNote().setText(note);
