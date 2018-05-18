@@ -45,6 +45,11 @@ public class Menu implements GUI {
         return gui;
     }
     
+    public void updateAll() {
+        generateTab.updateTemplates();
+        editTab.updateTemplates();
+    }
+    
     public GridScene getGUI() {
         return gui;
     }

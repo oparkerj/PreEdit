@@ -40,7 +40,9 @@ public class PreEdit extends Application implements PreEditAPI {
     
     public PreEdit() {
         instance = this;
-        catalog = new Catalog();
+        catalog = new Catalog(() -> {
+            if (menu != null) getMenu().updateAll();
+        });
         registerLocalModules();
     }
     

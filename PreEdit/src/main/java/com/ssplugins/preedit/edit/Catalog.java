@@ -24,7 +24,10 @@ public class Catalog {
     private Map<String, Class<? extends Module>> modules = new HashMap<>();
     private Map<String, Class<? extends Effect>> effects = new HashMap<>();
     
-    public Catalog() {
+    private Runnable callback;
+    
+    public Catalog(Runnable callback) {
+        this.callback = callback;
         GsonBuilder gsonBuilder = new GsonBuilder().serializeNulls();
         gsonBuilder.registerTypeAdapter(Effect.class, new EffectAdapter(this));
         ModuleAdapter moduleAdapter = new ModuleAdapter(this);
@@ -72,6 +75,18 @@ public class Catalog {
         }
     }
     
+    private void callback() {
+        if (callback != null) callback.run();
+    }
+    
+    public Optional<JsonObject> parseJson(String json) {
+        try {
+            return Optional.ofNullable(new JsonParser().parse(json).getAsJsonObject());
+        } catch (JsonSyntaxException e) {
+            return Optional.empty();
+        }
+    }
+    
     public Set<String> getTemplates() {
         return Collections.unmodifiableSet(data.keySet());
     }
@@ -80,9 +95,22 @@ public class Catalog {
         return new Template(name, width, height);
     }
     
-    public void addTemplate(JsonObject template) {
-        if (!template.has("name")) return;
+    private boolean addPassive(JsonObject template) {
+        if (!template.has("name")) return false;
         data.add(template.get("name").getAsString(), template);
+        return true;
+    }
+    
+    public void addTemplate(JsonObject template) {
+        if (addPassive(template)) callback();
+    }
+    
+    public void mergeTemplates(JsonObject catalog) {
+        catalog.keySet().forEach(s -> {
+            if (templateExists(s)) return;
+            addPassive(catalog.getAsJsonObject(s));
+        });
+        callback();
     }
     
     public boolean removeTemplate(Template template) {
@@ -93,6 +121,7 @@ public class Catalog {
         if (templateExists(name)) {
             // TODO check if template is open. close it
             data.remove(name);
+            callback();
             return true;
         }
         return false;
