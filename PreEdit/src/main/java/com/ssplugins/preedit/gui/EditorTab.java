@@ -249,6 +249,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
                 Optional<ButtonType> op = Dialogs.confirm("Are you sure you want to delete the current template?", null);
                 op.filter(button -> button.getButtonData() == ButtonBar.ButtonData.YES).ifPresent(button -> {
                     base.getCatalog().removeTemplate(state.getTemplate());
+                    base.getCatalog().saveData();
                     resetNodes();
                     updateTemplates();
                 });

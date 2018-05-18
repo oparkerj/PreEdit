@@ -80,6 +80,11 @@ public class Catalog {
         return new Template(name, width, height);
     }
     
+    public void addTemplate(JsonObject template) {
+        if (!template.has("name")) return;
+        data.add(template.get("name").getAsString(), template);
+    }
+    
     public boolean removeTemplate(Template template) {
         return removeTemplate(template.getName());
     }
@@ -88,7 +93,6 @@ public class Catalog {
         if (templateExists(name)) {
             // TODO check if template is open. close it
             data.remove(name);
-            saveData();
             return true;
         }
         return false;
@@ -96,15 +100,6 @@ public class Catalog {
     
     public boolean templateExists(String name) {
         return data.keySet().contains(name);
-    }
-    
-    public Optional<Template> jsonToTemplate(JsonObject template) {
-        try {
-            Template t = gson.fromJson(template, Template.class);
-            return Optional.ofNullable(t);
-        } catch (JsonSyntaxException e) {
-            return Optional.empty();
-        }
     }
     
     public Optional<Template> loadTemplate(String name) {
