@@ -12,6 +12,8 @@ public class InputMap {
     
     private Map<String, Input<?, ?>> inputs = new HashMap<>();
     
+    public InputMap() {}
+    
     public int size() {
         return inputs.size();
     }

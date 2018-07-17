@@ -63,4 +63,5 @@ public class ColorInput extends Input<ColorPicker, Color> {
     protected void setUpdateTrigger(ColorPicker node, Runnable update) {
         node.valueProperty().addListener(observable -> update.run());
     }
+    
 }

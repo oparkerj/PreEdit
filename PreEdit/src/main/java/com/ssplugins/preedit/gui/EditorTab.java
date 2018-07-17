@@ -52,7 +52,6 @@ public class EditorTab extends BorderPane implements PreEditTab {
     private State state;
     private AtomicBoolean loading = new AtomicBoolean(false);
     private boolean editControls;
-    private UndoHistory history;
     
     private ToolBar toolbar;
     private ComboBox<String> selector;
@@ -91,7 +90,6 @@ public class EditorTab extends BorderPane implements PreEditTab {
         this.base = base;
         this.stage = base.getStage();
         this.editControls = editControls;
-        this.history = new UndoHistory();
         state = new State();
         state.setRenderCall(() -> {
             try {
@@ -124,7 +122,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
                 }
             });
         });
-        stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (editControls) {
                 if (event.getCode() == KeyCode.S && event.isControlDown()) {
                     save();
@@ -145,10 +143,6 @@ public class EditorTab extends BorderPane implements PreEditTab {
     
     public EditorCanvas getCanvas() {
         return canvas;
-    }
-    
-    public UndoHistory getUndoHistory() {
-        return history;
     }
     
     public void checkSave() {

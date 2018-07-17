@@ -94,4 +94,5 @@ public class NumberInput extends Input<NumberField, Number> {
     protected void setUpdateTrigger(NumberField node, Runnable update) {
         node.numberProperty().addListener(observable -> update.run());
     }
+    
 }

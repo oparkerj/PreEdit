@@ -58,4 +58,5 @@ public class CheckboxInput extends Input<CheckBox, Boolean> {
     protected void setUpdateTrigger(CheckBox node, Runnable update) {
         node.selectedProperty().addListener(observable -> update.run());
     }
+    
 }

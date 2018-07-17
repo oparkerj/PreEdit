@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -97,6 +98,15 @@ public final class Util {
         } catch (SilentFailException e) {
             return Optional.empty();
         }
+    }
+    
+    public static WritableImage renderNode(Node node) {
+        Bounds bounds = node.getLayoutBounds();
+        WritableImage img = new WritableImage((int) bounds.getWidth(), (int) bounds.getHeight());
+        SnapshotParameters sp = new SnapshotParameters();
+        sp.setFill(Color.TRANSPARENT);
+        node.snapshot(sp, img);
+        return img;
     }
     
     public static <T extends Enum<T>> Callback<ListView<T>, ListCell<T>> enumCellFactory() {

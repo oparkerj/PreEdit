@@ -16,12 +16,14 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+// Base class for creating an input shown to the user
+// The node N is displayed in the input area and O is the output type.
 public abstract class Input<N extends Node, O> implements Comparable<Input> {
     
     private N node;
     private UserInput<N> displayNode;
     private JsonConverter<O> converter;
-    private boolean ready, gen, init;
+    private boolean ready, gen, init, undoSetup;
     private int order = -1;
     private BooleanProperty userProvided = new SimpleBooleanProperty(false);
     private Runnable update;
@@ -36,8 +38,9 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     
     protected abstract JsonConverter<O> getJsonConverter();
     
-    protected abstract void setUpdateTrigger(N node, Runnable update);
+    protected abstract void setUpdateTrigger(N node, Runnable update); // Use the runnable to request a canvas update when the input value changes.
     
+    // Must be called in order for an input to finish setup and be used.
     protected final void ready() {
         this.ready = true;
         this.node = createInputNode();
@@ -49,7 +52,7 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
             });
         }
         this.converter = getJsonConverter();
-        getValue();
+        getValue(); // Will mark the input invalid if the
     }
     
     public final int getOrder() {
@@ -109,8 +112,7 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     }
     
     public final <T extends Input> Optional<T> as(Class<T> type) {
-        if (type.isAssignableFrom(this.getClass())) return Optional.of(type.cast(this));
-        return Optional.empty();
+        return Optional.of(this).filter(t -> type.isAssignableFrom(t.getClass())).map(type::cast);
     }
     
     public final void note(String note) {

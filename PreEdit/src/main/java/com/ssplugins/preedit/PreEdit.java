@@ -61,6 +61,7 @@ public class PreEdit extends Application implements PreEditAPI {
         catalog.registerModule("FileImage", FileImage.class);
         catalog.registerModule("Brush", Brush.class);
         catalog.registerModule("Text", TextModule.class);
+        
         catalog.registerEffect("DropShadow", ShadowEffect.class);
         catalog.registerEffect("BoxBlur", BoxBlurEffect.class);
         catalog.registerEffect("Bloom", BloomEffect.class);
@@ -73,6 +74,8 @@ public class PreEdit extends Application implements PreEditAPI {
         catalog.registerEffect("PerspectiveTransform", PerspectiveEffect.class);
         catalog.registerEffect("MotionBlur", MotionBlurEffect.class);
         catalog.registerEffect("Reflection", ReflectionEffect.class);
+        
+//        catalog.registerEffect("BoundingBox", BoundingBoxEffect.class);
     }
     
     private List<String> loadAddons() {

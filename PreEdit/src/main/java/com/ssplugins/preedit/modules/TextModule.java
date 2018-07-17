@@ -6,6 +6,7 @@ import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.wrapper.FilteredObjectProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -18,11 +19,14 @@ import javafx.scene.text.*;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.IllegalFormatException;
+import java.util.Optional;
 
 public class TextModule extends NodeModule {
     
     private Text text;
     private Text unwrapped;
+    private FilteredObjectProperty<String> outText;
     private ObjectProperty<Font> font;
     private FontWeight weight;
     private FontPosture posture;
@@ -60,6 +64,13 @@ public class TextModule extends NodeModule {
     protected void preload() {
         text = new Text();
         unwrapped = new Text();
+        outText = new FilteredObjectProperty<>("", s -> {
+            try {
+                Optional<String> out = getInputs().getInput("Placeholders", TextAreaInput.class).map(this::getLines).map(strings -> String.format(s, (Object[]) strings));
+                if (out.isPresent()) return out;
+            } catch (IllegalFormatException ignored) {}
+            return Optional.of(s);
+        });
         unwrapped.textProperty().bind(text.textProperty());
         unwrapped.fontProperty().bind(text.fontProperty());
         unwrapped.textAlignmentProperty().bind(text.textAlignmentProperty());
@@ -92,9 +103,17 @@ public class TextModule extends NodeModule {
     @Override
     protected void defineInputs(InputMap map) {
         TextAreaInput content = new TextAreaInput(true);
-        text.textProperty().bind(content.textProperty());
+        content.textProperty().addListener((observable, oldValue, newValue) -> {
+            outText.set(newValue);
+        });
+        text.textProperty().bind(outText);
         text.fontProperty().bind(font);
         map.addInput("Content", content);
+        TextAreaInput placeholders = new TextAreaInput(true);
+        placeholders.textProperty().addListener((observable, oldValue, newValue) -> {
+            outText.update();
+        });
+        map.addInput("Placeholders", placeholders);
         ChoiceInput<String> fontFamily = new ChoiceInput<>(Font.getFamilies(), font.get().getName(), JsonConverter.forString());
         fontFamily.valueProperty().addListener((observable, oldValue, newValue) -> {
             update(newValue, weight, posture, font.get().getSize());
@@ -143,6 +162,10 @@ public class TextModule extends NodeModule {
         text.yProperty().bind(location.yProperty().add(yOffset));
         text.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
+    }
+    
+    private String[] getLines(TextAreaInput input) {
+        return input.textProperty().get().split("\\r?\\n");
     }
     
 }
