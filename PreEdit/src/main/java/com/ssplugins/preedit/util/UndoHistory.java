@@ -16,23 +16,24 @@ public class UndoHistory {
     
     private int capacity = 200;
     private int pointer = -1;
-    private AtomicBoolean working;
+    private final AtomicBoolean working;
     
     private List<UndoTrigger> triggers = new ArrayList<>();
     private List<Undo> list = new ArrayList<>();
     
-    private boolean mouseDown;
+    private final AtomicBoolean mouseDown;
     private List<KeyCode> keys = new ArrayList<>();
     
     private Runnable onUpdate;
     
     public UndoHistory(Stage stage) {
         working = new AtomicBoolean();
+        mouseDown = new AtomicBoolean(false);
         stage.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-            mouseDown = true;
+            mouseDown.set(true);
         });
         stage.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
-            mouseDown = false;
+            mouseDown.set(false);
             collectSteps();
         });
         stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -67,7 +68,7 @@ public class UndoHistory {
     }
     
     public boolean isButtonHeld() {
-        if (mouseDown) return true;
+        if (mouseDown.get()) return true;
         if (keys.contains(KeyCode.UP)) return true;
         if (keys.contains(KeyCode.DOWN)) return true;
         if (keys.contains(KeyCode.LEFT)) return true;
@@ -147,15 +148,15 @@ public class UndoHistory {
         while (list.size() > capacity) list.remove(0);
     }
     
-    private abstract class Undo {
+    private interface Undo {
         
-        public abstract void restore();
+        void restore();
         
-        public abstract Undo redoStep();
+        Undo redoStep();
         
     }
     
-    private class UndoStep<T> extends Undo {
+    private class UndoStep<T> implements Undo {
         
         private Property<T> property;
         private T oldValue;
@@ -177,7 +178,7 @@ public class UndoHistory {
         
     }
     
-    private class UndoGroup extends Undo {
+    private class UndoGroup implements Undo {
     
         private List<Undo> steps;
     
@@ -223,14 +224,18 @@ public class UndoHistory {
             return Optional.ofNullable(step);
         }
     
-        public <U> void submit(Property<U> property, U oldValue) {
+        public <U> void submitBypass(Property<U> property, U oldValue) {
             if (history.isWorking()) return;
+            history.push(new UndoStep<>(property, oldValue));
+        }
+    
+        public <U> void submit(Property<U> property, U oldValue) {
             if (history.isButtonHeld()) {
                 if (submit.get() != null) return;
                 submit.updateAndGet(undoStep -> new UndoStep<>(property, oldValue));
                 return;
             }
-            history.push(new UndoStep<>(property, oldValue));
+            submitBypass(property, oldValue);
         }
     
         public <U> void auto(Property<U> property) {
