@@ -1,6 +1,7 @@
 package com.ssplugins.preedit.input;
 
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextArea;
 
@@ -49,4 +50,8 @@ public class TextAreaInput extends Input<TextArea, String> {
         return emptyAllowed || value.isEmpty();
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        undoHistory.createTrigger().auto(getNode().textProperty());
+    }
 }

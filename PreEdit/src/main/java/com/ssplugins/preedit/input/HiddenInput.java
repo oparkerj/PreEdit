@@ -2,6 +2,7 @@ package com.ssplugins.preedit.input;
 
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import javafx.scene.Node;
 
 public class HiddenInput extends Input<Node, Void> {
@@ -46,4 +47,8 @@ public class HiddenInput extends Input<Node, Void> {
         this.update = update;
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        //
+    }
 }

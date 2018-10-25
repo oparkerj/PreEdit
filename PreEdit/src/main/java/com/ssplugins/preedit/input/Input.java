@@ -5,6 +5,7 @@ import com.google.gson.JsonNull;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.UserInput;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import com.ssplugins.preedit.util.Util;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -39,6 +40,8 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     protected abstract JsonConverter<O> getJsonConverter();
     
     protected abstract void setUpdateTrigger(N node, Runnable update); // Use the runnable to request a canvas update when the input value changes.
+    
+    protected abstract void addUndoTrigger(UndoHistory undoHistory);
     
     // Must be called in order for an input to finish setup and be used.
     protected final void ready() {
@@ -109,6 +112,12 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     public final void setUpdateTrigger(Runnable update) {
         this.update = update;
         setUpdateTrigger(node, update);
+    }
+    
+    public final void linkUndoHistory(UndoHistory undoHistory) {
+        if (undoSetup) return;
+        undoSetup = true;
+        addUndoTrigger(undoHistory);
     }
     
     public final <T extends Input> Optional<T> as(Class<T> type) {

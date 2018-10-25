@@ -2,6 +2,7 @@ package com.ssplugins.preedit.input;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import com.ssplugins.preedit.util.Util;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
@@ -81,4 +82,8 @@ public class ChoiceInput<T> extends Input<ComboBox<T>, T> {
         return value != null;
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        undoHistory.createTrigger().auto(getNode().valueProperty());
+    }
 }

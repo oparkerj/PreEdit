@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import javafx.scene.control.CheckBox;
 
 public class CheckboxInput extends Input<CheckBox, Boolean> {
@@ -59,4 +60,8 @@ public class CheckboxInput extends Input<CheckBox, Boolean> {
         node.selectedProperty().addListener(observable -> update.run());
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        undoHistory.createTrigger().auto(getNode().selectedProperty());
+    }
 }

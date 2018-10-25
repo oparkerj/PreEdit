@@ -6,6 +6,7 @@ import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.JsonConverter;
 import com.ssplugins.preedit.util.Range;
+import com.ssplugins.preedit.util.UndoHistory;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -95,4 +96,8 @@ public class NumberInput extends Input<NumberField, Number> {
         node.numberProperty().addListener(observable -> update.run());
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        undoHistory.createTrigger().auto(getNode().numberProperty());
+    }
 }

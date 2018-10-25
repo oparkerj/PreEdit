@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.nodes.NumberField;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import com.ssplugins.preedit.util.wrapper.GridMap;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
@@ -54,6 +55,9 @@ public class LocationInput extends Input<GridMap, Bounds> {
         });
         angle.addListener((observable, oldValue, newValue) -> {
             bounds.set(new BoundingBox(getX(), getY(), newValue.doubleValue(), getWidth(), getHeight(), 0));
+        });
+        bounds.addListener((observable, oldValue, newValue) -> {
+            setNodeValue(getNode(), newValue);
         });
     }
     
@@ -205,4 +209,18 @@ public class LocationInput extends Input<GridMap, Bounds> {
         return true;
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        UndoHistory.UndoTrigger trigger = undoHistory.createTrigger();
+        bounds.addListener((observable, oldValue, newValue) -> {
+            if (oldValue.getMinX() == newValue.getMinX() && oldValue.getMinY() == newValue.getMinY()) {
+                if (oldValue.getWidth() != newValue.getWidth() || oldValue.getHeight() != newValue.getHeight()) {
+                    if (size) trigger.submit(bounds, oldValue);
+                }
+                else if (oldValue.getMinZ() != newValue.getMinZ()) {
+                    if (rotate) trigger.submit(bounds, oldValue);
+                }
+            }
+        });
+    }
 }

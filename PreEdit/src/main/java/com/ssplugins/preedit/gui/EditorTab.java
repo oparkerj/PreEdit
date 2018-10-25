@@ -53,6 +53,8 @@ public class EditorTab extends BorderPane implements PreEditTab {
     private AtomicBoolean loading = new AtomicBoolean(false);
     private boolean editControls;
     
+    private UndoHistory undoHistory;
+    
     private ToolBar toolbar;
     private ComboBox<String> selector;
     private Button btnNew;
@@ -128,7 +130,15 @@ public class EditorTab extends BorderPane implements PreEditTab {
                     save();
                 }
             }
+            if (event.getCode() == KeyCode.Z && event.isControlDown()) {
+                undoHistory.undo();
+            }
+            else if (event.getCode() == KeyCode.Y && event.isControlDown()) {
+                undoHistory.redo();
+            }
         });
+        undoHistory = new UndoHistory(stage);
+        undoHistory.setOnUpdate(state::render);
         defineNodes();
         Platform.runLater(this::updateTemplates);
     }
@@ -143,6 +153,10 @@ public class EditorTab extends BorderPane implements PreEditTab {
     
     public EditorCanvas getCanvas() {
         return canvas;
+    }
+    
+    public UndoHistory getUndoHistory() {
+        return undoHistory;
     }
     
     public void checkSave() {
@@ -615,6 +629,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
     private void setInputs(InputMap map) {
         paramArea.getChildren().clear();
         if (map == null) return;
+        map.getInputs().forEach((s, input) -> input.linkUndoHistory(undoHistory));
         UITools.setInputNodes(map, state, paramArea, !editControls);
     }
     

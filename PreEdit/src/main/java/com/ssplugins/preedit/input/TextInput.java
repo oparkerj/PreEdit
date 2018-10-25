@@ -1,6 +1,7 @@
 package com.ssplugins.preedit.input;
 
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextField;
 
@@ -48,4 +49,8 @@ public class TextInput extends Input<TextField, String> {
         return !value.isEmpty();
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        undoHistory.createTrigger().auto(getNode().textProperty());
+    }
 }

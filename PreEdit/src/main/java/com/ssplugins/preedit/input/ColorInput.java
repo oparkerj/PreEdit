@@ -3,6 +3,7 @@ package com.ssplugins.preedit.input;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
@@ -64,4 +65,8 @@ public class ColorInput extends Input<ColorPicker, Color> {
         node.valueProperty().addListener(observable -> update.run());
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        undoHistory.createTrigger().auto(getNode().valueProperty());
+    }
 }

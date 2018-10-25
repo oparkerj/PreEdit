@@ -24,6 +24,8 @@ public class UndoHistory {
     private boolean mouseDown;
     private List<KeyCode> keys = new ArrayList<>();
     
+    private Runnable onUpdate;
+    
     public UndoHistory(Stage stage) {
         working = new AtomicBoolean();
         stage.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -45,11 +47,22 @@ public class UndoHistory {
     private void collectSteps() {
         List<Undo> steps = new ArrayList<>();
         triggers.stream().map(UndoTrigger::getPendingChange).filter(Optional::isPresent).map(Optional::get).forEach(steps::add);
+        if (steps.size() == 0) return;
         if (steps.size() == 1) {
             push(steps.get(0));
         }
         else {
             push(new UndoGroup(steps));
+        }
+    }
+    
+    public void setOnUpdate(Runnable onUpdate) {
+        this.onUpdate = onUpdate;
+    }
+    
+    private void update() {
+        if (onUpdate != null) {
+            onUpdate.run();
         }
     }
     
@@ -95,12 +108,14 @@ public class UndoHistory {
             pointer--;
             if (pointer < 0) {
                 pointer = 0;
+                working.set(false);
                 return;
             }
             Undo step = list.get(pointer);
             if (push) list.add(step.redoStep());
             step.restore();
             working.set(false);
+            update();
         }
     }
     
@@ -110,13 +125,15 @@ public class UndoHistory {
             working.set(true);
             if (pointer == -1) return;
             pointer++;
-            if (pointer == list.size()) {
-                pointer--;
+            if (pointer >= list.size()) {
+                pointer = list.size() - 1;
+                working.set(false);
                 return;
             }
             Undo step = list.get(pointer);
             step.restore();
             working.set(false);
+            update();
         }
     }
     
@@ -209,6 +226,7 @@ public class UndoHistory {
         public <U> void submit(Property<U> property, U oldValue) {
             if (history.isWorking()) return;
             if (history.isButtonHeld()) {
+                if (submit.get() != null) return;
                 submit.updateAndGet(undoStep -> new UndoStep<>(property, oldValue));
                 return;
             }

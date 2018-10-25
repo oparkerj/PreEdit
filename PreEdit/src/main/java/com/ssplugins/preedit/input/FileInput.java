@@ -6,6 +6,7 @@ import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.JsonConverter;
+import com.ssplugins.preedit.util.UndoHistory;
 import com.ssplugins.preedit.util.Util;
 import com.ssplugins.preedit.util.wrapper.GridMap;
 import javafx.beans.property.StringProperty;
@@ -87,4 +88,8 @@ public class FileInput extends Input<GridMap, File> {
         label.textProperty().addListener(observable -> update.run());
     }
     
+    @Override
+    protected void addUndoTrigger(UndoHistory undoHistory) {
+        //
+    }
 }
