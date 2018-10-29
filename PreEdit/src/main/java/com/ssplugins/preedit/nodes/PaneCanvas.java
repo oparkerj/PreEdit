@@ -1,6 +1,8 @@
 package com.ssplugins.preedit.nodes;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -12,15 +14,24 @@ public class PaneCanvas extends Pane {
     private Canvas canvas;
     private ObjectProperty<Node> node;
     
+    private Rectangle clip;
+    private IntegerProperty clipX, clipY, clipWidth, clipHeight;
+    
     public PaneCanvas(double width, double height) {
         this.prefWidthProperty().bind(this.minWidthProperty());
         this.prefHeightProperty().bind(this.minHeightProperty());
         canvas = new Canvas(width, height);
         canvas.widthProperty().bind(this.minWidthProperty());
         canvas.heightProperty().bind(this.minHeightProperty());
-        Rectangle clip = new Rectangle(width, height);
-        clip.widthProperty().bind(this.widthProperty());
-        clip.heightProperty().bind(this.heightProperty());
+        clip = new Rectangle(width, height);
+        clipX = new SimpleIntegerProperty();
+        clipY = new SimpleIntegerProperty();
+        clipWidth = new SimpleIntegerProperty((int) this.getWidth());
+        clipHeight = new SimpleIntegerProperty((int) this.getHeight());
+        clip.xProperty().bind(this.clipX);
+        clip.yProperty().bind(this.clipY);
+        clip.widthProperty().bind(clipWidth);
+        clip.heightProperty().bind(clipHeight);
         this.setClip(clip);
         this.getChildren().add(canvas);
         node = new SimpleObjectProperty<>();

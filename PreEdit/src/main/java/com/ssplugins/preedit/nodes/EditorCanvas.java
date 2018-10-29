@@ -4,6 +4,9 @@ import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.edit.NodeModule;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.util.ExpandableBounds;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -25,6 +28,8 @@ public class EditorCanvas extends StackPane {
     private Canvas transparentLayer;
     private static Canvas debug;
     
+    private ExpandableBounds viewport;
+    
     public EditorCanvas(double width, double height) {
         this.prefWidthProperty().bind(this.minWidthProperty());
         this.prefHeightProperty().bind(this.minHeightProperty());
@@ -40,6 +45,8 @@ public class EditorCanvas extends StackPane {
         posPane.getChildren().add(handle);
         posPane.getChildren().add(debug);
         bgPane.getChildren().add(transparentLayer);
+    
+        viewport = new ExpandableBounds(0, 0, width, height);
     }
     
     public static Canvas debugCanvas() {
@@ -59,6 +66,10 @@ public class EditorCanvas extends StackPane {
         context.translate(cx, cy);
         context.rotate(deg);
         context.translate(-cx, -cy);
+    }
+    
+    public ExpandableBounds getViewport() {
+        return viewport;
     }
     
     public NodeHandle createNodeHandle() {
