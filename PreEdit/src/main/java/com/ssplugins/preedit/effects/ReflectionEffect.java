@@ -2,10 +2,9 @@ package com.ssplugins.preedit.effects;
 
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.input.InputMap;
+import com.ssplugins.preedit.util.CanvasLayer;
 import com.ssplugins.preedit.util.Range;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Reflection;
 
 public class ReflectionEffect extends Effect {
@@ -18,7 +17,7 @@ public class ReflectionEffect extends Effect {
     }
     
     @Override
-    public void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) {
+    public void apply(CanvasLayer canvas, Node node, boolean editor) {
         quickApply(reflection, canvas, node);
     }
     

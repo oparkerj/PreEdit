@@ -6,9 +6,9 @@ import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.nodes.FreesizeHandle;
+import com.ssplugins.preedit.util.CanvasLayer;
+import com.ssplugins.preedit.util.ExpandableBounds;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.PerspectiveTransform;
 
 public class PerspectiveEffect extends Effect {
@@ -41,12 +41,15 @@ public class PerspectiveEffect extends Effect {
         if (nodeHandle == null) {
             nodeHandle = tab.getCanvas().createNodeHandle();
             nodeHandle.setNode(handle);
+            ExpandableBounds viewport = tab.getCanvas().getViewport();
+            handle.translateXProperty().bind(viewport.xProperty().negate());
+            handle.translateYProperty().bind(viewport.yProperty().negate());
         }
         nodeHandle.toggle(selected);
     }
     
     @Override
-    public void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) {
+    public void apply(CanvasLayer canvas, Node node, boolean editor) {
         quickApply(transform, canvas, node);
     }
     

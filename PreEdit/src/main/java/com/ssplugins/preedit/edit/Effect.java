@@ -1,11 +1,10 @@
 package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.util.CanvasLayer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.effect.*;
@@ -29,7 +28,7 @@ public abstract class Effect extends Layer {
         moduleProperty().set(module);
     }
     
-    public abstract void apply(Canvas canvas, GraphicsContext context, Node node, boolean editor) throws SilentFailException;
+    public abstract void apply(CanvasLayer canvas, Node node, boolean editor) throws SilentFailException;
     
     public abstract void reset();
     
@@ -57,8 +56,10 @@ public abstract class Effect extends Layer {
         }
     }
     
-    public final void quickApply(javafx.scene.effect.Effect effect, Canvas canvas, Node node) {
-        addEffect(canvas, effect);
+    public final void quickApply(javafx.scene.effect.Effect effect, CanvasLayer canvas, Node node) {
+        if (canvas.canvasLoaded()) {
+            addEffect(canvas.getCanvas(), effect);
+        }
         if (node != null) node.setEffect(effect);
     }
     

@@ -48,6 +48,10 @@ public class InputMap {
         return getInput(name, type).flatMap(Input::getValue).orElseThrow(Util.silentFail());
     }
     
+    public <T> void setValue(String name, Class<? extends Input<?, T>> type, T value) {
+        getInput(name, type).ifPresent(o -> o.setValue(value));
+    }
+    
     public void addNumberProperty(String name, Property<Number> property, Range range, boolean decimal) {
         addNumberProperty(name, property, range, decimal, 1);
     }
@@ -59,6 +63,14 @@ public class InputMap {
         if (range != null) input.setRange(range);
         property.bind(input.numberProperty());
         addInput(name, input);
+    }
+    
+    public void copyInputs(InputMap other, String prefix, String... except) {
+        List<String> exceptions = Arrays.asList(except);
+        other.getInputs().forEach((s, input) -> {
+            if (exceptions.contains(s)) return;
+            this.addInput(prefix + " " + s, input);
+        });
     }
     
 }

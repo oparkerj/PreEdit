@@ -221,6 +221,9 @@ public class LocationInput extends Input<GridMap, Bounds> {
                     if (rotate) trigger.submit(bounds, oldValue);
                 }
             }
+            else {
+                trigger.submit(bounds, oldValue);
+            }
         });
     }
 }

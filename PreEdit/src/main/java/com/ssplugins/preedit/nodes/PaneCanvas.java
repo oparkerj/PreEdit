@@ -1,28 +1,37 @@
 package com.ssplugins.preedit.nodes;
 
+import com.ssplugins.preedit.util.CanvasLayer;
+import com.ssplugins.preedit.util.ExpandableBounds;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
-public class PaneCanvas extends Pane {
+public class PaneCanvas extends Pane implements CanvasLayer {
+    
+    private ExpandableBounds viewport;
     
     private Canvas canvas;
     private ObjectProperty<Node> node;
     
-    public PaneCanvas(double width, double height) {
+    private Rectangle clip;
+    
+    public PaneCanvas(double width, double height, ExpandableBounds viewport) {
+        this.viewport = viewport;
+        this.translateXProperty().bind(viewport.xProperty().negate());
+        this.translateYProperty().bind(viewport.yProperty().negate());
         this.prefWidthProperty().bind(this.minWidthProperty());
         this.prefHeightProperty().bind(this.minHeightProperty());
-        canvas = new Canvas(width, height);
-        canvas.widthProperty().bind(this.minWidthProperty());
-        canvas.heightProperty().bind(this.minHeightProperty());
-        Rectangle clip = new Rectangle(width, height);
-        clip.widthProperty().bind(this.widthProperty());
-        clip.heightProperty().bind(this.heightProperty());
+        clip = new Rectangle(width, height);
+        clip.xProperty().bind(viewport.xProperty());
+        clip.yProperty().bind(viewport.yProperty());
+        clip.widthProperty().bind(viewport.widthProperty());
+        clip.heightProperty().bind(viewport.heightProperty());
         this.setClip(clip);
-        this.getChildren().add(canvas);
+//        this.getChildren().add(canvas);
         node = new SimpleObjectProperty<>();
         node.addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
@@ -34,8 +43,29 @@ public class PaneCanvas extends Pane {
         });
     }
     
+    @Override
+    public boolean canvasLoaded() {
+        return canvas != null;
+    }
+    
+    @Override
     public Canvas getCanvas() {
+        if (canvas == null) {
+            canvas = new Canvas(this.getMinWidth(), this.getMinHeight());
+            canvas.widthProperty().bind(this.minWidthProperty());
+            canvas.heightProperty().bind(this.minHeightProperty());
+        }
         return canvas;
+    }
+    
+    @Override
+    public GraphicsContext getGraphics() {
+        return getCanvas().getGraphicsContext2D();
+    }
+    
+    @Override
+    public ExpandableBounds getExpandableBounds() {
+        return viewport;
     }
     
     public Node getNode() {
