@@ -5,6 +5,7 @@ import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.input.*;
 import com.ssplugins.preedit.nodes.ResizeHandle;
+import com.ssplugins.preedit.util.CanvasLayer;
 import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.SafePixelWriter;
 import com.ssplugins.preedit.util.Util;
@@ -126,7 +127,9 @@ public class Brush extends Module {
     }
     
     @Override
-    public void draw(Canvas canvas, GraphicsContext context, boolean editor) throws SilentFailException {
+    public void draw(CanvasLayer canvasLayer, boolean editor) throws SilentFailException {
+        Canvas canvas = canvasLayer.getCanvas();
+        GraphicsContext context = canvasLayer.getGraphics();
         if (image.get() == null) {
             image.set(new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight()));
         }

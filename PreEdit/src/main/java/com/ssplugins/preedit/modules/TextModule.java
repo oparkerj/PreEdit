@@ -33,13 +33,16 @@ public class TextModule extends NodeModule {
     
     private DoubleProperty yOffset;
     
+    private ChoiceInput<String> fontFamily;
+    private ChoiceInput<TextAlignment> textAlignment;
+    
     private void update(String name, FontWeight weight, FontPosture posture, double size) {
         font.set(Font.font(name, weight, posture, size));
     }
     
     private static boolean LOADED = false;
     
-    private static void loadFonts() {
+    public static void loadFonts() {
         if (LOADED) return;
         LOADED = true;
         File fonts = new File("C:" + File.separator + "Windows" + File.separator + "Fonts");
@@ -114,7 +117,7 @@ public class TextModule extends NodeModule {
             outText.update();
         });
         map.addInput("Placeholders", placeholders);
-        ChoiceInput<String> fontFamily = new ChoiceInput<>(Font.getFamilies(), font.get().getName(), JsonConverter.forString());
+        fontFamily = new ChoiceInput<>(Font.getFamilies(), font.get().getName(), JsonConverter.forString());
         fontFamily.valueProperty().addListener((observable, oldValue, newValue) -> {
             update(newValue, weight, posture, font.get().getSize());
         });
@@ -148,7 +151,8 @@ public class TextModule extends NodeModule {
         color.setValue(Color.BLACK);
         text.fillProperty().bind(color.valueProperty());
         map.addInput("Color", color);
-        ChoiceInput<TextAlignment> textAlignment = new ChoiceInput<>(TextAlignment.values(), TextAlignment.LEFT, Util.enumConverter(TextAlignment.class));
+        //
+        textAlignment = new ChoiceInput<>(TextAlignment.values(), TextAlignment.LEFT, Util.enumConverter(TextAlignment.class));
         textAlignment.setCellFactory(Util.enumCellFactory());
         textAlignment.valueProperty().addListener((observable, oldValue, newValue) -> {
             text.setTextAlignment(newValue);
@@ -162,6 +166,14 @@ public class TextModule extends NodeModule {
         text.yProperty().bind(location.yProperty().add(yOffset));
         text.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
+    }
+    
+    public ChoiceInput<TextAlignment> getTextAlignment() {
+        return textAlignment;
+    }
+    
+    public ChoiceInput<String> getFontFamily() {
+        return fontFamily;
     }
     
     private String[] getLines(TextAreaInput input) {

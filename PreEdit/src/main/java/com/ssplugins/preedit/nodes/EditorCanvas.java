@@ -4,9 +4,8 @@ import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.edit.NodeModule;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.util.CanvasLayer;
 import com.ssplugins.preedit.util.ExpandableBounds;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -31,9 +30,14 @@ public class EditorCanvas extends StackPane {
     private ExpandableBounds viewport;
     
     public EditorCanvas(double width, double height) {
+        viewport = new ExpandableBounds(0, 0, width, height);
         this.prefWidthProperty().bind(this.minWidthProperty());
         this.prefHeightProperty().bind(this.minHeightProperty());
+        this.minWidthProperty().bind(viewport.widthProperty());
+        this.minHeightProperty().bind(viewport.heightProperty());
         transparentLayer = new Canvas(width, height);
+        transparentLayer.widthProperty().bind(this.minWidthProperty());
+        transparentLayer.heightProperty().bind(this.minHeightProperty());
         debug = new Canvas(width, height);
         debug.setMouseTransparent(true);
         setCanvasSize(width, height);
@@ -42,11 +46,11 @@ public class EditorCanvas extends StackPane {
         posPane = new Pane();
         this.getChildren().add(posPane);
         handle = new ResizeHandle();
+        handle.translateXProperty().bind(viewport.xProperty().negate());
+        handle.translateYProperty().bind(viewport.yProperty().negate());
         posPane.getChildren().add(handle);
         posPane.getChildren().add(debug);
         bgPane.getChildren().add(transparentLayer);
-    
-        viewport = new ExpandableBounds(0, 0, width, height);
     }
     
     public static Canvas debugCanvas() {
@@ -93,10 +97,13 @@ public class EditorCanvas extends StackPane {
     }
     
     public void setCanvasSize(double width, double height) {
-        this.setMinWidth(width);
-        this.setMinHeight(height);
-        transparentLayer.setWidth(width);
-        transparentLayer.setHeight(height);
+//        this.setMinWidth(width);
+//        this.setMinHeight(height);
+        viewport.setOriginalWidth(width);
+        viewport.setOriginalHeight(height);
+        viewport.reset();
+//        transparentLayer.setWidth(width);
+//        transparentLayer.setHeight(height);
         debug.setWidth(width);
         debug.setHeight(height);
     }
@@ -142,8 +149,7 @@ public class EditorCanvas extends StackPane {
     
     public void renderImage(boolean display, List<Module> modules, boolean editor) throws SilentFailException {
         clearAll();
-        if (display) fillTransparent();
-        else handle.hide();
+        viewport.reset();
         ListIterator<Module> it = modules.listIterator(modules.size());
         for (Node node : this.getChildren()) {
             if (!(node instanceof PaneCanvas)) continue;
@@ -151,35 +157,41 @@ public class EditorCanvas extends StackPane {
             paneCanvas.clearNode();
             if (!it.hasPrevious()) break;
             Module m = it.previous();
-            Canvas canvas = paneCanvas.getCanvas();
-            canvas.setEffect(null);
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.save();
+            if (paneCanvas.canvasLoaded()) {
+                paneCanvas.getCanvas().setEffect(null);
+                paneCanvas.getGraphics().save();
+            }
             if (m instanceof NodeModule) {
                 Node n = ((NodeModule) m).getNode();
                 n.setEffect(null);
                 paneCanvas.setNode(n);
-                renderEffects(m.getEffects(), canvas, gc, n, editor);
+                ((NodeModule) m).requestExpansion(viewport);
+                renderEffects(m.getEffects(), paneCanvas, n, editor);
             }
             else {
-                m.draw(canvas, gc, editor);
-                renderEffects(m.getEffects(), canvas, gc, null, editor);
+                m.draw(paneCanvas, editor);
+                renderEffects(m.getEffects(), paneCanvas, null, editor);
             }
-            gc.restore();
+            if (paneCanvas.canvasLoaded()) {
+                paneCanvas.getGraphics().restore();
+            }
         }
+        if (display) fillTransparent();
+        else handle.hide();
+        
     }
     
-    private void renderEffects(List<Effect> list, Canvas c, GraphicsContext context, Node node, boolean editor) throws SilentFailException {
+    private void renderEffects(List<Effect> list, CanvasLayer canvas, Node node, boolean editor) throws SilentFailException {
         ListIterator<Effect> it = list.listIterator();
         while (it.hasNext()) {
             Effect e = it.next();
             e.reset();
-            e.apply(c, context, node, editor);
+            e.apply(canvas, node, editor);
         }
     }
     
     private PaneCanvas newLayer() {
-        PaneCanvas c = new PaneCanvas(this.getMinWidth(), this.getMinHeight());
+        PaneCanvas c = new PaneCanvas(this.getMinWidth(), this.getMinHeight(), viewport);
         c.minWidthProperty().bind(this.minWidthProperty());
         c.minHeightProperty().bind(this.minHeightProperty());
         this.getChildren().add(this.getChildren().size() - 1, c);

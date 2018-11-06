@@ -181,6 +181,12 @@ public final class Util {
         return bounds.getMinY() + bounds.getHeight() / 2;
     }
     
+    public static <T> void softBind(Property<T> value, Property<T> property) {
+        property.addListener((observable, oldValue, newValue) -> {
+            value.setValue(newValue);
+        });
+    }
+    
     public static Property<Number> bindingToProperty(NumberBinding binding) {
         ObjectProperty<Number> o = new SimpleObjectProperty<>(binding.getValue());
         binding.addListener((observable, oldValue, newValue) -> {

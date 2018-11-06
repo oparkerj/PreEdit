@@ -1,39 +1,37 @@
 package com.ssplugins.preedit.nodes;
 
-import javafx.beans.property.IntegerProperty;
+import com.ssplugins.preedit.util.CanvasLayer;
+import com.ssplugins.preedit.util.ExpandableBounds;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
-public class PaneCanvas extends Pane {
+public class PaneCanvas extends Pane implements CanvasLayer {
+    
+    private ExpandableBounds viewport;
     
     private Canvas canvas;
     private ObjectProperty<Node> node;
     
     private Rectangle clip;
-    private IntegerProperty clipX, clipY, clipWidth, clipHeight;
     
-    public PaneCanvas(double width, double height) {
+    public PaneCanvas(double width, double height, ExpandableBounds viewport) {
+        this.viewport = viewport;
+        this.translateXProperty().bind(viewport.xProperty().negate());
+        this.translateYProperty().bind(viewport.yProperty().negate());
         this.prefWidthProperty().bind(this.minWidthProperty());
         this.prefHeightProperty().bind(this.minHeightProperty());
-        canvas = new Canvas(width, height);
-        canvas.widthProperty().bind(this.minWidthProperty());
-        canvas.heightProperty().bind(this.minHeightProperty());
         clip = new Rectangle(width, height);
-        clipX = new SimpleIntegerProperty();
-        clipY = new SimpleIntegerProperty();
-        clipWidth = new SimpleIntegerProperty((int) this.getWidth());
-        clipHeight = new SimpleIntegerProperty((int) this.getHeight());
-        clip.xProperty().bind(this.clipX);
-        clip.yProperty().bind(this.clipY);
-        clip.widthProperty().bind(clipWidth);
-        clip.heightProperty().bind(clipHeight);
+        clip.xProperty().bind(viewport.xProperty());
+        clip.yProperty().bind(viewport.yProperty());
+        clip.widthProperty().bind(viewport.widthProperty());
+        clip.heightProperty().bind(viewport.heightProperty());
         this.setClip(clip);
-        this.getChildren().add(canvas);
+//        this.getChildren().add(canvas);
         node = new SimpleObjectProperty<>();
         node.addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
@@ -45,8 +43,29 @@ public class PaneCanvas extends Pane {
         });
     }
     
+    @Override
+    public boolean canvasLoaded() {
+        return canvas != null;
+    }
+    
+    @Override
     public Canvas getCanvas() {
+        if (canvas == null) {
+            canvas = new Canvas(this.getMinWidth(), this.getMinHeight());
+            canvas.widthProperty().bind(this.minWidthProperty());
+            canvas.heightProperty().bind(this.minHeightProperty());
+        }
         return canvas;
+    }
+    
+    @Override
+    public GraphicsContext getGraphics() {
+        return getCanvas().getGraphicsContext2D();
+    }
+    
+    @Override
+    public ExpandableBounds getExpandableBounds() {
+        return viewport;
     }
     
     public Node getNode() {
