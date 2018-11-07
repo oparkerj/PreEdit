@@ -8,7 +8,6 @@ import com.ssplugins.preedit.input.NumberInput;
 import com.ssplugins.preedit.nodes.ResizeHandle;
 import com.ssplugins.preedit.util.ExpandableBounds;
 import com.ssplugins.preedit.util.Range;
-import com.ssplugins.preedit.util.Util;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
@@ -33,8 +32,8 @@ public class TopText extends MultiNodeModule {
     
     @Override
     public void addNodes() {
-        text.getFontFamily().setValue("Impact");
-        text.getTextAlignment().setValue(TextAlignment.CENTER);
+        text.getFontFamily().setDefaultValue("Impact");
+        text.getTextAlignment().setDefaultValue(TextAlignment.CENTER);
         addModule(solid);
         addModule(text);
     }
@@ -61,12 +60,7 @@ public class TopText extends MultiNodeModule {
     
     @Override
     public void linkResizeHandle(ResizeHandle handle) {
-        handle.link(solid.getBounds());
-        handle.layoutXProperty().set(0);
-        handle.link(ResizeHandle.HandleProperty.Y, Util.bindingToProperty(totalHeight.negate()));
-        handle.setDraggable(false);
-        handle.setSizeable(false);
-        handle.setSpinnable(false);
+        handle.hide();
     }
     
     @Override
@@ -76,12 +70,12 @@ public class TopText extends MultiNodeModule {
     
     @Override
     public String getName() {
-        return "TopText";
+        return "Top Text";
     }
     
     @Override
     protected void defineInputs(InputMap map) {
-        map.copyInputs(text.getInputs(), "Text", "Placeholders", "Alignment", "Wrap Width", "Location");
+        map.copyInputs(text.getInputs(), "Text", "Placeholders", "Wrap Width", "Location");
         map.copyInputs(solid.getInputs(), "Background", "Location");
         NumberInput padding = new NumberInput(false);
         padding.setRange(Range.lowerBound(0));

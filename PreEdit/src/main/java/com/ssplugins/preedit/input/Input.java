@@ -24,7 +24,7 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     private N node;
     private UserInput<N> displayNode;
     private JsonConverter<O> converter;
-    private boolean ready, gen, init, undoSetup;
+    private boolean ready, gen, init, undoSetup, loaded;
     private int order = -1;
     private BooleanProperty userProvided = new SimpleBooleanProperty(false);
     private Runnable update;
@@ -72,6 +72,10 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     
     public final boolean isInit() {
         return init;
+    }
+    
+    public final boolean isLoaded() {
+        return loaded;
     }
     
     protected final void setSlideAction(UserInput.SlideAction<N> action, Function<N, Double> function) {
@@ -168,6 +172,10 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
         setNodeValue(node, o);
     }
     
+    public final void setDefaultValue(O o) {
+        if (!loaded) setValue(o);
+    }
+    
     public final void init(O o) {
         init = true;
         setValue(o);
@@ -180,6 +188,7 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
     
     public final void deserialize(JsonElement value) {
         init(converter.fromJson(value));
+        loaded = true;
     }
     
     public final boolean isValid() {
