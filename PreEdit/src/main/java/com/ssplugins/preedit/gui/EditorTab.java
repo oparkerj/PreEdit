@@ -1,5 +1,6 @@
 package com.ssplugins.preedit.gui;
 
+import com.google.gson.JsonParseException;
 import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.api.PreEditTab;
 import com.ssplugins.preedit.edit.Catalog;
@@ -7,6 +8,7 @@ import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.exceptions.SilentFailException;
+import com.ssplugins.preedit.exceptions.SimpleException;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.modules.FileImage;
@@ -207,17 +209,23 @@ public class EditorTab extends BorderPane implements PreEditTab {
                 return;
             }
             checkSave();
-            Optional<Template> template = base.getCatalog().loadTemplate(newValue);
-            if (template.isPresent()) {
-                if (!state.isSaved() && !base.getCatalog().templateExists(oldValue)) {
-                    selector.getItems().remove(oldValue);
-                    return;
+            try {
+                Optional<Template> template = base.getCatalog().loadTemplate(newValue);
+                if (template.isPresent()) {
+                    if (!state.isSaved() && !base.getCatalog().templateExists(oldValue)) {
+                        selector.getItems().remove(oldValue);
+                        return;
+                    }
+                    resetNodes();
+                    state.templateProperty().set(template.get());
                 }
-                resetNodes();
-                state.templateProperty().set(template.get());
-            }
-            else {
-                Dialogs.show("Could not find template \"" + newValue + "\".", null, AlertType.WARNING);
+                else {
+                    Dialogs.show("Could not find template \"" + newValue + "\".", null, AlertType.WARNING);
+                }
+            } catch (JsonParseException e) {
+                if (e.getCause() instanceof SimpleException) {
+                    Dialogs.show(e.getCause().getMessage(), null, AlertType.WARNING);
+                }
             }
         });
         toolbar.getItems().add(selector);

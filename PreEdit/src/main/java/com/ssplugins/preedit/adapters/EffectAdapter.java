@@ -3,6 +3,7 @@ package com.ssplugins.preedit.adapters;
 import com.google.gson.*;
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.edit.Effect;
+import com.ssplugins.preedit.exceptions.SimpleException;
 
 import java.lang.reflect.Type;
 
@@ -18,7 +19,7 @@ public class EffectAdapter implements JsonSerializer<Effect>, JsonDeserializer<E
     public Effect deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = element.getAsJsonObject();
         String name = json.get("name").getAsString();
-        Effect effect = catalog.createEffect(name).orElseThrow(() -> new JsonParseException("Could not create effect \"" + name + "\""));
+        Effect effect = catalog.createEffect(name).orElseThrow(() -> new JsonParseException(new SimpleException("Template uses effect \"" + name + "\" which is missing.")));
         if (json.has("displayName")) {
             JsonElement display = json.get("displayName");
             if (!display.isJsonNull()) effect.setDisplayName(display.getAsString());

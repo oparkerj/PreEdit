@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.ssplugins.preedit.edit.Catalog;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
+import com.ssplugins.preedit.exceptions.SimpleException;
 import com.ssplugins.preedit.util.wrapper.ShiftList;
 
 import java.lang.reflect.Type;
@@ -25,7 +26,7 @@ public class ModuleAdapter implements JsonSerializer<Module>, JsonDeserializer<M
     public Module deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = element.getAsJsonObject();
         String name = json.get("name").getAsString();
-        Module module = catalog.createModule(name).orElseThrow(() -> new JsonParseException("Could not create module \"" + name + "\""));
+        Module module = catalog.createModule(name).orElseThrow(() -> new JsonParseException(new SimpleException("Template uses module \"" + name + "\" which is missing.")));
         if (json.has("displayName")) {
             JsonElement display = json.get("displayName");
             if (!display.isJsonNull()) module.setDisplayName(display.getAsString());
