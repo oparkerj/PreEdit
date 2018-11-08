@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -84,7 +85,7 @@ public class PreEdit extends Application implements PreEditAPI {
     }
     
     private List<String> loadAddons() {
-        File dir = new File("addons");
+        File dir = new File(getApplicationDirectory(), "addons");
         dir.mkdirs();
         if (!dir.exists()) return Collections.emptyList();
         File[] files = dir.listFiles();
@@ -191,6 +192,14 @@ public class PreEdit extends Application implements PreEditAPI {
                 editTab.getState().templateProperty().set(template);
                 editTab.getState().upToDateProperty().set(false);
             });
+        }
+    }
+    
+    public static File getApplicationDirectory() {
+        try {
+            return new File(PreEdit.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+        } catch (URISyntaxException e) {
+            return new File(".");
         }
     }
     

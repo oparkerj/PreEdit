@@ -1,6 +1,7 @@
 package com.ssplugins.preedit.edit;
 
 import com.google.gson.*;
+import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.adapters.EffectAdapter;
 import com.ssplugins.preedit.adapters.InputMapAdapter;
 import com.ssplugins.preedit.adapters.ModuleAdapter;
@@ -17,7 +18,7 @@ import java.util.*;
 
 public class Catalog {
     
-    private static final Path TEMPLATE_PATH = Paths.get("templates.json");
+    private static final Path TEMPLATE_PATH = Paths.get(PreEdit.getApplicationDirectory().getPath(), "templates.json");
     private Gson gson;
     
     private JsonObject data;
