@@ -35,12 +35,16 @@ public class FileInput extends Input<GridMap, File> {
         label.setText(file.getAbsolutePath());
     }
     
+    public static FileChooser.ExtensionFilter getExtensionFilter() {
+        return new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif");
+    }
+    
     @Override
     protected GridMap createInputNode() {
         GridMap map = new GridMap();
         Button btn = new Button("Choose File");
         btn.setOnAction(event -> {
-            Optional<File> op = Dialogs.chooseFile(PreEdit.stage(), null, new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif"));
+            Optional<File> op = Dialogs.chooseFile(PreEdit.stage(), null, getExtensionFilter());
             op.ifPresent(file -> {
                 label.setText(file.getAbsolutePath());
             });

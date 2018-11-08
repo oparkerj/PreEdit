@@ -3,9 +3,12 @@ package com.ssplugins.preedit;
 import com.ssplugins.preedit.api.AddonLoader;
 import com.ssplugins.preedit.api.PreEditAPI;
 import com.ssplugins.preedit.edit.Catalog;
+import com.ssplugins.preedit.edit.Template;
 import com.ssplugins.preedit.effects.*;
+import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.gui.GUI;
 import com.ssplugins.preedit.gui.Menu;
+import com.ssplugins.preedit.input.FileInput;
 import com.ssplugins.preedit.modules.*;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.GridScene;
@@ -26,7 +29,7 @@ import java.util.stream.Stream;
 public class PreEdit extends Application implements PreEditAPI {
     
     public static void main(String[] args) {
-        Application.launch(PreEdit.class);
+        Application.launch(PreEdit.class, args);
     }
     
     public static final String NAME = "PreEdit";
@@ -152,6 +155,43 @@ public class PreEdit extends Application implements PreEditAPI {
             tabPane.prefWidthProperty().bind(stage.widthProperty());
             tabPane.prefHeightProperty().bind(stage.heightProperty());
         });
+    
+        loadParameters();
+    }
+    
+    private void loadParameters() {
+        List<String> params = this.getParameters().getRaw();
+        if (params.size() > 0) {
+            File file = new File(params.get(0));
+            if (!file.exists()) {
+                Dialogs.show("Input file does not exist.", null, Alert.AlertType.WARNING);
+                return;
+            }
+            String name = file.getName().toLowerCase();
+            String ext = name.substring(name.lastIndexOf('.'));
+            List<String> extensions = FileInput.getExtensionFilter().getExtensions();
+            if (extensions.stream().map(s -> s.substring(1)).noneMatch(s -> s.equals(ext))) {
+                Dialogs.show("Input file should be one of the following formats:\n" + String.join(", ", extensions), null, Alert.AlertType.WARNING);
+                return;
+            }
+            
+            FileImage image = new FileImage();
+            image.setDelegate(ImageModule.Delegate.NOT_NEXT);
+            image.setFile(file);
+            Platform.runLater(() -> {
+                Optional<Image> img = image.getImage();
+                if (!img.isPresent()) {
+                    Dialogs.show("Unable to load input image.", null, Alert.AlertType.WARNING);
+                    return;
+                }
+                Template template = new Template("", (int) img.get().getWidth(), (int) img.get().getHeight());
+                template.addModule(image);
+                getMenu().selectTab(getMenu().getEditTabRaw());
+                EditorTab editTab = getMenu().getEditTab();
+                editTab.getState().templateProperty().set(template);
+                editTab.getState().upToDateProperty().set(false);
+            });
+        }
     }
     
     public Menu getMenu() {

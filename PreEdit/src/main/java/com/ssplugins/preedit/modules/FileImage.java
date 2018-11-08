@@ -32,12 +32,12 @@ public class FileImage extends ImageModule {
                     setImage(null, init);
                     return;
                 }
-                new Thread(() -> {
+                FileImage.this.runDelegate(() -> {
                     Image img = new Image("file:" + f.getAbsolutePath());
                     Platform.runLater(() -> {
                         setImage(img, init);
                     });
-                }).start();
+                });
             } catch (Exception e) {
                 setImage(null, false);
             }

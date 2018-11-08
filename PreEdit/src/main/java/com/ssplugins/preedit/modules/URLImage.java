@@ -9,7 +9,6 @@ import javafx.scene.image.Image;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -41,7 +40,7 @@ public class URLImage extends ImageModule {
                 setImage(null, init);
                 return;
             }
-            new Thread(() -> {
+            URLImage.this.runDelegate(() -> {
                 try {
                     URLConnection conn = new URL(link).openConnection();
                     conn.setRequestProperty("User-Agent", PreEdit.NAME + " (" + PreEdit.REPO + ")");
@@ -57,7 +56,7 @@ public class URLImage extends ImageModule {
                 } catch (IllegalArgumentException | IOException e) {
                     input.note("Unable to get image from URL: " + e.getMessage());
                 }
-            }).start();
+            });
         });
         map.addInput("URL", input);
     }

@@ -11,10 +11,14 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.util.Optional;
+
 public class ImageModule extends NodeModule {
     
     private Image image;
     private ImageView view;
+    
+    private Delegate delegate = Delegate.ALL;
     
     public void setImage(Image image, boolean init) {
         this.image = image;
@@ -25,6 +29,36 @@ public class ImageModule extends NodeModule {
                 input.heightProperty().set((int) image.getHeight());
             });
         }
+    }
+    
+    protected void runDelegate(Runnable runnable) {
+        if (delegate == Delegate.NONE || delegate == Delegate.NOT_NEXT) {
+            runnable.run();
+        }
+        else {
+            new Thread(runnable).start();
+        }
+        if (delegate == Delegate.NEXT) {
+            delegate = Delegate.NONE;
+        }
+        else if (delegate == Delegate.NOT_NEXT) {
+            delegate = Delegate.ALL;
+        }
+    }
+    
+    public Optional<Image> getImage() {
+        return Optional.ofNullable(image);
+    }
+    
+    public Delegate getDelegate() {
+        return delegate;
+    }
+    
+    public void setDelegate(Delegate delegate) {
+        if (delegate == null) {
+            return;
+        }
+        this.delegate = delegate;
     }
     
     @Override
@@ -68,6 +102,13 @@ public class ImageModule extends NodeModule {
         view.rotateProperty().bind(location.angleProperty());
         map.addInput("Location", location);
         map.addInput("hidden", new HiddenInput());
+    }
+    
+    public enum Delegate {
+        ALL,
+        NEXT,
+        NOT_NEXT,
+        NONE
     }
     
 }

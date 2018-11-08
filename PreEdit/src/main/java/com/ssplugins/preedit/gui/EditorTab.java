@@ -169,6 +169,13 @@ public class EditorTab extends BorderPane implements PreEditTab {
     }
     
     public void save() {
+        if (state.getTemplate().getName().isEmpty()) {
+            Optional<String> name = Dialogs.input("Enter name for the template:", null, "Template Name");
+            if (!name.isPresent()) {
+                return;
+            }
+            state.getTemplate().setName(name.get());
+        }
         base.getCatalog().saveTemplate(state.getTemplate());
         state.savedProperty().set(true);
     }
@@ -202,6 +209,9 @@ public class EditorTab extends BorderPane implements PreEditTab {
         selector.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 resetNodes();
+                return;
+            }
+            if (newValue.isEmpty()) {
                 return;
             }
             if (loading.get()) {
@@ -328,6 +338,9 @@ public class EditorTab extends BorderPane implements PreEditTab {
         canvas = new EditorCanvas(CANVAS_MIN, CANVAS_MIN);
         state.templateProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
+            if (selector.getValue() == null || !selector.getValue().equals(newValue.getName())) {
+                selector.setValue("");
+            }
             newValue.setEditor(editControls);
             canvas.clearAll();
             canvas.setLayerCount(newValue.getModules().size());
