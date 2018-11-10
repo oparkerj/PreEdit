@@ -25,6 +25,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
@@ -366,7 +367,8 @@ public class EditorTab extends BorderPane implements PreEditTab {
         canvas.addEventFilter(MouseEvent.ANY, event -> {
             getSelectedModule().ifPresent(module -> module.onMouseEvent(event, editControls));
         });
-        canvasPane.add(canvas, 0, 0);
+        Group canvasZoom = new Group(canvas);
+        canvasPane.add(canvasZoom, 0, 0);
         ///////////////////// Draggables ///////////////////////
         if (editControls) {
             canvasArea.setOnDragOver(event -> {
