@@ -6,12 +6,17 @@ import com.ssplugins.preedit.edit.NodeModule;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.util.CanvasLayer;
 import com.ssplugins.preedit.util.ExpandableBounds;
+import com.ssplugins.preedit.util.Range;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -28,6 +33,10 @@ public class EditorCanvas extends StackPane {
     private static Canvas debug;
     
     private ExpandableBounds viewport;
+    
+    private DoubleProperty scaleFactor;
+    private Scale scale;
+    private Range scaleRange;
     
     public EditorCanvas(double width, double height) {
         viewport = new ExpandableBounds(0, 0, width, height);
@@ -51,6 +60,16 @@ public class EditorCanvas extends StackPane {
         posPane.getChildren().add(handle);
         posPane.getChildren().add(debug);
         bgPane.getChildren().add(transparentLayer);
+    
+        scaleFactor = new SimpleDoubleProperty(1);
+        scaleRange = Range.from(0.1, 5);
+        scale = new Scale(scaleFactor.get(), scaleFactor.get());
+        scale.xProperty().bind(scaleFactor);
+        scale.yProperty().bind(scaleFactor);
+        DoubleBinding offset = this.widthProperty().multiply(scaleFactor.negate().add(1)).divide(2);
+        this.translateXProperty().bind(offset);
+        this.translateYProperty().bind(offset);
+        this.getTransforms().addAll(scale);
     }
     
     public static Canvas debugCanvas() {
@@ -74,6 +93,18 @@ public class EditorCanvas extends StackPane {
     
     public ExpandableBounds getViewport() {
         return viewport;
+    }
+    
+    public double getScaleFactor() {
+        return scaleFactor.get();
+    }
+    
+    public DoubleProperty scaleFactorProperty() {
+        return scaleFactor;
+    }
+    
+    public Range getScaleRange() {
+        return scaleRange;
     }
     
     public NodeHandle createNodeHandle() {

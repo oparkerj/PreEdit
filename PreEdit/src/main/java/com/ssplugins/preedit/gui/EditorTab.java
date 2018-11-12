@@ -366,6 +366,19 @@ public class EditorTab extends BorderPane implements PreEditTab {
         canvas.addEventFilter(MouseEvent.ANY, event -> {
             getSelectedModule().ifPresent(module -> module.onMouseEvent(event, editControls));
         });
+        canvasArea.addEventFilter(ScrollEvent.SCROLL, event -> {
+            if (!event.isAltDown()) {
+                return;
+            }
+            event.consume();
+            double delta = event.isControlDown() ? 0.05 : 0.15;
+            if (event.getDeltaY() < 0) {
+                canvas.scaleFactorProperty().set(canvas.getScaleRange().clamp(canvas.getScaleFactor() - delta));
+            }
+            else {
+                canvas.scaleFactorProperty().set(canvas.getScaleRange().clamp(canvas.getScaleFactor() + delta));
+            }
+        });
         canvasPane.add(canvas, 0, 0);
         ///////////////////// Draggables ///////////////////////
         if (editControls) {
