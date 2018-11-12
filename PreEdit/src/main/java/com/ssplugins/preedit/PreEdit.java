@@ -192,7 +192,7 @@ public class PreEdit extends Application implements PreEditAPI {
                 getMenu().selectTab(getMenu().getEditTabRaw());
                 EditorTab editTab = getMenu().getEditTab();
                 editTab.getState().templateProperty().set(template);
-                editTab.getState().upToDateProperty().set(false);
+                editTab.getState().savedProperty().set(false);
             });
         }
     }
