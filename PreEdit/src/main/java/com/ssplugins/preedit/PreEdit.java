@@ -78,10 +78,6 @@ public class PreEdit extends Application implements PreEditAPI {
         catalog.registerEffect("MotionBlur", MotionBlurEffect.class);
         catalog.registerEffect("Reflection", ReflectionEffect.class);
         catalog.registerEffect("Clip", ClipEffect.class);
-        
-        catalog.registerEffect("Scale", ScaleEffect.class);
-        
-//        catalog.registerEffect("BoundingBox", BoundingBoxEffect.class);
     }
     
     private List<String> loadAddons() {
