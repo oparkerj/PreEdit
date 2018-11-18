@@ -198,15 +198,18 @@ public class Launcher {
         if (!hasVersion(version)) {
             throw new IllegalArgumentException();
         }
-        List<String> append = new ArrayList<>();
-        append.add("wd:" + dir.getPath());
-        if (msg != null) {
-            append.add("msg:" + msg);
-        }
-        append.addAll(Arrays.asList(args));
-        args = append.toArray(new String[0]);
         File file = getVersionFile(version);
-        Runtime.getRuntime().exec("java -jar " + file.getPath() + " " + String.join(" ", args));
+        List<String> command = new ArrayList<>();
+        command.add("java");
+        command.add("-jar");
+        command.add(file.getPath());
+        command.add("wd:" + dir.getPath());
+        if (msg != null) {
+            command.add("msg:" + msg);
+        }
+        command.addAll(Arrays.asList(args));
+        ProcessBuilder builder = new ProcessBuilder(command);
+        builder.start();
     }
     
     public Update downloadLatestVersion() throws IOException, UnirestException {
