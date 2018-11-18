@@ -9,6 +9,10 @@ public interface GUI {
     
     PreEditTab getEditorTab();
     
+    Tab editorTab();
+    
+    Tab generatorTab();
+    
     void addTab(Tab tab);
     
     void selectTab(Tab tab);

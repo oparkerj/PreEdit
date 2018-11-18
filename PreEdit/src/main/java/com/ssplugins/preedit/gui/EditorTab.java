@@ -12,6 +12,7 @@ import com.ssplugins.preedit.exceptions.SimpleException;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.modules.FileImage;
+import com.ssplugins.preedit.modules.ImageModule;
 import com.ssplugins.preedit.modules.TextModule;
 import com.ssplugins.preedit.modules.URLImage;
 import com.ssplugins.preedit.nodes.EditorCanvas;
@@ -28,6 +29,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -147,6 +149,9 @@ public class EditorTab extends BorderPane implements PreEditTab {
     
     void updateTemplates() {
         selector.setItems(FXCollections.observableArrayList(base.getCatalog().getTemplates()));
+        if (state.isTemplateLoaded()) {
+            selector.setValue(state.getTemplate().getName());
+        }
     }
     
     public State getState() {
@@ -176,8 +181,8 @@ public class EditorTab extends BorderPane implements PreEditTab {
             }
             state.getTemplate().setName(name.get());
         }
-        base.getCatalog().saveTemplate(state.getTemplate());
         state.savedProperty().set(true);
+        base.getCatalog().saveTemplate(state.getTemplate());
     }
     
     @Override
@@ -198,6 +203,11 @@ public class EditorTab extends BorderPane implements PreEditTab {
     @Override
     public Optional<BufferedImage> renderImage() {
         return renderPNG();
+    }
+    
+    @Override
+    public Optional<WritableImage> renderImageRaw() {
+        return renderRaw();
     }
     
     private void defineNodes() {
@@ -277,7 +287,6 @@ public class EditorTab extends BorderPane implements PreEditTab {
                     base.getCatalog().removeTemplate(state.getTemplate());
                     base.getCatalog().saveData();
                     resetNodes();
-                    updateTemplates();
                 });
             });
             toolbar.getItems().addAll(btnDelete);
@@ -300,10 +309,7 @@ public class EditorTab extends BorderPane implements PreEditTab {
             btnCopy = new Button("Copy to Clipboard");
             btnCopy.setOnAction(event -> {
                 renderRaw().ifPresent(image -> {
-                    Clipboard board = Clipboard.getSystemClipboard();
-                    ClipboardContent content = new ClipboardContent();
-                    content.putImage(image);
-                    board.setContent(content);
+                    Util.copyToClipboard(image);
                     
                     Popup popup = new Popup();
                     popup.setAutoFix(true);
@@ -366,41 +372,70 @@ public class EditorTab extends BorderPane implements PreEditTab {
         canvas.addEventFilter(MouseEvent.ANY, event -> {
             getSelectedModule().ifPresent(module -> module.onMouseEvent(event, editControls));
         });
-        canvasArea.addEventFilter(ScrollEvent.SCROLL, event -> {
-            if (!event.isAltDown()) {
-                return;
-            }
-            event.consume();
-            double delta = event.isControlDown() ? 0.05 : 0.15;
-            if (event.getDeltaY() < 0) {
-                canvas.scaleFactorProperty().set(canvas.getScaleRange().clamp(canvas.getScaleFactor() - delta));
-            }
-            else {
-                canvas.scaleFactorProperty().set(canvas.getScaleRange().clamp(canvas.getScaleFactor() + delta));
-            }
-        });
+//        canvasArea.addEventFilter(ScrollEvent.SCROLL, event -> {
+//            if (!event.isAltDown()) {
+//                return;
+//            }
+//            event.consume();
+//            double delta = event.isControlDown() ? 0.05 : 0.15;
+//            if (event.getDeltaY() < 0) {
+//                canvas.scaleFactorProperty().set(canvas.getScaleRange().clamp(canvas.getScaleFactor() - delta));
+//            }
+//            else {
+//                canvas.scaleFactorProperty().set(canvas.getScaleRange().clamp(canvas.getScaleFactor() + delta));
+//            }
+//        });
+        ScrollHandler canvasScrollHandler = new ScrollHandler(canvas, canvas.getScaleRange(), 0.05, 0.15);
+        canvas.scaleFactorProperty().bindBidirectional(canvasScrollHandler.outputProperty());
         canvasPane.add(canvas, 0, 0);
         ///////////////////// Draggables ///////////////////////
         if (editControls) {
             canvasArea.setOnDragOver(event -> {
-                if (state.getTemplate() == null) return;
                 Dragboard board = event.getDragboard();
-                if (board.hasFiles() || board.hasImage() || board.hasRtf() || board.hasString() || board.hasUrl()) {
+                if (state.getTemplate() == null && board.hasFiles()) {
+                    event.acceptTransferModes(TransferMode.LINK);
+                }
+                else if (board.hasFiles() || board.hasRtf() || board.hasString() || board.hasUrl()) {
                     event.acceptTransferModes(TransferMode.LINK);
                 }
                 else event.consume();
             });
             canvasArea.setOnDragDropped(event -> {
-                if (state.getTemplate() == null) return;
                 Dragboard board = event.getDragboard();
                 boolean dropped = false;
-                if (board.hasFiles()) {
+                if (state.getTemplate() == null) {
                     dropped = true;
                     try {
                         File file = board.getFiles().get(0);
                         String name = file.getName().toLowerCase();
-                        if (!name.endsWith(".png") && !name.endsWith(".jpg") && !name.endsWith(".jpeg") && !name.endsWith(".gif") && !name.endsWith(".bmp"))
+                        if (!name.endsWith(".png") && !name.endsWith(".jpg") && !name.endsWith(".jpeg") && !name.endsWith(".gif") && !name.endsWith(".bmp")) {
                             throw new IllegalArgumentException();
+                        }
+                        FileImage image = new FileImage();
+                        image.setDelegate(ImageModule.Delegate.NOT_NEXT);
+                        image.setFile(file);
+                        Platform.runLater(() -> {
+                            Optional<Image> img = image.getImage();
+                            if (!img.isPresent()) {
+                                Dialogs.show("Unable to load input image.", null, AlertType.WARNING);
+                            }
+                            else {
+                                Template template = new Template("", (int) img.get().getWidth(), (int) img.get().getHeight());
+                                template.addModule(image);
+                                state.templateProperty().set(template);
+                                state.savedProperty().set(false);
+                            }
+                        });
+                    } catch (IllegalArgumentException ignored) {}
+                }
+                else if (board.hasFiles()) {
+                    dropped = true;
+                    try {
+                        File file = board.getFiles().get(0);
+                        String name = file.getName().toLowerCase();
+                        if (!name.endsWith(".png") && !name.endsWith(".jpg") && !name.endsWith(".jpeg") && !name.endsWith(".gif") && !name.endsWith(".bmp")) {
+                            throw new IllegalArgumentException();
+                        }
                         Optional<FileImage> op = base.getCatalog().createModule(FileImage.class);
                         op.ifPresent(fileImage -> {
                             this.addModule(fileImage);
@@ -429,15 +464,18 @@ public class EditorTab extends BorderPane implements PreEditTab {
                             });
                             layers.getSelectionModel().select(urlImage);
                         });
+                        dropped = true;
                     } catch (IllegalArgumentException ignored) {
                     }
                 }
                 else if (board.hasRtf()) {
+                    dropped = true;
                     String text = board.getRtf();
                     Optional<TextModule> op = base.getCatalog().createModule(TextModule.class);
                     dragTextToModule(event, text, op);
                 }
                 else if (board.hasString()) {
+                    dropped = true;
                     String text = board.getString();
                     Optional<TextModule> op = base.getCatalog().createModule(TextModule.class);
                     dragTextToModule(event, text, op);
@@ -716,8 +754,14 @@ public class EditorTab extends BorderPane implements PreEditTab {
             Dialogs.show("There are currently invalid parameters. Unable to export image.", null, AlertType.WARNING);
             return;
         }
+        saveImage(out, img.get());
+        state.render();
+        Dialogs.show("Exported " + out.getName(), null, AlertType.INFORMATION);
+    }
+    
+    public static void saveImage(File out, BufferedImage image) {
         try {
-            BufferedImage bi = img.get();
+            BufferedImage bi = image;
             int i = out.getName().lastIndexOf('.');
             String format = out.getName().substring(i + 1);
             if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
@@ -726,14 +770,11 @@ public class EditorTab extends BorderPane implements PreEditTab {
             boolean png = ImageIO.write(bi, format, out);
             if (!png) {
                 Dialogs.show("Invalid file extension.", null, AlertType.WARNING);
-                return;
             }
         } catch (IOException e) {
             e.printStackTrace();
             Dialogs.exception("Unable to export image.", null, e);
         }
-        state.render();
-        Dialogs.show("Exported " + out.getName(), null, AlertType.INFORMATION);
     }
     
     private void addModule(Module module) {

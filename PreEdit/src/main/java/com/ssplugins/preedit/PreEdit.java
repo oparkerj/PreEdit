@@ -12,6 +12,7 @@ import com.ssplugins.preedit.input.FileInput;
 import com.ssplugins.preedit.modules.*;
 import com.ssplugins.preedit.util.Dialogs;
 import com.ssplugins.preedit.util.GridScene;
+import com.ssplugins.preedit.util.Util;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -36,6 +37,7 @@ public class PreEdit extends Application implements PreEditAPI {
     public static final String NAME = "PreEdit";
     public static final String REPO = "https://github.com/567legodude/PreEdit";
     private static PreEdit instance;
+    private static File workingDir = null;
     
     private Catalog catalog;
     private Stage stage;
@@ -45,10 +47,6 @@ public class PreEdit extends Application implements PreEditAPI {
     
     public PreEdit() {
         instance = this;
-        catalog = new Catalog(() -> {
-            if (menu != null) getMenu().updateAll();
-        });
-        registerLocalModules();
     }
     
     public static PreEdit getInstance() {
@@ -111,6 +109,7 @@ public class PreEdit extends Application implements PreEditAPI {
                 addonLoader.load(this);
                 addons.add(addonLoader);
             } catch (Throwable t) {
+                Util.logError(t);
                 failed.add(name);
             }
         });
@@ -120,8 +119,14 @@ public class PreEdit extends Application implements PreEditAPI {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
+        loadSpecialParameters();
+        catalog = new Catalog(() -> {
+            if (menu != null) getMenu().updateAll();
+        });
+        registerLocalModules();
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
-            Dialogs.exception("Something went wrong.", null, e);
+            Util.logError(e);
+            Dialogs.exception("Something went wrong. (Error in log file)", null, e);
             Platform.exit();
         });
         stage.setOnCloseRequest(event -> {
@@ -162,46 +167,70 @@ public class PreEdit extends Application implements PreEditAPI {
         loadParameters();
     }
     
+    private void loadSpecialParameters() {
+        List<String> params = this.getParameters().getRaw();
+        for (String param : params) {
+            if (param.startsWith("wd:")) {
+                param = param.substring(3);
+                workingDir = new File(param);
+            }
+        }
+    }
+    
     private void loadParameters() {
         List<String> params = this.getParameters().getRaw();
-        if (params.size() > 0) {
-            File file = new File(params.get(0));
-            if (!file.exists()) {
-                Dialogs.show("Input file does not exist.", null, Alert.AlertType.WARNING);
-                return;
+        for (String param : params) {
+            if (param.startsWith("msg:")) {
+                param = param.substring(4);
+                Dialogs.show(param, null, Alert.AlertType.INFORMATION);
             }
-            String name = file.getName().toLowerCase();
-            String ext = name.substring(name.lastIndexOf('.'));
-            List<String> extensions = FileInput.getExtensionFilter().getExtensions();
-            if (extensions.stream().map(s -> s.substring(1)).noneMatch(s -> s.equals(ext))) {
-                Dialogs.show("Input file should be one of the following formats:\n" + String.join(", ", extensions), null, Alert.AlertType.WARNING);
-                return;
+            else if (param.startsWith("wd:")) {
+                //
             }
-            
-            FileImage image = new FileImage();
-            image.setDelegate(ImageModule.Delegate.NOT_NEXT);
-            image.setFile(file);
-            Platform.runLater(() -> {
-                Optional<Image> img = image.getImage();
-                if (!img.isPresent()) {
-                    Dialogs.show("Unable to load input image.", null, Alert.AlertType.WARNING);
+            else {
+                File file = new File(params.get(0));
+                if (!file.exists()) {
+                    Dialogs.show("Input file does not exist.", null, Alert.AlertType.WARNING);
                     return;
                 }
-                Template template = new Template("", (int) img.get().getWidth(), (int) img.get().getHeight());
-                template.addModule(image);
-                getMenu().selectTab(getMenu().getEditTabRaw());
-                EditorTab editTab = getMenu().getEditTab();
-                editTab.getState().templateProperty().set(template);
-                editTab.getState().savedProperty().set(false);
-            });
+                String name = file.getName().toLowerCase();
+                String ext = name.substring(name.lastIndexOf('.'));
+                List<String> extensions = FileInput.getExtensionFilter().getExtensions();
+                if (extensions.stream().map(s -> s.substring(1)).noneMatch(s -> s.equals(ext))) {
+                    Dialogs.show("Input file should be one of the following formats:\n" + String.join(", ", extensions), null, Alert.AlertType.WARNING);
+                    return;
+                }
+    
+                FileImage image = new FileImage();
+                image.setDelegate(ImageModule.Delegate.NOT_NEXT);
+                image.setFile(file);
+                Platform.runLater(() -> {
+                    Optional<Image> img = image.getImage();
+                    if (!img.isPresent()) {
+                        Dialogs.show("Unable to load input image.", null, Alert.AlertType.WARNING);
+                        return;
+                    }
+                    Template template = new Template("", (int) img.get().getWidth(), (int) img.get().getHeight());
+                    template.addModule(image);
+                    getMenu().selectTab(getMenu().getEditTabRaw());
+                    EditorTab editTab = getMenu().getEditTab();
+                    editTab.getState().templateProperty().set(template);
+                    editTab.getState().savedProperty().set(false);
+                });
+                break;
+            }
         }
     }
     
     public static File getApplicationDirectory() {
+        if (workingDir != null) {
+            return workingDir;
+        }
         try {
-            return new File(PreEdit.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+            workingDir = new File(PreEdit.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+            return workingDir;
         } catch (URISyntaxException e) {
-            return new File(".");
+            return workingDir = new File(".");
         }
     }
     

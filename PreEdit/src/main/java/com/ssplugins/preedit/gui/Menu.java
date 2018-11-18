@@ -75,6 +75,16 @@ public class Menu implements GUI {
     }
     
     @Override
+    public Tab editorTab() {
+        return getEditTabRaw();
+    }
+    
+    @Override
+    public Tab generatorTab() {
+        return getGenerateTabRaw();
+    }
+    
+    @Override
     public void selectTab(Tab tab) {
         tabPane.getSelectionModel().select(tab);
     }

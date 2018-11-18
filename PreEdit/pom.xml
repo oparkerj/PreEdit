@@ -9,8 +9,12 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>PreEdit</artifactId>
+
+    <properties>
+        <output.version>1.0.6</output.version>
+        <output.name>PreEdit-build-${output.version}</output.name>
+    </properties>
 
     <build>
         <plugins>
@@ -24,7 +28,7 @@
                             <mainClass>com.ssplugins.preedit.PreEdit</mainClass>
                         </transformer>
                     </transformers>
-                    <finalName>PreEdit</finalName>
+                    <finalName>${output.name}</finalName>
                 </configuration>
                 <executions>
                     <execution>
@@ -35,50 +39,58 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>1.7.24</version>
-                <executions>
-                    <execution>
-                        <id>l4j</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
-                        <configuration>
-                            <headerType>gui</headerType>
-                            <outfile>target/PreEdit.exe</outfile>
-                            <jar>target/PreEdit.jar</jar>
-                            <icon>icon.ico</icon>
-                            <classPath>
-                                <mainClass>com.ssplugins.preedit.PreEdit</mainClass>
-                                <addDependencies>true</addDependencies>
-                            </classPath>
-                            <jre>
-                                <minVersion>1.8</minVersion>
-                            </jre>
-                            <splash>
-                                <file>icon.bmp</file>
-                                <timeout>30</timeout>
-                                <waitForWindow>true</waitForWindow>
-                            </splash>
-                            <versionInfo>
-                                <fileVersion>${project.version}.0</fileVersion>
-                                <txtFileVersion>${project.version}.0</txtFileVersion>
-                                <fileDescription>PreEdit Image Editor</fileDescription>
-                                <copyright>SSPlugins</copyright>
-                                <productVersion>${project.version}.0</productVersion>
-                                <txtProductVersion>${project.version}.0</txtProductVersion>
-                                <productName>PreEdit</productName>
-                                <internalName>PreEdit</internalName>
-                                <originalFilename>PreEdit.exe</originalFilename>
-                            </versionInfo>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
             </plugin>
+
+            <!--<plugin>-->
+                <!--<groupId>com.akathist.maven.plugins.launch4j</groupId>-->
+                <!--<artifactId>launch4j-maven-plugin</artifactId>-->
+                <!--<version>1.7.24</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>l4j</id>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>launch4j</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<headerType>gui</headerType>-->
+                            <!--<outfile>target/PreEdit.exe</outfile>-->
+                            <!--<jar>target/PreEdit.jar</jar>-->
+                            <!--<icon>icon.ico</icon>-->
+                            <!--<classPath>-->
+                                <!--<mainClass>com.ssplugins.preedit.PreEdit</mainClass>-->
+                                <!--<addDependencies>true</addDependencies>-->
+                            <!--</classPath>-->
+                            <!--<jre>-->
+                                <!--<minVersion>1.8</minVersion>-->
+                            <!--</jre>-->
+                            <!--<splash>-->
+                                <!--<file>icon.bmp</file>-->
+                                <!--<timeout>30</timeout>-->
+                                <!--<waitForWindow>true</waitForWindow>-->
+                            <!--</splash>-->
+                            <!--<versionInfo>-->
+                                <!--<fileVersion>${project.version}.0</fileVersion>-->
+                                <!--<txtFileVersion>${project.version}.0</txtFileVersion>-->
+                                <!--<fileDescription>PreEdit Image Editor</fileDescription>-->
+                                <!--<copyright>SSPlugins</copyright>-->
+                                <!--<productVersion>${project.version}.0</productVersion>-->
+                                <!--<txtProductVersion>${project.version}.0</txtProductVersion>-->
+                                <!--<productName>PreEdit</productName>-->
+                                <!--<internalName>PreEdit</internalName>-->
+                                <!--<originalFilename>PreEdit.exe</originalFilename>-->
+                            <!--</versionInfo>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
 
         <extensions>

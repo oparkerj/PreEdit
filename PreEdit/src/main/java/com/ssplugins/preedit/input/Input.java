@@ -55,7 +55,7 @@ public abstract class Input<N extends Node, O> implements Comparable<Input> {
             });
         }
         this.converter = getJsonConverter();
-        getValue(); // Will mark the input invalid if the
+        getValue(); // Will mark the input invalid if the default value isn't valid
     }
     
     public final int getOrder() {

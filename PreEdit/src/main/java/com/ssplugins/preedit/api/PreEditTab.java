@@ -3,6 +3,7 @@ package com.ssplugins.preedit.api;
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Node;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.WritableImage;
 
 import java.awt.image.BufferedImage;
 import java.util.Optional;
@@ -16,5 +17,7 @@ public interface PreEditTab {
     BooleanBinding templateLoadedProperty();
     
     Optional<BufferedImage> renderImage();
+    
+    Optional<WritableImage> renderImageRaw();
     
 }

@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.util.Collection;
@@ -113,14 +114,14 @@ public final class Dialogs {
         return Optional.ofNullable(chooser.showOpenDialog(stage));
     }
     
-    public static Optional<File> saveFile(Stage stage, String title) {
+    public static Optional<File> saveFile(Window window, String title) {
         if (!Platform.isFxApplicationThread()) {
-            return Util.runFXSafeFlat(() -> saveFile(stage, title));
+            return Util.runFXSafeFlat(() -> saveFile(window, title));
         }
         FileChooser chooser = new FileChooser();
         chooser.setTitle(title == null ? PreEdit.NAME : title);
         chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG Files", "*.png"), new FileChooser.ExtensionFilter("JPEG Files", "*.jpg", "*.jpeg"));
-        File file = chooser.showSaveDialog(stage);
+        File file = chooser.showSaveDialog(window);
         return Optional.ofNullable(file);
     }
     

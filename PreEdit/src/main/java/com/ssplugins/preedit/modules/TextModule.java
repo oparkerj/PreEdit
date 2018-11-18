@@ -68,6 +68,9 @@ public class TextModule extends NodeModule {
         text = new Text();
         unwrapped = new Text();
         outText = new FilteredObjectProperty<>("", s -> {
+            if (s == null || s.isEmpty()) {
+                return Optional.of("");
+            }
             try {
                 Optional<String> out = getInputs().getInput("Placeholders", TextAreaInput.class).map(this::getLines).map(strings -> String.format(s, (Object[]) strings));
                 if (out.isPresent()) return out;

@@ -81,7 +81,7 @@ public class State {
         return template;
     }
     
-    public Boolean getTemplateLoaded() {
+    public Boolean isTemplateLoaded() {
         return templateLoaded.get();
     }
     

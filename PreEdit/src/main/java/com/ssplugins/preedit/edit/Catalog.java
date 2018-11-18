@@ -148,6 +148,7 @@ public class Catalog {
         }
         data.add(template.getName(), gson.toJsonTree(template, Template.class));
         saveData();
+        callback();
     }
     
     public void saveData() {
