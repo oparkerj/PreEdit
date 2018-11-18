@@ -74,7 +74,7 @@ public class Launcher {
     private static void launchVersion(Launcher launcher, Version version) {
         try {
             launcher.launch(version);
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (IOException e) {
             launcher.log(e);
             JOptionPane.showMessageDialog(null, "Unable to load the application. Show the 'errors.log' file to the developer if necessary.");
         }
@@ -98,9 +98,6 @@ public class Launcher {
         } catch (UnirestException e) {
             launcher.log(e);
             JOptionPane.showMessageDialog(null, "Unable to download the latest version of the file.");
-        } catch (ClassNotFoundException e) {
-            launcher.log(e);
-            JOptionPane.showMessageDialog(null, "Unable to load the application.");
         }
     }
     
@@ -193,11 +190,11 @@ public class Launcher {
         return getVersionFile(version).exists();
     }
     
-    public void launch(Version version) throws IOException, ClassNotFoundException {
+    public void launch(Version version) throws IOException {
         launch(version, null);
     }
     
-    public void launch(Version version, String msg) throws IOException, ClassNotFoundException {
+    public void launch(Version version, String msg) throws IOException {
         if (!hasVersion(version)) {
             throw new IllegalArgumentException();
         }
