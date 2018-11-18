@@ -203,9 +203,9 @@ public class Launcher {
         command.add("java");
         command.add("-jar");
         command.add(file.getPath());
-        command.add("wd:" + dir.getPath());
+        command.add("--wd=" + dir.getPath());
         if (msg != null) {
-            command.add("msg:" + msg);
+            command.add("--msg=" + msg);
         }
         command.addAll(Arrays.asList(args));
         ProcessBuilder builder = new ProcessBuilder(command);
