@@ -2,7 +2,6 @@ package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.ResizeHandle;
-import com.ssplugins.preedit.util.CanvasLayer;
 import com.ssplugins.preedit.util.wrapper.ShiftList;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;

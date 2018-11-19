@@ -3,8 +3,8 @@ package com.ssplugins.preedit.input;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
-import com.ssplugins.preedit.util.JsonConverter;
-import com.ssplugins.preedit.util.UndoHistory;
+import com.ssplugins.preedit.util.calc.UndoHistory;
+import com.ssplugins.preedit.util.data.JsonConverter;
 import javafx.scene.control.CheckBox;
 
 public class CheckboxInput extends Input<CheckBox, Boolean> {

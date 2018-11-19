@@ -1,8 +1,8 @@
 package com.ssplugins.preedit.input;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
-import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.data.Range;
 import javafx.beans.property.Property;
 
 import java.util.*;

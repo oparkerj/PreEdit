@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.data;
 
 public class TemplateInfo {
     

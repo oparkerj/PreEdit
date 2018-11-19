@@ -2,6 +2,7 @@ package com.ssplugins.preedit.util;
 
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.nodes.UserInput;
+import com.ssplugins.preedit.util.data.State;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 

@@ -1,9 +1,9 @@
 package com.ssplugins.preedit.input;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
-import com.ssplugins.preedit.util.JsonConverter;
-import com.ssplugins.preedit.util.UndoHistory;
 import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.calc.UndoHistory;
+import com.ssplugins.preedit.util.data.JsonConverter;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

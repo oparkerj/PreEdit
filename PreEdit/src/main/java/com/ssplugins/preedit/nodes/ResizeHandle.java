@@ -1,8 +1,8 @@
 package com.ssplugins.preedit.nodes;
 
 import com.ssplugins.preedit.input.LocationInput;
-import com.ssplugins.preedit.util.SizeHandler;
 import com.ssplugins.preedit.util.UITools;
+import com.ssplugins.preedit.util.calc.SizeHandler;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

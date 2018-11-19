@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.data;
 
 import com.ssplugins.preedit.edit.Template;
 import javafx.beans.binding.BooleanBinding;

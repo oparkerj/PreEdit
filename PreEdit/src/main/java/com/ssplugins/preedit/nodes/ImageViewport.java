@@ -2,9 +2,9 @@ package com.ssplugins.preedit.nodes;
 
 import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.util.Dialogs;
-import com.ssplugins.preedit.util.Range;
-import com.ssplugins.preedit.util.ScrollHandler;
 import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.calc.ScrollHandler;
+import com.ssplugins.preedit.util.data.Range;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

@@ -1,6 +1,6 @@
 package com.ssplugins.preedit.nodes;
 
-import com.ssplugins.preedit.util.Range;
+import com.ssplugins.preedit.util.data.Range;
 import com.ssplugins.preedit.util.wrapper.FilteredObjectProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

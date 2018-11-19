@@ -1,5 +1,6 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.edit;
 
+import com.ssplugins.preedit.util.calc.ExpandableBounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 

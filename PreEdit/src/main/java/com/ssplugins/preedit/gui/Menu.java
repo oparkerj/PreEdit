@@ -2,7 +2,7 @@ package com.ssplugins.preedit.gui;
 
 import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.api.PreEditTab;
-import com.ssplugins.preedit.util.GridScene;
+import com.ssplugins.preedit.util.wrapper.GridScene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;

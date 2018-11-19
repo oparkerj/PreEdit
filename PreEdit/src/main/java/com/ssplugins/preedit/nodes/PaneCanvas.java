@@ -1,7 +1,7 @@
 package com.ssplugins.preedit.nodes;
 
-import com.ssplugins.preedit.util.CanvasLayer;
-import com.ssplugins.preedit.util.ExpandableBounds;
+import com.ssplugins.preedit.edit.CanvasLayer;
+import com.ssplugins.preedit.util.calc.ExpandableBounds;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;

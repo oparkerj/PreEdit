@@ -2,6 +2,7 @@ package com.ssplugins.preedit.util;
 
 import com.ssplugins.preedit.PreEdit;
 import com.ssplugins.preedit.nodes.NumberField;
+import com.ssplugins.preedit.util.data.TemplateInfo;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.*;

@@ -1,12 +1,12 @@
 package com.ssplugins.preedit.effects;
 
+import com.ssplugins.preedit.edit.CanvasLayer;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.input.ChoiceInput;
 import com.ssplugins.preedit.input.ColorInput;
 import com.ssplugins.preedit.input.InputMap;
-import com.ssplugins.preedit.util.CanvasLayer;
-import com.ssplugins.preedit.util.Range;
 import com.ssplugins.preedit.util.Util;
+import com.ssplugins.preedit.util.data.Range;
 import javafx.scene.Node;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;

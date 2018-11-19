@@ -1,13 +1,13 @@
 package com.ssplugins.preedit.effects;
 
+import com.ssplugins.preedit.edit.CanvasLayer;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.gui.EditorTab;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.LocationInput;
 import com.ssplugins.preedit.nodes.EditorCanvas;
 import com.ssplugins.preedit.nodes.FreesizeHandle;
-import com.ssplugins.preedit.util.CanvasLayer;
-import com.ssplugins.preedit.util.ExpandableBounds;
+import com.ssplugins.preedit.util.calc.ExpandableBounds;
 import javafx.scene.Node;
 import javafx.scene.effect.PerspectiveTransform;
 

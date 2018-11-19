@@ -1,12 +1,12 @@
 package com.ssplugins.preedit.nodes;
 
+import com.ssplugins.preedit.edit.CanvasLayer;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.edit.NodeModule;
 import com.ssplugins.preedit.exceptions.SilentFailException;
-import com.ssplugins.preedit.util.CanvasLayer;
-import com.ssplugins.preedit.util.ExpandableBounds;
-import com.ssplugins.preedit.util.Range;
+import com.ssplugins.preedit.util.calc.ExpandableBounds;
+import com.ssplugins.preedit.util.data.Range;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;

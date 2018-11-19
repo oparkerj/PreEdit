@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.calc;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;

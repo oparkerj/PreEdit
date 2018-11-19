@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;

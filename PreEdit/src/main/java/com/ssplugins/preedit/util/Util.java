@@ -7,6 +7,7 @@ import com.ssplugins.preedit.edit.Module;
 import com.ssplugins.preedit.exceptions.InvalidInputException;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.nodes.EditorCanvas;
+import com.ssplugins.preedit.util.data.JsonConverter;
 import javafx.application.Platform;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.ObjectProperty;

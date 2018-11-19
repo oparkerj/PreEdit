@@ -1,5 +1,6 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.calc;
 
+import com.ssplugins.preedit.util.data.Range;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;

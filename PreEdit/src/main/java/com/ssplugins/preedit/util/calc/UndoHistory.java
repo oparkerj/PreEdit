@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.calc;
 
 import javafx.beans.property.Property;
 import javafx.scene.input.KeyCode;

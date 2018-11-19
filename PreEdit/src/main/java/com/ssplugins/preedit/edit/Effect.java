@@ -1,7 +1,6 @@
 package com.ssplugins.preedit.edit;
 
 import com.ssplugins.preedit.exceptions.SilentFailException;
-import com.ssplugins.preedit.util.CanvasLayer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;

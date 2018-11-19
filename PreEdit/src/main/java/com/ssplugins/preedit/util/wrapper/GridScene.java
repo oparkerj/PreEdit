@@ -1,4 +1,4 @@
-package com.ssplugins.preedit.util;
+package com.ssplugins.preedit.util.wrapper;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;

@@ -1,11 +1,11 @@
 package com.ssplugins.preedit.effects;
 
+import com.ssplugins.preedit.edit.CanvasLayer;
 import com.ssplugins.preedit.edit.Effect;
 import com.ssplugins.preedit.exceptions.SilentFailException;
 import com.ssplugins.preedit.input.InputMap;
 import com.ssplugins.preedit.input.NumberInput;
-import com.ssplugins.preedit.util.CanvasLayer;
-import com.ssplugins.preedit.util.Range;
+import com.ssplugins.preedit.util.data.Range;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
